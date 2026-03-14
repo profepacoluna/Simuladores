@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Actividades Interactivas</title>
+  <title>Simuladores Usicamm 2026</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
 
@@ -204,18 +204,6 @@
     }
     .card:hover .card-icon { transform: scale(1.1) rotate(-4deg); }
 
-    .card-tag {
-      display: inline-block;
-      font-size: .65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--accent);
-      background: color-mix(in srgb, var(--accent) 12%, white);
-      padding: 3px 9px;
-      border-radius: 50px;
-      margin-bottom: 8px;
-    }
 
     .card-title {
       font-family: 'Syne', sans-serif;
@@ -376,7 +364,7 @@
   <div class="header-brand">
     <div class="header-logo">🎓</div>
     <div class="header-title">
-      Actividades Interactivas
+      Simuladores Usicamm 2026
       <span>Prof. Francisco De Jesús Luna Benítez</span>
     </div>
   </div>
@@ -427,7 +415,6 @@
     {
       file:    'Simulador_LGDNNA.html',
       emoji:   '⚖️',
-      tag:     'Legislación',
       title:   'Simulador LGDNNA',
       desc:    'Ley General de los Derechos de Niñas, Niños y Adolescentes. Practica situaciones y aplica la normativa vigente.',
       accent:  'var(--c1)'
@@ -435,7 +422,6 @@
     {
       file:    'Simulador_Metodologias.html',
       emoji:   '🧠',
-      tag:     'Didáctica',
       title:   'Metodologías Sociocríticas',
       desc:    'Explora enfoques pedagógicos críticos y reflexivos para la transformación educativa y social.',
       accent:  'var(--c2)'
@@ -443,7 +429,6 @@
     {
       file:    'Simulador_Acoso_Escolar.html',
       emoji:   '🛡️',
-      tag:     'Convivencia',
       title:   'Protocolo: Acoso Escolar',
       desc:    'Simula el protocolo oficial de erradicación del bullying y aprende a intervenir correctamente.',
       accent:  'var(--c3)'
@@ -451,7 +436,6 @@
     {
       file:    'simulador_NEM_2022.html',
       emoji:   '🎒',
-      tag:     'Reforma',
       title:   'Simulador NEM 2022',
       desc:    'Conoce y practica los fundamentos de la Nueva Escuela Mexicana y su marco curricular.',
       accent:  'var(--c4)'
@@ -459,26 +443,23 @@
     {
       file:    'simulador_conflictos_escolares.html',
       emoji:   '🤝',
-      tag:     'Mediación',
       title:   'Resolución de Conflictos',
       desc:    'Aprende estrategias y técnicas de mediación para resolver conflictos escolares de forma pacífica.',
       accent:  'var(--c5)'
     },
     {
-      file:    'simulador_metodologias_2_.html',
-      emoji:   '🔬',
-      tag:     'Didáctica II',
-      title:   'Metodologías Sociocríticas II',
-      desc:    'Segunda parte del simulador de metodologías: profundiza en la práctica docente transformadora.',
-      accent:  'var(--c6)'
-    },
-    {
       file:    'simulador_vygotsky.html',
       emoji:   '🧩',
-      tag:     'Psicología',
       title:   'Simulador Vygotsky',
       desc:    'Zona de desarrollo próximo, andamiaje y aprendizaje social. Pon en práctica la teoría vygotskyiana.',
       accent:  'var(--c7)'
+    },
+    {
+      file:    'simulador_pnce.html',
+      emoji:   '📋',
+      title:   'Simulador PNCE 2026',
+      desc:    'Programa Nacional de Convivencia Escolar. Practica los protocolos y estrategias para una sana convivencia.',
+      accent:  'var(--c6)'
     }
   ];
 
@@ -494,7 +475,6 @@
     card.setAttribute('aria-label', 'Abrir ' + act.title);
     card.innerHTML = `
       <div class="card-icon">${act.emoji}</div>
-      <span class="card-tag">${act.tag}</span>
       <div class="card-title">${act.title}</div>
       <p class="card-desc">${act.desc}</p>
       <span class="card-cta">
@@ -520,7 +500,7 @@
     document.getElementById('viewerIcon').textContent    = act.emoji;
     document.getElementById('viewerIcon').style.background = `color-mix(in srgb, ${act.accent} 15%, white)`;
     document.getElementById('viewerTitle').textContent   = act.title;
-    document.getElementById('viewerSubtitle').textContent = act.tag + ' · ' + act.file;
+    document.getElementById('viewerSubtitle').textContent = act.file;
     spinner.style.borderTopColor = act.accent;
 
     // reset frame
