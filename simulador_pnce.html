@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador 2026 - PNCE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 900px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .header h2 {
+            font-size: 1.1em;
+            font-weight: normal;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.85;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            margin: 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .question-container.active {
+            display: flex;
+        }
+
+        .question-number {
+            background: #2d5016;
+            color: white;
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: #f5f5f5;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover {
+            background: #e8f5e9;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #2d5016;
+            background: #e8f5e9;
+        }
+
+        .option.correct {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .option-letter {
+            background: #2d5016;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .option.correct .option-letter {
+            background: #4CAF50;
+        }
+
+        .option.incorrect .option-letter {
+            background: #f44336;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1.05em;
+            color: #333;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-prev {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            background: #bdbdbd;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: 1;
+        }
+
+        .results-container.active {
+            display: flex;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .score-label {
+            font-size: 0.3em;
+            margin-top: 10px;
+        }
+
+        .results-details {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.4);
+        }
+
+        @media (max-height: 700px) {
+            .content {
+                padding: 20px;
+            }
+            .question-text {
+                font-size: 1.1em;
+                margin-bottom: 20px;
+            }
+            .option {
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simulador 2026</h1>
+            <h2>Programa Nacional de Convivencia Escolar</h2>
+            <p>Profesor Francisco De Jesús Luna Benitez</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="content" id="content">
+            <!-- Pregunta 1 -->
+            <div class="question-container active" data-question="1">
+                <div class="question-number">Reactivo 1 de 15</div>
+                <div class="question-text">Durante un Consejo Técnico Escolar, el profesor Alejandro comenta la importancia de que el maestro promueva aprendizajes dentro y fuera del aula para el fortalecimiento personal y el establecimiento de relaciones personales armónicas ¿A qué apartado del Programa Nacional de Convivencia Escolar hace alusión?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Antecedentes del documento</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Fundamentación conceptual</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Fundamentación legal</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()" disabled>← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 2 -->
+            <div class="question-container" data-question="2">
+                <div class="question-number">Reactivo 2 de 15</div>
+                <div class="question-text">Este eje se orienta a fortalecer la autovaloración de los alumnos. Implica la práctica de habilidades para que se conozcan, acepten lo que son y trabajen en lo que pueden ser mejor; aprecien sus características y cualidades personales, desarrollen actitudes de respeto y cuidado de sí y de los demás.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Autoconcepto y autoimagen</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Fortalecimiento de la autoestima</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 3 -->
+            <div class="question-container" data-question="3">
+                <div class="question-number">Reactivo 3 de 15</div>
+                <div class="question-text">En el grupo de la profesora Alaydi, realizarán un proyecto donde se abordará la temática de la importancia de preservar e impulsar el conocimiento de las culturas indígenas de nuestro país por los miembros de la comunidad escolar ¿Qué eje formativo del Programa Nacional de Convivencia Escolar abona la anterior situación?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Apego a las raíces históricas</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Identidad cultural</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Convivencia armónica, pacífica e inclusiva</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 4 -->
+            <div class="question-container" data-question="4">
+                <div class="question-number">Reactivo 4 de 15</div>
+                <div class="question-text">Este eje formativo del PNCE reconoce que la escuela y la familia enseñan a los alumnos formas de vivir y convivir, pero el hogar es también un espacio de aprendizaje, por lo que es vital abordar el eje de convivencia familiar y sus implicaciones en la vida escolar, así como favorecer la estrecha relación entre la familia y la escuela para trabajar en equipo y lograr la mejora de la convivencia escolar.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Comunicación y colaboración con las familias</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Convivencia armónica, pacífica e inclusiva</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Comunidad y escuela</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 5 -->
+            <div class="question-container" data-question="5">
+                <div class="question-number">Reactivo 5 de 15</div>
+                <div class="question-text">Elige la opción que señale los enunciados presentes en los objetivos específicos del PNCE.<br><br>I. Impulsar la participación informada y proactiva de las familias de las/os alumnas/os en escuelas públicas de educación básica, a favor de la convivencia escolar sana y pacífica.<br>II. Dotar de materiales e insumos necesarios para la implementación del presente plan<br>III. Coadyuvar a la prevención de situaciones de acoso escolar.<br>IV. Intervenir directamente en las situaciones conflictivas que acontecen en las escuelas para obtener mejores resultados<br>V. Fortalecer el Sistema Básico de Mejora Educativa en las escuelas beneficiadas en el PNCE.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">I, III, IV</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">I, III, V</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">II, IV, V</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 6 -->
+            <div class="question-container" data-question="6">
+                <div class="question-number">Reactivo 6 de 15</div>
+                <div class="question-text">Elige el material del PNCE que brinda orientaciones didácticas respecto de los temas que integran el programa, y sobre las actividades que los alumnos realizan en cada una de las sesiones.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Cuaderno de actividades para el alumno</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Guía para el docente</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Manual para el docente</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 7 -->
+            <div class="question-container" data-question="7">
+                <div class="question-number">Reactivo 7 de 15</div>
+                <div class="question-text">El profesor Arnulfo menciona que ha observado que en su escuela existen diversas problemáticas en cuanto a la convivencia entre los estudiantes, situación que el docente de Educación Física ha informado con anterioridad. Del siguiente listado de temas de los materiales ¿Cuáles pudiera priorizar para el trabajo áulico para la atención de dicha problemática?<br><br>I. Autoestima. Me conozco y me quiero como soy.<br>II. Expreso y manejo mis emociones.<br>III. Convivo con los demás y los respeto.<br>IV. Las reglas: acuerdos de convivencia.<br>V. Resolución pacífica de conflictos.<br>VI. Todas las familias son importantes.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">I, II, VI</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">II, III, VI</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">III, IV, V</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 8 -->
+            <div class="question-container" data-question="8">
+                <div class="question-number">Reactivo 8 de 15</div>
+                <div class="question-text">¿Cuál es el propósito de los talleres para madres, padres y tutores propuestos en el Manual de trabajo?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Fortalecer el importante vínculo de la familia con los docentes y directores, con el fin de promover estrategias y prácticas de crianza que mejoren la convivencia familiar y contribuyan a la convivencia armónica, pacífica e inclusiva en la escuela</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Ser un referente de comunicación para la evaluación auténtica de los ejes que componen el Programa Nacional de Convivencia Escolar</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Establecer protocolos de actuación de cómo las madres, padres y tutores deben de actuar conforme a un manual que delimita sus acciones para homogeneizar sus respuestas ante los conflictos que se puedan vivir desde los hogares</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 9 -->
+            <div class="question-container" data-question="9">
+                <div class="question-number">Reactivo 9 de 15</div>
+                <div class="question-text">¿Qué actividad puede favorecer el logro del eje Expresión y autorregulación de emociones?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">La representación de un cuento mediante el uso de marionetas donde el protagonista tenga miedo a las alturas</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Elaboración de un tríptico donde se informe sobre los cambios fisiológicos que provocan las diversas emociones</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Dinámica donde los estudiantes elijan un color que represente las emociones que sienten en ese momento y, reunidos en parejas, dialogar sobre sus emociones</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 10 -->
+            <div class="question-container" data-question="10">
+                <div class="question-number">Reactivo 10 de 15</div>
+                <div class="question-text">En el grupo de 5to grado, se está realizando una actividad donde los estudiantes analizan el caso de cómo administrar el agua potable de una comunidad dividiendo el recurso principalmente entre la escuela, el hospital y los hogares con la intención de que cada uno funcione de la mejor manera. Se hacen equipos de trabajo donde cada uno elabora su propuesta. Para concluir, cada equipo comparte sus propuestas y eligen la más viable. Con base en la actividad ¿Qué eje del PNCE se está fortaleciendo?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Convivencia armónica, pacífica e inclusiva</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Respeto de turnos para participar</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Manejo y resolución de conflictos</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 11 -->
+            <div class="question-container" data-question="11">
+                <div class="question-number">Reactivo 11 de 15</div>
+                <div class="question-text">Este eje involucra el desarrollo de habilidades para la negociación, la mediación y el arbitraje, como el diálogo, la empatía y la escucha activa, entre otras.</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Manejo y resolución de conflictos</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Promoción de la cultura de la paz</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 12 -->
+            <div class="question-container" data-question="12">
+                <div class="question-number">Reactivo 12 de 15</div>
+                <div class="question-text">Es la habilidad para percibir, comprender, asimilar y regular las emociones propias y la de los demás</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Gestión de emociones</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Inteligencia emocional</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 13 -->
+            <div class="question-container" data-question="13">
+                <div class="question-number">Reactivo 13 de 15</div>
+                <div class="question-text">La maestra Angélica se encuentra realizando una actividad donde sus estudiantes realizarán un dibujo libre donde utilicen diversos colores para expresar sus sentimientos. Al finalizar, todos compartirán sus producciones ¿Qué eje formativo del PNCE está favoreciendo?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Fortalecimiento de la autoestima</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Inteligencia emocional</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 14 -->
+            <div class="question-container" data-question="14">
+                <div class="question-number">Reactivo 14 de 15</div>
+                <div class="question-text">Este eje está orientado a que los alumnos reconozcan, regulen y comuniquen adecuadamente sus emociones, lo cual requiere habilidades para identificar lo que sienten y poderlo expresar en forma asertiva</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Fortalecimiento de la autoestima</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Manejo y resolución de conflictos</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="nextQuestion()">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Pregunta 15 -->
+            <div class="question-container" data-question="15">
+                <div class="question-number">Reactivo 15 de 15</div>
+                <div class="question-text">La maestra Adriana se encuentra realizando una dinámica donde sus estudiantes deberán de redactar una carta dirigida a sí mismos donde escriban cualidades que les gusta de su propia personalidad ¿Qué eje del PNCE está favoreciendo?</div>
+                <div class="options">
+                    <div class="option" data-answer="A">
+                        <div class="option-letter">A</div>
+                        <div class="option-text">Inteligencia emocional</div>
+                    </div>
+                    <div class="option" data-answer="B">
+                        <div class="option-letter">B</div>
+                        <div class="option-text">Fortalecimiento de la autoestima</div>
+                    </div>
+                    <div class="option" data-answer="C">
+                        <div class="option-letter">C</div>
+                        <div class="option-text">Expresión y autorregulación de emociones</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-prev" onclick="previousQuestion()">← Anterior</button>
+                    <button class="btn-next" onclick="showResults()">Ver Resultados</button>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="results-container">
+                <div class="score-circle" id="scoreCircle">
+                    <div id="scorePercentage">0%</div>
+                    <div class="score-label">Calificación</div>
+                </div>
+                <div class="results-details" id="resultsDetails"></div>
+                <button class="btn-restart" onclick="restartQuiz()">🔄 Reiniciar Simulador</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctAnswers = {
+            1: 'B', 2: 'C', 3: 'C', 4: 'A', 5: 'B',
+            6: 'B', 7: 'C', 8: 'A', 9: 'C', 10: 'C',
+            11: 'A', 12: 'C', 13: 'B', 14: 'A', 15: 'B'
+        };
+
+        let currentQuestion = 1;
+        let userAnswers = {};
+        let quizFinished = false;
+
+        // Selección de opciones
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (quizFinished) return;
+                
+                const container = this.closest('.question-container');
+                const questionNum = parseInt(container.dataset.question);
+                
+                // Remover selección previa
+                container.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Marcar como seleccionada
+                this.classList.add('selected');
+                userAnswers[questionNum] = this.dataset.answer;
+                
+                updateProgress();
+            });
+        });
+
+        function updateProgress() {
+            const answered = Object.keys(userAnswers).length;
+            const progress = (answered / 15) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 15) {
+                document.querySelectorAll('.question-container')[currentQuestion - 1].classList.remove('active');
+                currentQuestion++;
+                document.querySelectorAll('.question-container')[currentQuestion - 1].classList.add('active');
+                
+                // Actualizar estado de botones
+                document.querySelectorAll('.btn-prev').forEach(btn => {
+                    btn.disabled = currentQuestion === 1;
+                });
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 1) {
+                document.querySelectorAll('.question-container')[currentQuestion - 1].classList.remove('active');
+                currentQuestion--;
+                document.querySelectorAll('.question-container')[currentQuestion - 1].classList.add('active');
+                
+                // Actualizar estado de botones
+                document.querySelectorAll('.btn-prev').forEach(btn => {
+                    btn.disabled = currentQuestion === 1;
+                });
+            }
+        }
+
+        function showResults() {
+            quizFinished = true;
+            
+            // Calcular resultados
+            let correct = 0;
+            for (let i = 1; i <= 15; i++) {
+                if (userAnswers[i] === correctAnswers[i]) {
+                    correct++;
+                }
+            }
+            
+            const percentage = Math.round((correct / 15) * 100);
+            
+            // Mostrar respuestas correctas/incorrectas
+            for (let i = 1; i <= 15; i++) {
+                const container = document.querySelectorAll('.question-container')[i - 1];
+                const options = container.querySelectorAll('.option');
+                
+                options.forEach(option => {
+                    const answer = option.dataset.answer;
+                    option.style.cursor = 'default';
+                    
+                    if (answer === correctAnswers[i]) {
+                        option.classList.add('correct');
+                    } else if (answer === userAnswers[i] && answer !== correctAnswers[i]) {
+                        option.classList.add('incorrect');
+                    }
+                });
+            }
+            
+            // Ocultar preguntas y mostrar resultados
+            document.querySelectorAll('.question-container').forEach(q => q.classList.remove('active'));
+            document.querySelector('.results-container').classList.add('active');
+            
+            // Actualizar resultados
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('resultsDetails').innerHTML = 
+                `<strong>${correct} de 15 respuestas correctas</strong><br>` +
+                `${15 - correct} incorrectas`;
+            
+            // Color del círculo según calificación
+            const circle = document.getElementById('scoreCircle');
+            if (percentage >= 80) {
+                circle.style.background = 'linear-gradient(135deg, #4CAF50, #81C784)';
+            } else if (percentage >= 60) {
+                circle.style.background = 'linear-gradient(135deg, #FF9800, #FFB74D)';
+            } else {
+                circle.style.background = 'linear-gradient(135deg, #f44336, #e57373)';
+            }
+            
+            // Barra de progreso al 100%
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 1;
+            userAnswers = {};
+            quizFinished = false;
+            
+            // Resetear todas las opciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                option.style.cursor = 'pointer';
+            });
+            
+            // Mostrar primera pregunta
+            document.querySelector('.results-container').classList.remove('active');
+            document.querySelectorAll('.question-container')[0].classList.add('active');
+            
+            // Resetear barra de progreso
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Deshabilitar botón anterior
+            document.querySelectorAll('.btn-prev').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+    </script>
+</body>
+</html>
