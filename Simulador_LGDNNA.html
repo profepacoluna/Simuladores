@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ============================================================
+       META Y CONFIGURACIÓN BÁSICA
+       ============================================================ -->
+  <meta charset="UTF-8" />
+  <!-- Viewport: evita deformación en móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador LGDNNA – Prof. Francisco De Jesus Luna Benitez</title>
+
+  <!-- Google Fonts: Nunito (cuerpo) + Outfit (títulos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- ============================================================
+       ESTILOS CSS – Todo en un único archivo
+       ============================================================ -->
+  <style>
+    /* ── Variables de color (tema azul claro / blanco) ─────────── */
+    :root {
+      --azul-oscuro: #1a3a6b;
+      --azul-medio: #2563eb;
+      --azul-claro: #3b82f6;
+      --azul-suave: #dbeafe;
+      --azul-hover: #1d4ed8;
+      --verde: #10b981;
+      --verde-suave: #d1fae5;
+      --rojo: #ef4444;
+      --rojo-suave: #fee2e2;
+      --amarillo: #f59e0b;
+      --amarillo-suave: #fef3c7;
+      --blanco: #ffffff;
+      --gris-fondo: #f0f6ff;
+      --gris-borde: #c7d8f5;
+      --gris-texto: #374151;
+      --gris-claro: #6b7280;
+      --sombra: 0 4px 24px rgba(37,99,235,0.12);
+      --radio: 14px;
+    }
+
+    /* ── Reset y base ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--gris-fondo);
+      color: var(--gris-texto);
+      min-height: 100vh;
+      /* Evita desbordamiento horizontal en móviles */
+      overflow-x: hidden;
+    }
+
+    /* ── ENCABEZADO ──────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+      color: var(--blanco);
+      padding: 1rem 1.25rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1rem, 3.5vw, 1.5rem); /* escala con la pantalla */
+      letter-spacing: 0.5px;
+    }
+    header p {
+      font-size: clamp(0.72rem, 2vw, 0.9rem);
+      opacity: 0.88;
+      margin-top: 0.2rem;
+    }
+    /* Barra de progreso dentro del header */
+    #barra-progreso-wrap {
+      background: rgba(255,255,255,0.2);
+      border-radius: 99px;
+      height: 6px;
+      margin-top: 0.6rem;
+      overflow: hidden;
+    }
+    #barra-progreso {
+      background: #7dd3fc;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 99px;
+    }
+
+    /* ── CONTENEDOR PRINCIPAL (centrado, máx 780px) ─────────────── */
+    .contenedor {
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem; /* padding lateral relativo */
+    }
+
+    /* ── TARJETA GENÉRICA ────────────────────────────────────────── */
+    .card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--gris-borde);
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── PANTALLA DE BIENVENIDA ──────────────────────────────────── */
+    #pantalla-bienvenida { text-align: center; }
+    #pantalla-bienvenida .icono-titulo {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    #pantalla-bienvenida h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.25rem, 4vw, 1.8rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.4rem;
+    }
+    #pantalla-bienvenida p {
+      color: var(--gris-claro);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+    /* Chips de info */
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1.4rem; }
+    .chip {
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-radius: 99px;
+      padding: 0.3rem 0.8rem;
+    }
+    /* Input de nombre */
+    .campo-nombre { margin-bottom: 1.2rem; }
+    .campo-nombre label {
+      display: block;
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .campo-nombre input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gris-borde);
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      color: var(--gris-texto);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .campo-nombre input:focus { border-color: var(--azul-claro); }
+
+    /* ── BOTONES ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.8rem;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-primario {
+      background: var(--azul-medio);
+      color: var(--blanco);
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+      width: 100%;
+    }
+    .btn-primario:hover { background: var(--azul-hover); box-shadow: 0 6px 18px rgba(37,99,235,0.45); }
+    .btn-secundario {
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      width: 100%;
+      margin-top: 0.7rem;
+    }
+    .btn-secundario:hover { background: #bfdbfe; }
+
+    /* ── BARRA SUPERIOR DEL EXAMEN (timer + pregunta) ────────────── */
+    #barra-examen {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 0.85rem 1.2rem;
+      box-shadow: var(--sombra);
+      border: 1px solid var(--gris-borde);
+      margin-bottom: 1.2rem;
+      /* Sticky debajo del header */
+      position: sticky;
+      top: 80px;
+      z-index: 90;
+    }
+    .info-pregunta {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--azul-oscuro);
+    }
+    .info-pregunta span {
+      background: var(--azul-suave);
+      border-radius: 99px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+    /* Timer */
+    #timer-box {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--azul-oscuro);
+      background: var(--azul-suave);
+      border-radius: 10px;
+      padding: 0.35rem 0.85rem;
+      transition: background 0.4s, color 0.4s;
+    }
+    #timer-box.urgente { background: var(--rojo-suave); color: var(--rojo); animation: pulso 1s infinite; }
+    @keyframes pulso { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+
+    /* ── TARJETA DE PREGUNTA ─────────────────────────────────────── */
+    #card-pregunta { position: relative; }
+    .etiqueta-tipo {
+      display: inline-block;
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      font-weight: 700;
+      font-size: 0.75rem;
+      border-radius: 99px;
+      padding: 0.2rem 0.75rem;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #num-pregunta {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      color: var(--gris-claro);
+      margin-bottom: 0.3rem;
+    }
+    #texto-pregunta {
+      font-size: clamp(0.95rem, 2.5vw, 1.08rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      line-height: 1.7;
+      margin-bottom: 1.3rem;
+    }
+
+    /* Tabla de relación de elementos */
+    .tabla-relacion {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: 0.88rem;
+    }
+    .tabla-relacion th {
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      font-weight: 800;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      border-bottom: 2px solid var(--gris-borde);
+    }
+    .tabla-relacion td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid #e5edff;
+      vertical-align: top;
+    }
+    .tabla-relacion tr:nth-child(even) td { background: #f5f9ff; }
+
+    /* ── OPCIONES ────────────────────────────────────────────────── */
+    #lista-opciones { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    #lista-opciones li {
+      border: 2px solid var(--gris-borde);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.12s;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+    }
+    #lista-opciones li:hover { border-color: var(--azul-claro); background: #f0f6ff; transform: translateX(3px); }
+    /* Letra de opción */
+    .opcion-letra {
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      min-width: 2.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.18s, color 0.18s;
+    }
+    .opcion-texto {
+      padding: 0.85rem 1rem;
+      font-size: clamp(0.88rem, 2.2vw, 0.97rem);
+      line-height: 1.55;
+    }
+    /* Seleccionada */
+    #lista-opciones li.seleccionada { border-color: var(--azul-claro); background: var(--azul-suave); }
+    #lista-opciones li.seleccionada .opcion-letra { background: var(--azul-claro); color: var(--blanco); }
+    /* Correcta */
+    #lista-opciones li.correcta { border-color: var(--verde); background: var(--verde-suave); }
+    #lista-opciones li.correcta .opcion-letra { background: var(--verde); color: var(--blanco); }
+    /* Incorrecta */
+    #lista-opciones li.incorrecta { border-color: var(--rojo); background: var(--rojo-suave); }
+    #lista-opciones li.incorrecta .opcion-letra { background: var(--rojo); color: var(--blanco); }
+    /* Bloqueada (ya respondida) */
+    #lista-opciones li.bloqueada { cursor: default; }
+    #lista-opciones li.bloqueada:hover { transform: none; }
+
+    /* ── RETROALIMENTACIÓN ───────────────────────────────────────── */
+    #retroalimentacion {
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    #retroalimentacion.correcto { background: var(--verde-suave); color: #065f46; border-left: 4px solid var(--verde); }
+    #retroalimentacion.incorrecto { background: var(--rojo-suave); color: #991b1b; border-left: 4px solid var(--rojo); }
+    #retroalimentacion strong { display: block; margin-bottom: 0.3rem; }
+
+    /* ── NAVEGACIÓN ──────────────────────────────────────────────── */
+    #nav-botones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+    }
+    #nav-botones .btn { width: 100%; }
+    /* Botón "Entregar" ocupa todo el ancho */
+    #btn-entregar { grid-column: 1 / -1; background: var(--verde); color: var(--blanco); display: none; }
+    #btn-entregar:hover { background: #059669; }
+
+    /* ── MAPA DE PREGUNTAS ───────────────────────────────────────── */
+    #mapa-titulo { font-weight: 800; color: var(--azul-oscuro); font-size: 0.9rem; margin-bottom: 0.7rem; }
+    #mapa-preguntas {
+      display: grid;
+      /* Columnas que se adaptan: mínimo 36px, máximo libres */
+      grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+      gap: 6px;
+    }
+    .mapa-btn {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid var(--gris-borde);
+      background: var(--blanco);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      color: var(--gris-claro);
+    }
+    .mapa-btn:hover { border-color: var(--azul-claro); }
+    .mapa-btn.actual { border-color: var(--azul-medio); background: var(--azul-suave); color: var(--azul-oscuro); }
+    .mapa-btn.respondida { background: var(--azul-medio); border-color: var(--azul-medio); color: var(--blanco); }
+    .mapa-btn.correcta-mapa { background: var(--verde); border-color: var(--verde); color: var(--blanco); }
+    .mapa-btn.incorrecta-mapa { background: var(--rojo); border-color: var(--rojo); color: var(--blanco); }
+
+    /* ── PANTALLA DE RESULTADOS ──────────────────────────────────── */
+    #pantalla-resultado { text-align: center; display: none; }
+    #pantalla-resultado .icono-resultado { font-size: 4rem; display: block; margin-bottom: 0.5rem; }
+    #pantalla-resultado h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.4rem;
+    }
+    #pantalla-resultado .nombre-resultado {
+      font-size: 1rem;
+      color: var(--gris-claro);
+      margin-bottom: 1.2rem;
+    }
+    /* Círculo de calificación */
+    .circulo-cal {
+      width: clamp(110px, 25vw, 140px);
+      height: clamp(110px, 25vw, 140px);
+      border-radius: 50%;
+      border: 6px solid var(--azul-medio);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      background: var(--azul-suave);
+    }
+    .circulo-cal .num-cal {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 7vw, 2.8rem);
+      color: var(--azul-oscuro);
+      line-height: 1;
+    }
+    .circulo-cal .den-cal { font-size: 0.85rem; color: var(--gris-claro); font-weight: 700; }
+    /* Estadísticas de resultado */
+    .stats-resultado {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.3rem;
+    }
+    .stat-item {
+      border-radius: 12px;
+      padding: 0.85rem 0.5rem;
+      font-weight: 700;
+    }
+    .stat-item .stat-num { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; display: block; }
+    .stat-item.correctas { background: var(--verde-suave); color: #065f46; }
+    .stat-item.incorrectas { background: var(--rojo-suave); color: #991b1b; }
+    .stat-item.tiempo { background: var(--amarillo-suave); color: #92400e; }
+    /* Mensaje de calificación */
+    #mensaje-cal {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    #mensaje-cal.aprobado { background: var(--verde-suave); color: #065f46; }
+    #mensaje-cal.reprobado { background: var(--rojo-suave); color: #991b1b; }
+
+    /* ── REVISIÓN DE RESPUESTAS ──────────────────────────────────── */
+    #seccion-revision { display: none; }
+    .item-revision {
+      background: var(--blanco);
+      border-radius: 12px;
+      border: 1px solid var(--gris-borde);
+      padding: 1.1rem 1.2rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.93rem;
+    }
+    .item-revision .num-rev {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      color: var(--azul-oscuro);
+      margin-bottom: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .item-revision .pregunta-rev { font-weight: 700; color: var(--gris-texto); line-height: 1.6; margin-bottom: 0.5rem; }
+    .item-revision .resp-item { font-size: 0.88rem; padding: 0.3rem 0; }
+    .item-revision .resp-item.cor { color: #065f46; font-weight: 700; }
+    .item-revision .resp-item.inco { color: #991b1b; font-weight: 700; }
+    .item-revision .explicacion-rev {
+      margin-top: 0.5rem;
+      font-size: 0.86rem;
+      color: #374151;
+      line-height: 1.6;
+      background: var(--azul-suave);
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      color: var(--gris-claro);
+      font-size: 0.78rem;
+      padding: 1.5rem 1rem;
+    }
+
+    /* ── RESPONSIVE: pantallas muy pequeñas < 400px ─────────────── */
+    @media (max-width: 400px) {
+      .card { padding: 1.2rem 1rem; }
+      #nav-botones { grid-template-columns: 1fr; }
+      #btn-entregar { grid-column: 1; }
+    }
+
+    /* ── Ocultar secciones por defecto ────────────────────────────── */
+    #pantalla-examen    { display: none; }
+
+    /* ── Modal de confirmación personalizado ─────────────────────── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,30,80,0.55);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #modal-overlay.activo { display: flex; }
+    #modal-box {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 1.8rem 1.5rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      animation: fadeIn 0.25s ease;
+    }
+    #modal-box .modal-icono { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+    #modal-box h3 { font-family:'Outfit',sans-serif; color:var(--azul-oscuro); font-size:1.15rem; margin-bottom:0.5rem; }
+    #modal-box p  { color:var(--gris-claro); font-size:0.9rem; line-height:1.6; margin-bottom:1.2rem; }
+    .modal-btns   { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+    .modal-btns .btn { width:100%; padding:0.65rem 0.5rem; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       ENCABEZADO STICKY CON BARRA DE PROGRESO
+       ============================================================ -->
+  <header>
+    <h1>📚 Simulador de Conocimientos · LGDNNA</h1>
+    <p>Prof. Francisco De Jesus Luna Benitez</p>
+    <div id="barra-progreso-wrap"><div id="barra-progreso"></div></div>
+  </header>
+
+  <!-- ============================================================
+       CONTENEDOR PRINCIPAL (centrado y responsive)
+       ============================================================ -->
+  <main class="contenedor">
+
+    <!-- ── PANTALLA 1: BIENVENIDA / SOLICITAR NOMBRE ──────────── -->
+    <div id="pantalla-bienvenida">
+      <div class="card">
+        <span class="icono-titulo">🏛️</span>
+        <h2>Ley General de los Derechos de Niñas, Niños y Adolescentes</h2>
+        <p>Este simulador evalúa tu conocimiento sobre los pilares fundamentales de la <strong>LGDNNA</strong>. Contiene <strong>40 reactivos</strong> con formatos de cuestionamiento directo, completamiento, ordenamiento y relación de elementos.</p>
+
+        <!-- Chips informativos -->
+        <div class="chips">
+          <span class="chip">📝 40 reactivos</span>
+          <span class="chip">⏱️ 90 minutos</span>
+          <span class="chip">✅ 3 opciones por pregunta</span>
+          <span class="chip">📖 LGDNNA</span>
+        </div>
+
+        <!-- Campo para capturar el nombre del participante -->
+        <div class="campo-nombre">
+          <label for="input-nombre">👤 Ingresa tu nombre completo para comenzar:</label>
+          <input type="text" id="input-nombre" placeholder="Ejemplo: María García López" autocomplete="name" />
+        </div>
+
+        <button class="btn btn-primario" onclick="iniciarExamen()">🚀 Iniciar simulador</button>
+      </div>
+    </div>
+
+    <!-- ── PANTALLA 2: EXAMEN ──────────────────────────────────── -->
+    <div id="pantalla-examen">
+
+      <!-- Barra superior: número de pregunta + timer -->
+      <div id="barra-examen">
+        <div class="info-pregunta">
+          Pregunta <span id="label-num">1 / 40</span>
+        </div>
+        <!-- Temporizador de 90 minutos -->
+        <div id="timer-box">⏱️ <span id="timer-display">90:00</span></div>
+      </div>
+
+      <!-- Tarjeta con la pregunta activa -->
+      <div class="card" id="card-pregunta">
+        <div class="etiqueta-tipo" id="etiqueta-tipo">Cuestionamiento directo</div>
+        <p id="num-pregunta">Pregunta 1 de 40</p>
+        <!-- Contexto de tabla (para reactivos de relación / tabla) -->
+        <div id="contexto-tabla" style="display:none; margin-bottom:1rem;"></div>
+        <p id="texto-pregunta"></p>
+        <ul id="lista-opciones"></ul>
+        <div id="retroalimentacion"></div>
+        <!-- Botones: Anterior / Siguiente / Entregar -->
+        <div id="nav-botones">
+          <button class="btn btn-secundario" id="btn-anterior" onclick="navegarPregunta(-1)">← Anterior</button>
+          <button class="btn btn-primario" id="btn-siguiente" onclick="navegarPregunta(1)">Siguiente →</button>
+          <button class="btn" id="btn-entregar" onclick="confirmarEntrega()">📩 Entregar examen</button>
+        </div>
+      </div>
+
+      <!-- Mapa de navegación de preguntas -->
+      <div class="card">
+        <p id="mapa-titulo">🗺️ Navegador de preguntas (haz clic para ir a cualquier pregunta)</p>
+        <div id="mapa-preguntas"></div>
+      </div>
+    </div>
+
+    <!-- ── PANTALLA 3: RESULTADOS ─────────────────────────────── -->
+    <div id="pantalla-resultado">
+      <div class="card">
+        <span class="icono-resultado" id="icono-resultado">🏆</span>
+        <h2 id="titulo-resultado">¡Examen completado!</h2>
+        <p class="nombre-resultado" id="nombre-resultado-display"></p>
+
+        <!-- Círculo con calificación -->
+        <div class="circulo-cal">
+          <span class="num-cal" id="cal-numero">0</span>
+          <span class="den-cal" id="den-cal">de 40</span>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-resultado">
+          <div class="stat-item correctas"><span class="stat-num" id="stat-cor">0</span>✅ Correctas</div>
+          <div class="stat-item incorrectas"><span class="stat-num" id="stat-inc">0</span>❌ Incorrectas</div>
+          <div class="stat-item tiempo"><span class="stat-num" id="stat-tiempo">--</span>⏱️ Tiempo</div>
+        </div>
+
+        <!-- Mensaje aprobado / reprobado -->
+        <div id="mensaje-cal"></div>
+
+        <!-- Botones de acción -->
+        <button class="btn btn-primario" onclick="verRevision()">🔍 Revisar respuestas</button>
+        <button class="btn btn-secundario" onclick="reiniciarExamen()">🔄 Volver a intentar</button>
+      </div>
+    </div>
+
+    <!-- ── SECCIÓN DE REVISIÓN DETALLADA ─────────────────────── -->
+    <div id="seccion-revision">
+      <div class="card">
+        <h2 style="font-family:'Outfit',sans-serif;color:var(--azul-oscuro);margin-bottom:1rem;">📋 Revisión de respuestas</h2>
+        <div id="lista-revision"></div>
+        <button class="btn btn-primario" onclick="ocultarRevision()" style="margin-top:0.5rem;">⬆️ Regresar a resultados</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── MODAL DE CONFIRMACIÓN ──────────────────────────────────── -->
+  <div id="modal-overlay">
+    <div id="modal-box">
+      <span class="modal-icono">📩</span>
+      <h3 id="modal-titulo">¿Entregar examen?</h3>
+      <p id="modal-mensaje">¿Estás seguro de que deseas entregar el examen?</p>
+      <div class="modal-btns">
+        <button class="btn btn-secundario" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primario" id="modal-confirmar" onclick="entregarExamen(false)">Entregar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2025 · Prof. Francisco De Jesus Luna Benitez · Simulador LGDNNA</footer>
+
+  <!-- ============================================================
+       JAVASCRIPT – Lógica del simulador
+       ============================================================ -->
+  <script>
+    // ──────────────────────────────────────────────────────────────
+    // BANCO DE 40 PREGUNTAS
+    // Formatos: "directo", "completamiento", "ordenamiento", "relacion"
+    // correcto: índice 0-based de la opción correcta
+    // ──────────────────────────────────────────────────────────────
+    const preguntas = [
+
+      // ── 1-15: CUESTIONAMIENTO DIRECTO ──────────────────────────
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Cuántos derechos fundamentales enuncia el Artículo 13 de la LGDNNA?",
+        opciones: ["15 derechos", "20 derechos", "25 derechos"],
+        correcto: 1,
+        explicacion: "El Artículo 13 enuncia 20 derechos fundamentales que la guía agrupa en 5 pilares estratégicos."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué principio establece que siempre se elegirá la interpretación legal que mayor beneficio otorgue a la niñez cuando existan distintas interpretaciones?",
+        opciones: ["Igualdad Sustantiva", "Interés Superior de la Niñez", "No Discriminación"],
+        correcto: 1,
+        explicacion: "El Interés Superior de la Niñez (Art. 2 y 3) es la consideración primordial en la toma de decisiones y guía la interpretación legal en favor de los menores."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué artículo de la LGDNNA establece el Derecho a la Identidad, que incluye nombre, apellidos, nacionalidad y conocer la filiación?",
+        opciones: ["Art. 17", "Art. 21 y 22", "Art. 19"],
+        correcto: 2,
+        explicacion: "El Art. 19 regula el Derecho a la Identidad, señalando que la falta de documentación no será obstáculo para garantizar los derechos del menor."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Cuál es la transformación central que realiza la LGDNNA respecto a niñas, niños y adolescentes en el ámbito jurídico?",
+        opciones: [
+          "De sujetos de derechos a objetos de protección institucional",
+          "De objetos de protección a titulares plenos de derechos",
+          "De beneficiarios de programas sociales a sujetos tutelados"
+        ],
+        correcto: 1,
+        explicacion: "La LGDNNA transforma la visión jurídica: los menores dejan de ser objetos de protección para convertirse en titulares plenos de derechos."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué artículo de la LGDNNA obliga a que los presupuestos incluyan la asignación de recursos para cumplir con los derechos de la niñez, bajo el principio 'no hay derechos sin presupuesto'?",
+        opciones: ["Solo el Art. 13", "Art. 2 y 3", "Art. 36 y 37"],
+        correcto: 1,
+        explicacion: "La Garantía Presupuestal (Art. 2 y 3) establece la obligación ineludible de incorporar en los presupuestos los recursos para cumplir la ley."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Cuáles son las tres obligaciones concretas que impone el Derecho de Prioridad (Art. 17) a la sociedad y al Estado?",
+        opciones: [
+          "Protección y socorro; registro de nacimiento; diseño de políticas",
+          "Protección y socorro; atención preferente en servicios; diseño de políticas públicas",
+          "Atención en servicios; educación gratuita; acceso a la justicia"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 17 obliga a: 1) brindar auxilio prioritario en emergencias, 2) atender a menores antes que adultos en los servicios, y 3) considerarlos eje central en políticas públicas."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "El Art. 39 de la LGDNNA prohíbe restringir los derechos de los menores por causas como origen étnico, género o condición socioeconómica. ¿A qué tipo de igualdad corresponde este artículo?",
+        opciones: ["Igualdad Sustantiva", "Autonomía Progresiva", "Igualdad Formal – Derecho a la No Discriminación"],
+        correcto: 2,
+        explicacion: "El Art. 39 regula la Igualdad Formal a través del Derecho a la No Discriminación, prohibiendo restricciones basadas en características personales."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Bajo qué condición el Principio de No Separación (Art. 23) permite que un niño sea separado de quien ejerce la patria potestad?",
+        opciones: [
+          "Nunca puede ocurrir bajo ninguna circunstancia",
+          "Solo por orden de autoridad competente, mediante debido proceso y como último recurso para preservar su Interés Superior",
+          "Solo cuando los padres lo soliciten voluntariamente a las autoridades"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 23 establece que la separación únicamente es posible mediante orden de autoridad competente, con debido proceso y como último recurso."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "Según el Art. 50 de la LGDNNA, ¿cuánto tiempo se fomenta la lactancia materna exclusiva antes de introducir alimentación complementaria?",
+        opciones: ["3 meses", "6 meses", "12 meses"],
+        correcto: 1,
+        explicacion: "El Art. 50 promueve la lactancia materna exclusiva durante los primeros 6 meses y la lactancia complementaria hasta los 2 años."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué establece el Art. 60 de la LGDNNA sobre el juego y la recreación en la vida de los menores?",
+        opciones: [
+          "Son actividades complementarias no esenciales que pueden limitarse",
+          "Son factores primordiales del desarrollo; imponer regímenes desproporcionados que los menoscaben es ilegal",
+          "Solo aplican en el ámbito escolar y deben ser supervisados"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 60 reconoce el juego y la recreación como factores primordiales del desarrollo, siendo ilegal imponer regímenes que limiten este derecho."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Cuál es la diferencia fundamental entre Igualdad Formal e Igualdad Sustantiva en el marco de la LGDNNA?",
+        opciones: [
+          "La igualdad formal garantiza todos los derechos; la sustantiva es solo aspiracional",
+          "La igualdad formal trata a todos igual; la sustantiva obliga al Estado a adoptar Acciones Afirmativas para eliminar barreras estructurales",
+          "La igualdad formal aplica a adultos; la sustantiva aplica exclusivamente a menores"
+        ],
+        correcto: 1,
+        explicacion: "La Igualdad Sustantiva (Art. 36 y 37) reconoce que no basta tratar a todos igual; el Estado debe adoptar medidas especiales temporales (Acciones Afirmativas) para nivelar las condiciones."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "Según el Art. 87, ¿cuál es el tratamiento jurídico que corresponde a niñas y niños menores de 12 años cuando cometen una conducta tipificada como delito?",
+        opciones: [
+          "Pueden ser sujetos de procedimiento penal con supervisión especial",
+          "Son exentos de responsabilidad penal y únicamente son sujetos de asistencia social para la restitución de derechos",
+          "Deben ser juzgados por un sistema especializado para menores"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 87 establece la Exención de Responsabilidad Penal: los menores de 12 años no pueden ser privados de libertad ni sujetos a procedimiento penal."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué concepto de la LGDNNA describe específicamente el derecho de los menores a acceder a las TIC, incluyendo banda ancha e internet, como parte de su integración a la sociedad de la información?",
+        opciones: ["Uso Seguro Digital", "Acceso Universal (Art. 101 Bis)", "Protección Activa contra el ciberacoso"],
+        correcto: 1,
+        explicacion: "El Art. 101 Bis establece el Acceso Universal: el derecho a las Tecnologías de la Información y Comunicación es un derecho consagrado que el Estado debe garantizar."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿En cuántos pilares estratégicos se agrupan los 20 derechos del Art. 13 en la guía de estudio de los Pilares de la LGDNNA?",
+        opciones: ["3 pilares", "4 pilares", "5 pilares"],
+        correcto: 2,
+        explicacion: "Los 20 derechos del Art. 13 se organizan en 5 pilares: Los Cimientos, Supervivencia y Familia, Desarrollo Integral, Voz y Privacidad, y Fronteras y Justicia."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Qué concepto describe el proceso por el cual el menor va adquiriendo gradualmente mayor capacidad de decidir conforme avanza en edad y madurez?",
+        opciones: ["Interés Superior de la Niñez", "Igualdad Sustantiva", "Autonomía Progresiva"],
+        correcto: 2,
+        explicacion: "La Autonomía Progresiva (Art. 2) establece que se debe considerar la opinión del menor según su edad, desarrollo evolutivo, cognoscitivo y madurez."
+      },
+
+      // ── 16-23: COMPLETAMIENTO ───────────────────────────────────
+      {
+        tipo: "Completamiento",
+        texto: "El Interés Superior de la Niñez es la consideración primordial en la toma de decisiones. Cuando existan diferentes interpretaciones legales, siempre se elegirá…",
+        opciones: [
+          "…la que sea más fácil de implementar por las autoridades.",
+          "…la que mayor beneficio otorgue a la niñez.",
+          "…la que cuente con mayor respaldo presupuestal."
+        ],
+        correcto: 1,
+        explicacion: "El principio de Interés Superior (Art. 2 y 3) exige siempre optar por la interpretación que otorgue el mayor beneficio a los menores."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "La Autonomía Progresiva (Art. 2) establece que se debe considerar la opinión del menor según su…",
+        opciones: [
+          "…nivel escolar y desempeño académico.",
+          "…edad, desarrollo evolutivo, cognoscitivo y madurez.",
+          "…decisión de sus padres o tutores."
+        ],
+        correcto: 1,
+        explicacion: "La Autonomía Progresiva reconoce que la capacidad de decisión del menor crece con su edad, desarrollo evolutivo, cognoscitivo y madurez."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "El Art. 53 establece que negar los ajustes razonables a niñas, niños y adolescentes con discapacidad constituye, legalmente…",
+        opciones: [
+          "…una falta administrativa menor que no requiere sanción.",
+          "…un acto de discriminación.",
+          "…una violación al reglamento escolar únicamente."
+        ],
+        correcto: 1,
+        explicacion: "Según el Art. 53, negar los ajustes razonables es un acto de discriminación; el Diseño Universal es obligatorio para garantizar la inclusión."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "Según los Art. 57 y 58, la educación debe ser de calidad, gratuita, inclusiva y basada en…",
+        opciones: [
+          "…un enfoque de competencias laborales.",
+          "…un enfoque de derechos humanos.",
+          "…un enfoque de valores tradicionales."
+        ],
+        correcto: 1,
+        explicacion: "La educación (Art. 57 y 58) debe estar basada en un enfoque de derechos humanos e inculcar la cultura de paz y educación cívica."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "Según el Art. 44, quienes ejercen la patria potestad tienen la obligación de adoptar prácticas de crianza positiva que incluyen formación basada en el respeto, enfoque de derechos humanos y…",
+        opciones: [
+          "…límites estrictos basados en la autoridad parental sin importar la edad.",
+          "…límites y disciplina acordes a la edad, y un entorno afectivo para el bienestar del menor.",
+          "…disciplina rigurosa para formar carácter y responsabilidad mediante el esfuerzo."
+        ],
+        correcto: 1,
+        explicacion: "La Crianza Positiva (Art. 44) exige: respeto, enfoque de derechos humanos, límites acordes a la edad y un entorno afectivo que fomente el bienestar."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "El Art. 101 Bis 2 establece que el Estado tiene el deber ineludible de prevenir, atender y sancionar…",
+        opciones: [
+          "…el uso excesivo de videojuegos y redes sociales por parte de menores.",
+          "…el ciberacoso y cualquier violencia digital que vulnere la seguridad o intimidad de los menores.",
+          "…el acceso no supervisado de menores a internet en el hogar."
+        ],
+        correcto: 1,
+        explicacion: "El Art. 101 Bis 2 establece la Protección Activa: el Estado debe prevenir, atender y sancionar el ciberacoso y la violencia digital contra menores."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "Según el Art. 89, los adolescentes de 12 a 17 años que cometen conductas tipificadas como delito están sujetos a…",
+        opciones: [
+          "…el mismo sistema penal que los adultos con medidas especiales de consideración.",
+          "…la Ley Nacional del Sistema Integral de Justicia Penal para Adolescentes, con garantía de asistencia especializada.",
+          "…únicamente medidas de asistencia social sin ninguna consecuencia legal."
+        ],
+        correcto: 1,
+        explicacion: "El Art. 89 establece un Sistema Especializado para adolescentes de 12 a 17 años, con asistencia legal, acompañamiento familiar y protección de identidad."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "El Derecho a la Identidad (Art. 19) incluye nombre, apellidos, nacionalidad y conocer la filiación. Sobre la documentación, la ley establece que…",
+        opciones: [
+          "…se requiere documentación oficial completa para garantizar todos los derechos.",
+          "…la falta de documentación no será obstáculo para garantizar los derechos del menor.",
+          "…solo aplica para menores nacidos en territorio nacional con registro oficial."
+        ],
+        correcto: 1,
+        explicacion: "El Art. 19 es claro: la falta de documentación no puede ser obstáculo para garantizar los derechos. Ningún menor puede quedar desprotegido por esta razón."
+      },
+
+      // ── 24-28: ORDENAMIENTO ─────────────────────────────────────
+      {
+        tipo: "Ordenamiento",
+        texto: "Ordene los 5 pilares estratégicos de la LGDNNA tal como aparecen en la guía de estudio (del primero al último):\n\n1. Voz y Privacidad\n2. Los Cimientos (Principios y Equidad)\n3. Fronteras y Justicia\n4. Supervivencia y Familia\n5. Desarrollo Integral",
+        opciones: [
+          "2, 4, 5, 1, 3",
+          "1, 2, 3, 4, 5",
+          "4, 2, 1, 5, 3"
+        ],
+        correcto: 0,
+        explicacion: "Los 5 pilares en orden son: 1-Los Cimientos, 2-Supervivencia y Familia, 3-Desarrollo Integral, 4-Voz y Privacidad, 5-Fronteras y Justicia."
+      },
+      {
+        tipo: "Ordenamiento",
+        texto: "Ordene las tres capas del 'Ecosistema de la LGDNNA' de adentro (centro) hacia afuera, según la síntesis de la guía:\n\n1. Entorno Inmediato (familia)\n2. El Sujeto de Derechos (el niño al centro)\n3. Obligación Estatal",
+        opciones: [
+          "3, 1, 2",
+          "2, 1, 3",
+          "1, 3, 2"
+        ],
+        correcto: 1,
+        explicacion: "El modelo concéntrico coloca al niño (sujeto de derechos) en el centro, rodeado por el Entorno Inmediato (familia) y finalmente la Obligación Estatal en el exterior."
+      },
+      {
+        tipo: "Ordenamiento",
+        texto: "Ordene las tres obligaciones del Derecho de Prioridad (Art. 17) tal como aparecen en la guía de estudio:\n\n1. Diseño de Políticas\n2. Protección y Socorro\n3. Atención en Servicios",
+        opciones: [
+          "2, 3, 1",
+          "1, 2, 3",
+          "3, 1, 2"
+        ],
+        correcto: 0,
+        explicacion: "El orden en la guía es: 1-Protección y Socorro (auxilio en emergencias), 2-Atención en Servicios (preferencia en atención), 3-Diseño de Políticas (eje central en políticas públicas)."
+      },
+      {
+        tipo: "Ordenamiento",
+        texto: "Ordene los tres niveles de la Frontera Digital (Art. 101 Bis) de más básico a más específico según la guía:\n\n1. Protección Activa contra ciberacoso\n2. Acceso Universal a TIC e internet\n3. Uso Seguro del internet como medio para ejercer otros derechos",
+        opciones: [
+          "2, 3, 1",
+          "1, 2, 3",
+          "3, 1, 2"
+        ],
+        correcto: 0,
+        explicacion: "El orden lógico y de la guía es: 1-Acceso Universal (derecho a las TIC), 2-Uso Seguro (internet para ejercer otros derechos), 3-Protección Activa (combate al ciberacoso)."
+      },
+      {
+        tipo: "Ordenamiento",
+        texto: "Ordene los siguientes elementos de la Crianza Positiva (Art. 44) tal como los lista la guía:\n\n1. Límites y disciplina acordes a su edad y facultades\n2. Formación y guía basada en el respeto\n3. Entorno afectivo que fomenta el bienestar y crecimiento\n4. Enfoque de Derechos Humanos y cultura de paz",
+        opciones: [
+          "1, 3, 2, 4",
+          "2, 4, 1, 3",
+          "3, 2, 4, 1"
+        ],
+        correcto: 1,
+        explicacion: "La guía lista: 1-Formación y guía basada en el respeto, 2-Enfoque de DDHH y cultura de paz, 3-Límites acordes a la edad, 4-Entorno afectivo."
+      },
+
+      // ── 29-40: RELACIÓN DE ELEMENTOS ────────────────────────────
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Art. 19", "2. Art. 44", "3. Art. 60", "4. Art. 87"],
+          col2: ["a) Derecho al descanso y esparcimiento", "b) Exención de responsabilidad penal para menores de 12 años", "c) Derecho a la identidad (nombre, nacionalidad, filiación)", "d) Crianza positiva y vida libre de violencia"]
+        },
+        texto: "Relacione cada artículo de la LGDNNA con el derecho o principio que establece:",
+        opciones: ["1c, 2d, 3a, 4b", "1d, 2c, 3b, 4a", "1a, 2b, 3c, 4d"],
+        correcto: 0,
+        explicacion: "Art.19=Identidad (c), Art.44=Crianza positiva (d), Art.60=Descanso y esparcimiento (a), Art.87=Exención penal menores de 12 (b)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Los Cimientos", "2. Supervivencia y Familia", "3. Desarrollo Integral", "4. Voz y Privacidad"],
+          col2: ["a) Salud, Educación, Juego", "b) Vida, Identidad, Crianza", "c) Participación, Intimidad y Datos Personales", "d) Principios y Equidad (Interés Superior, No Discriminación)"]
+        },
+        texto: "Relacione cada pilar estratégico de la LGDNNA con los derechos que lo conforman:",
+        opciones: ["1d, 2b, 3a, 4c", "1a, 2d, 3c, 4b", "1c, 2a, 3d, 4b"],
+        correcto: 0,
+        explicacion: "Los Cimientos=Principios y Equidad(d), Supervivencia y Familia=Vida/Identidad/Crianza(b), Desarrollo Integral=Salud/Educación/Juego(a), Voz y Privacidad=Participación/Intimidad(c)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Ajustes Razonables", "2. Diseño Universal", "3. Acciones Afirmativas", "4. Interés Superior"],
+          col2: ["a) Medidas especiales temporales para eliminar barreras estructurales", "b) Modificaciones en casos particulares para garantizar el goce de libertades", "c) Consideración primordial en toda toma de decisiones que afecte a la niñez", "d) Entornos y servicios utilizables por todas las personas sin adaptación especializada"]
+        },
+        texto: "Relacione cada concepto clave de la LGDNNA con su definición correcta:",
+        opciones: ["1b, 2d, 3a, 4c", "1a, 2c, 3d, 4b", "1d, 2b, 3c, 4a"],
+        correcto: 0,
+        explicacion: "Ajustes Razonables=adaptaciones individuales(b), Diseño Universal=entornos para todos sin adaptación(d), Acciones Afirmativas=medidas temporales(a), Interés Superior=consideración primordial(c)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Art. 2 y 3", "2. Art. 36 y 37", "3. Art. 53", "4. Art. 82, 87, 89"],
+          col2: ["a) Inclusión de niñas, niños y adolescentes con discapacidad", "b) Justicia y Debido Proceso; mínima intervención", "c) Igualdad Sustantiva y Acciones Afirmativas", "d) Interés Superior y Garantía Presupuestal"]
+        },
+        texto: "Relacione cada conjunto de artículos con su contenido principal en la LGDNNA:",
+        opciones: ["1d, 2c, 3a, 4b", "1c, 2a, 3b, 4d", "1a, 2d, 3c, 4b"],
+        correcto: 0,
+        explicacion: "Art.2-3=Interés Superior y presupuesto(d), Art.36-37=Igualdad Sustantiva(c), Art.53=Inclusión con discapacidad(a), Art.82-89=Justicia y debido proceso(b)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Libertad de Expresión (Art. 62-65)", "2. Derecho a la Salud (Art. 43, 50)", "3. Vivir en Familia (Art. 21 y 22)", "4. Entorno Digital Seguro (Art. 101 Bis)"],
+          col2: ["a) Pilar: Fronteras y Justicia", "b) Pilar: Desarrollo Integral", "c) Pilar: Voz y Privacidad", "d) Pilar: Supervivencia y Familia"]
+        },
+        texto: "Relacione cada derecho con el pilar estratégico al que pertenece en la guía de estudio:",
+        opciones: ["1c, 2b, 3d, 4a", "1a, 2c, 3b, 4d", "1b, 2d, 3c, 4a"],
+        correcto: 0,
+        explicacion: "Libertad de Expresión=Voz y Privacidad(c), Salud=Desarrollo Integral(b), Vivir en Familia=Supervivencia y Familia(d), Digital Seguro=Fronteras y Justicia(a)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Crianza Tradicional/Autoritaria", "2. Crianza Positiva"],
+          col2: ["a) Formación basada en el respeto; enfoque de DDHH; límites acordes a la edad", "b) Castigos corporales; tratos humillantes; imposición basada en el miedo"]
+        },
+        texto: "Relacione cada tipo de crianza con sus características según el Art. 44 y 46 de la LGDNNA:",
+        opciones: ["1b, 2a", "1a, 2b", "2b, 1a"],
+        correcto: 0,
+        explicacion: "La Crianza Tradicional/Autoritaria está PROHIBIDA: castigos físicos, humillaciones, imposición por miedo. La Crianza Positiva es el mandato legal: respeto, DDHH, límites apropiados."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Perspectiva Transversal (Art. 2)", "2. Autonomía Progresiva (Art. 2)", "3. Garantía Presupuestal (Art. 2 y 3)"],
+          col2: ["a) Obligación de incluir recursos en presupuestos; no hay derechos sin presupuesto", "b) Considerar la opinión según edad, desarrollo evolutivo y madurez", "c) Diseño de políticas con enfoque integral, de género y derechos humanos"]
+        },
+        texto: "Relacione cada componente del Art. 2 y 3 con su descripción correspondiente:",
+        opciones: ["1c, 2b, 3a", "1a, 2c, 3b", "1b, 2a, 3c"],
+        correcto: 0,
+        explicacion: "Perspectiva Transversal=políticas con enfoque integral y género(c), Autonomía Progresiva=opinión según madurez(b), Garantía Presupuestal=recursos obligatorios(a)."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Igualdad Formal", "2. Igualdad Sustantiva", "3. No Discriminación"],
+          col2: ["a) Prohibición de restringir derechos por origen étnico, género, discapacidad (Art. 39)", "b) Tratar a todos igual ante la ley", "c) Acciones Afirmativas para nivelar el terreno y eliminar barreras (Art. 36 y 37)"]
+        },
+        texto: "Relacione cada tipo de igualdad con su descripción en el marco de la LGDNNA:",
+        opciones: ["1b, 2c, 3a", "1a, 2b, 3c", "1c, 2a, 3b"],
+        correcto: 0,
+        explicacion: "Igualdad Formal=trato igual ante la ley(b), Igualdad Sustantiva=acciones afirmativas para eliminar barreras(c), No Discriminación=prohibición de restricciones por características personales(a)."
+      },
+
+      // ── PREGUNTAS 37-40: ADICIONALES ────────────────────────────
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "¿Cuál es el principio jurídico que establece que el sistema de justicia para adolescentes debe buscar la reinserción social con la menor intervención posible del Estado, evitando además que la víctima sea sometida a procesos traumáticos repetitivos?",
+        opciones: [
+          "Principio de Igualdad Sustantiva y Acciones Afirmativas",
+          "Principio de Mínima Intervención y No Revictimización",
+          "Principio de Autonomía Progresiva y Garantía Presupuestal"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 82 y 87 establecen la seguridad jurídica bajo el principio de Mínima Intervención y No Revictimización, protegiendo tanto al adolescente como a la víctima dentro del proceso judicial."
+      },
+      {
+        tipo: "Cuestionamiento directo",
+        texto: "Según el Art. 76 y 77 de la LGDNNA, ¿qué situación constituye una violación al Derecho a la Intimidad de un menor?",
+        opciones: [
+          "Publicar sus calificaciones escolares en el tablero de la escuela con su consentimiento",
+          "Cualquier manejo de su imagen o nombre en medios que menoscabe su honra o lo ponga en riesgo",
+          "Compartir fotografías familiares en redes sociales con configuración privada"
+        ],
+        correcto: 1,
+        explicacion: "El Art. 76-77 establece protección absoluta de datos personales; se considera violación cualquier manejo de la imagen o nombre del menor en medios que dañe su honra o lo exponga a riesgo."
+      },
+      {
+        tipo: "Completamiento",
+        texto: "El Art. 50 de la LGDNNA establece que el derecho al más alto nivel de salud incluye la Salud Mental, lo que implica atención psicológica y…",
+        opciones: [
+          "…acceso exclusivo a medicamentos sin receta médica para menores.",
+          "…protección contra prácticas culturales perjudiciales.",
+          "…supervisión permanente de hábitos alimenticios por parte del Estado."
+        ],
+        correcto: 1,
+        explicacion: "El Art. 50 incluye expresamente la Salud Mental como atención psicológica y protección contra prácticas culturales perjudiciales que afecten el bienestar psicológico del menor."
+      },
+      {
+        tipo: "Relación de elementos",
+        tabla: {
+          col1: ["1. Art. 14 al 17", "2. Art. 19 al 23", "3. Art. 62 al 65", "4. Art. 101 Bis al 101 Bis 2"],
+          col2: ["a) Identidad y Familia – Pilar: Supervivencia y Familia", "b) Frontera Digital – Pilar: Fronteras y Justicia", "c) Libertad de Expresión y Acceso a la Información – Pilar: Voz y Privacidad", "d) Vida, Supervivencia y Derecho de Prioridad – Pilar: Supervivencia y Familia"]
+        },
+        texto: "Relacione cada grupo de artículos con su contenido y el pilar al que pertenecen según la guía de estudio:",
+        opciones: ["1d, 2a, 3c, 4b", "1a, 2d, 3b, 4c", "1c, 2b, 3d, 4a"],
+        correcto: 0,
+        explicacion: "Art.14-17=Vida/Prioridad/Supervivencia(d), Art.19-23=Identidad y Familia(a), Art.62-65=Libertad de Expresión(c), Art.101Bis=Frontera Digital(b)."
+      }
+    ];
+
+    // ──────────────────────────────────────────────────────────────
+    // VARIABLES DE ESTADO DEL SIMULADOR
+    // ──────────────────────────────────────────────────────────────
+    let preguntaActual = 0;       // índice de la pregunta visible
+    let respuestas = new Array(preguntas.length).fill(null); // respuesta del usuario por pregunta
+    let nombreUsuario = "";
+    let timerInterval = null;     // referencia al intervalo del timer
+    let segundosRestantes = 5400; // 90 minutos en segundos
+    let tiempoUsado = 0;          // segundos consumidos al entregar
+    let examenEntregado = false;
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: INICIAR EXAMEN
+    // ──────────────────────────────────────────────────────────────
+    function iniciarExamen() {
+      const input = document.getElementById('input-nombre');
+      const nombre = input.value.trim();
+      if (!nombre) {
+        input.style.borderColor = 'var(--rojo)';
+        input.focus();
+        input.placeholder = '⚠️ Por favor ingresa tu nombre';
+        return;
+      }
+      nombreUsuario = nombre;
+      // Ocultar bienvenida y mostrar examen
+      document.getElementById('pantalla-bienvenida').style.display = 'none';
+      document.getElementById('pantalla-examen').style.display = 'block';
+      // Construir mapa de preguntas
+      construirMapa();
+      // Mostrar primera pregunta
+      mostrarPregunta(0);
+      // Iniciar temporizador
+      iniciarTimer();
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: TEMPORIZADOR
+    // ──────────────────────────────────────────────────────────────
+    function iniciarTimer() {
+      actualizarDisplayTimer();
+      timerInterval = setInterval(() => {
+        if (segundosRestantes <= 0) {
+          clearInterval(timerInterval);
+          entregarExamen(true); // tiempo agotado
+          return;
+        }
+        segundosRestantes--;
+        actualizarDisplayTimer();
+      }, 1000);
+    }
+
+    function actualizarDisplayTimer() {
+      const min = Math.floor(segundosRestantes / 60);
+      const seg = segundosRestantes % 60;
+      document.getElementById('timer-display').textContent =
+        String(min).padStart(2, '0') + ':' + String(seg).padStart(2, '0');
+      // Cambiar color si quedan menos de 5 minutos
+      const box = document.getElementById('timer-box');
+      box.classList.toggle('urgente', segundosRestantes <= 300);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: MOSTRAR PREGUNTA
+    // ──────────────────────────────────────────────────────────────
+    function mostrarPregunta(idx) {
+      preguntaActual = idx;
+      const p = preguntas[idx];
+
+      // Etiqueta de tipo
+      document.getElementById('etiqueta-tipo').textContent = p.tipo;
+
+      // Número de pregunta
+      document.getElementById('num-pregunta').textContent = `Pregunta ${idx + 1} de ${preguntas.length}`;
+      document.getElementById('label-num').textContent = `${idx + 1} / ${preguntas.length}`;
+
+      // Texto principal
+      document.getElementById('texto-pregunta').textContent = p.texto;
+
+      // Contexto de tabla (para reactivos de relación)
+      const ctxTabla = document.getElementById('contexto-tabla');
+      if (p.tabla) {
+        ctxTabla.style.display = 'block';
+        ctxTabla.innerHTML = crearTablaHTML(p.tabla);
+      } else {
+        ctxTabla.style.display = 'none';
+        ctxTabla.innerHTML = '';
+      }
+
+      // Opciones
+      const lista = document.getElementById('lista-opciones');
+      lista.innerHTML = '';
+      const letras = ['A', 'B', 'C', 'D', 'E'];
+      p.opciones.forEach((op, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="opcion-letra">${letras[i]}</span><span class="opcion-texto">${op}</span>`;
+        // Si ya respondida, no permitir cambio
+        if (respuestas[idx] !== null) {
+          li.classList.add('bloqueada');
+          if (i === respuestas[idx]) {
+            li.classList.add(i === p.correcto ? 'correcta' : 'incorrecta');
+          }
+          if (examenEntregado && i === p.correcto && respuestas[idx] !== i) {
+            li.classList.add('correcta');
+          }
+        } else {
+          li.addEventListener('click', () => seleccionarOpcion(i));
+        }
+        lista.appendChild(li);
+      });
+
+      // Retroalimentación
+      const retro = document.getElementById('retroalimentacion');
+      if (respuestas[idx] !== null && !examenEntregado) {
+        const esCorrecta = respuestas[idx] === p.correcto;
+        retro.style.display = 'block';
+        retro.className = 'correcta' === undefined ? '' : '';
+        retro.classList.remove('correcto', 'incorrecto');
+        retro.classList.add(esCorrecta ? 'correcto' : 'incorrecto');
+        retro.innerHTML = `<strong>${esCorrecta ? '✅ ¡Correcto!' : '❌ Respuesta incorrecta'}</strong>${p.explicacion}`;
+      } else {
+        retro.style.display = 'none';
+      }
+
+      // Botones Anterior / Siguiente / Entregar
+      document.getElementById('btn-anterior').disabled = idx === 0;
+      const btnSig = document.getElementById('btn-siguiente');
+      const btnEntr = document.getElementById('btn-entregar');
+      if (idx === preguntas.length - 1) {
+        btnSig.style.display = 'none';
+        btnEntr.style.display = 'block';
+      } else {
+        btnSig.style.display = 'block';
+        btnEntr.style.display = 'none';
+      }
+
+      // Actualizar mapa
+      actualizarMapa();
+      // Actualizar barra de progreso
+      const respondidas = respuestas.filter(r => r !== null).length;
+      document.getElementById('barra-progreso').style.width = (respondidas / preguntas.length * 100) + '%';
+    }
+
+    // Construir tabla HTML para reactivos de relación
+    function crearTablaHTML(tabla) {
+      let html = '<table class="tabla-relacion"><thead><tr><th>Columna 1</th><th>Columna 2</th></tr></thead><tbody>';
+      const max = Math.max(tabla.col1.length, tabla.col2.length);
+      for (let i = 0; i < max; i++) {
+        html += `<tr><td>${tabla.col1[i] || ''}</td><td>${tabla.col2[i] || ''}</td></tr>`;
+      }
+      html += '</tbody></table>';
+      return html;
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: SELECCIONAR OPCIÓN
+    // ──────────────────────────────────────────────────────────────
+    function seleccionarOpcion(idx) {
+      if (respuestas[preguntaActual] !== null) return; // ya respondida
+      respuestas[preguntaActual] = idx;
+      mostrarPregunta(preguntaActual); // refrescar vista con retroalimentación
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: NAVEGAR ENTRE PREGUNTAS
+    // ──────────────────────────────────────────────────────────────
+    function navegarPregunta(dir) {
+      const nuevo = preguntaActual + dir;
+      if (nuevo >= 0 && nuevo < preguntas.length) {
+        mostrarPregunta(nuevo);
+        // Scroll suave al inicio de la card
+        document.getElementById('card-pregunta').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: MAPA DE PREGUNTAS
+    // ──────────────────────────────────────────────────────────────
+    function construirMapa() {
+      const mapa = document.getElementById('mapa-preguntas');
+      mapa.innerHTML = '';
+      for (let i = 0; i < preguntas.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'mapa-btn';
+        btn.textContent = i + 1;
+        btn.id = `mapa-${i}`;
+        btn.addEventListener('click', () => {
+          mostrarPregunta(i);
+          document.getElementById('card-pregunta').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        mapa.appendChild(btn);
+      }
+    }
+
+    function actualizarMapa() {
+      for (let i = 0; i < preguntas.length; i++) {
+        const btn = document.getElementById(`mapa-${i}`);
+        if (!btn) continue;
+        btn.className = 'mapa-btn';
+        if (i === preguntaActual) btn.classList.add('actual');
+        if (examenEntregado && respuestas[i] !== null) {
+          btn.classList.add(respuestas[i] === preguntas[i].correcto ? 'correcta-mapa' : 'incorrecta-mapa');
+        } else if (respuestas[i] !== null) {
+          btn.classList.add('respondida');
+        }
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: CONFIRMAR ENTREGA (usa modal en lugar de confirm())
+    // ──────────────────────────────────────────────────────────────
+    function confirmarEntrega() {
+      const sinResponder = respuestas.filter(r => r === null).length;
+      const modal = document.getElementById('modal-overlay');
+      const titulo = document.getElementById('modal-titulo');
+      const mensaje = document.getElementById('modal-mensaje');
+      if (sinResponder > 0) {
+        titulo.textContent = '⚠️ Preguntas sin responder';
+        mensaje.textContent = `Tienes ${sinResponder} pregunta(s) sin responder. ¿Deseas entregar de todas formas?`;
+      } else {
+        titulo.textContent = '📩 ¿Entregar examen?';
+        mensaje.textContent = 'Has respondido todas las preguntas. ¿Confirmas la entrega?';
+      }
+      modal.classList.add('activo');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-overlay').classList.remove('activo');
+    }
+
+    function entregarExamen(porTiempo) {
+      // Cerrar modal si estaba abierto
+      document.getElementById('modal-overlay').classList.remove('activo');
+
+      if (examenEntregado) return;
+      examenEntregado = true;
+      clearInterval(timerInterval);
+      tiempoUsado = 5400 - segundosRestantes;
+
+      // Calcular resultados
+      let correctas = 0;
+      respuestas.forEach((r, i) => { if (r === preguntas[i].correcto) correctas++; });
+      const incorrectas = respuestas.filter((r, i) => r !== null && r !== preguntas[i].correcto).length;
+
+      // Formatear tiempo
+      const min = Math.floor(tiempoUsado / 60);
+      const seg = tiempoUsado % 60;
+      const tiempoStr = `${min}m ${seg}s`;
+
+      // Mostrar pantalla de resultado
+      document.getElementById('pantalla-examen').style.display = 'none';
+      const pRes = document.getElementById('pantalla-resultado');
+      pRes.style.display = 'block';
+
+      const pct = Math.round((correctas / preguntas.length) * 100);
+      document.getElementById('icono-resultado').textContent = pct >= 70 ? '🏆' : '📚';
+      document.getElementById('titulo-resultado').textContent = porTiempo ? '⏰ Tiempo agotado' : '¡Examen completado!';
+      document.getElementById('nombre-resultado-display').textContent = `Participante: ${nombreUsuario}`;
+      document.getElementById('cal-numero').textContent = correctas;
+      document.getElementById('den-cal').textContent = `de ${preguntas.length}`;
+      document.getElementById('stat-cor').textContent = correctas;
+      document.getElementById('stat-inc').textContent = incorrectas;
+      document.getElementById('stat-tiempo').textContent = tiempoStr;
+
+      const msg = document.getElementById('mensaje-cal');
+      if (pct >= 70) {
+        msg.className = 'aprobado';
+        msg.textContent = `✅ ¡Aprobado! Obtuviste ${correctas}/${preguntas.length} (${pct}%). ¡Excelente trabajo, ${nombreUsuario}!`;
+      } else {
+        msg.className = 'reprobado';
+        msg.textContent = `❌ No aprobado. Obtuviste ${correctas}/${preguntas.length} (${pct}%). Te recomendamos repasar los pilares de la LGDNNA.`;
+      }
+
+      // Actualizar mapa con colores de correcto/incorrecto
+      actualizarMapa();
+      // Scroll al inicio
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: VER REVISIÓN DETALLADA
+    // ──────────────────────────────────────────────────────────────
+    function verRevision() {
+      document.getElementById('pantalla-resultado').style.display = 'none';
+      const seccion = document.getElementById('seccion-revision');
+      seccion.style.display = 'block';
+      const lista = document.getElementById('lista-revision');
+      lista.innerHTML = '';
+      const letras = ['A', 'B', 'C', 'D'];
+
+      preguntas.forEach((p, i) => {
+        const uResp = respuestas[i];
+        const esCorrecta = uResp === p.correcto;
+        const div = document.createElement('div');
+        div.className = 'item-revision';
+        div.innerHTML = `
+          <div class="num-rev">${esCorrecta ? '✅' : '❌'} Pregunta ${i + 1} · ${p.tipo}</div>
+          <div class="pregunta-rev">${p.texto}</div>
+          ${uResp !== null
+            ? `<div class="resp-item ${esCorrecta ? 'cor' : 'inco'}">Tu respuesta: ${letras[uResp]}) ${p.opciones[uResp]}</div>`
+            : `<div class="resp-item inco">Sin responder</div>`
+          }
+          ${!esCorrecta
+            ? `<div class="resp-item cor">Respuesta correcta: ${letras[p.correcto]}) ${p.opciones[p.correcto]}</div>`
+            : ''
+          }
+          <div class="explicacion-rev">💡 ${p.explicacion}</div>
+        `;
+        lista.appendChild(div);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function ocultarRevision() {
+      document.getElementById('seccion-revision').style.display = 'none';
+      document.getElementById('pantalla-resultado').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // FUNCIÓN: REINICIAR EXAMEN
+    // ──────────────────────────────────────────────────────────────
+    function reiniciarExamen() {
+      preguntaActual = 0;
+      respuestas = new Array(preguntas.length).fill(null);
+      nombreUsuario = '';
+      segundosRestantes = 5400;
+      tiempoUsado = 0;
+      examenEntregado = false;
+      clearInterval(timerInterval);
+
+      document.getElementById('pantalla-resultado').style.display = 'none';
+      document.getElementById('seccion-revision').style.display = 'none';
+      document.getElementById('pantalla-examen').style.display = 'none';
+      document.getElementById('pantalla-bienvenida').style.display = 'block';
+      document.getElementById('input-nombre').value = '';
+      document.getElementById('barra-progreso').style.width = '0%';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+  </script>
+</body>
+</html>

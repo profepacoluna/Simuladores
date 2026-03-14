@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ============================================================
+       META Y CONFIGURACIÓN BÁSICA
+       Viewport asegura que el diseño se adapte a dispositivos móviles
+       ============================================================ -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador NEM  – Prof. Francisco De Jesus Luna Benitez</title>
+
+  <!-- ============================================================
+       FUENTES EXTERNAS (Google Fonts)
+       ============================================================ -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       VARIABLES CSS  – paleta azul + acentos cálidos
+       ============================================================ */
+    :root {
+      --azul-oscuro:   #0d2c5e;
+      --azul-medio:    #1a4fa8;
+      --azul-claro:    #3b82f6;
+      --azul-suave:    #dbeafe;
+      --azul-palido:   #eff6ff;
+      --acento-naranja:#f59e0b;
+      --acento-verde:  #10b981;
+      --acento-rojo:   #ef4444;
+      --texto-oscuro:  #1e293b;
+      --texto-medio:   #475569;
+      --blanco:        #ffffff;
+      --sombra:        0 4px 24px rgba(13,44,94,.12);
+      --radius:        14px;
+      --trans:         .25s ease;
+    }
+
+    /* ============================================================
+       RESET Y BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #e8f0fe 0%, #f0f7ff 60%, #dbeafe 100%);
+      color: var(--texto-oscuro);
+      min-height: 100vh;
+      /* Sin desbordamiento horizontal en móvil */
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       ENCABEZADO
+       ============================================================ */
+    header {
+      background: linear-gradient(120deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+      color: var(--blanco);
+      padding: 1.5rem 1rem 1.2rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(13,44,94,.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decoración geométrica del encabezado */
+    header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: -30px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: var(--acento-naranja);
+      color: var(--azul-oscuro);
+      font-weight: 900;
+      font-size: .75rem;
+      letter-spacing: .08em;
+      padding: .3rem .9rem;
+      border-radius: 999px;
+      margin-bottom: .7rem;
+      text-transform: uppercase;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 4vw, 2.1rem); /* Tamaño fluido */
+      line-height: 1.2;
+      margin-bottom: .4rem;
+    }
+
+    header p.subtitulo {
+      font-size: clamp(.8rem, 2.5vw, 1rem);
+      opacity: .85;
+      font-weight: 600;
+    }
+
+    header p.autor {
+      font-size: clamp(.7rem, 2vw, .9rem);
+      opacity: .7;
+      margin-top: .5rem;
+    }
+
+    /* ============================================================
+       CONTENEDOR PRINCIPAL  – centrado y con límite de ancho
+       ============================================================ */
+    .contenedor {
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem; /* Padding en móvil */
+    }
+
+    /* ============================================================
+       BARRA DE PROGRESO
+       ============================================================ */
+    .progreso-wrap {
+      background: var(--blanco);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.4rem;
+      box-shadow: var(--sombra);
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    .progreso-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .4rem;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--azul-medio);
+    }
+
+    .barra-fondo {
+      background: var(--azul-suave);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .barra-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-claro), var(--acento-naranja));
+      border-radius: 999px;
+      transition: width var(--trans);
+    }
+
+    /* ============================================================
+       TARJETA DE PREGUNTA
+       ============================================================ */
+    .tarjeta {
+      background: var(--blanco);
+      border-radius: var(--radius);
+      padding: 1.6rem 1.4rem;
+      box-shadow: var(--sombra);
+      margin-bottom: 1.4rem;
+      animation: fadeSlide .35s ease both;
+      border-top: 4px solid var(--azul-claro);
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .tipo-badge {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      margin-bottom: .85rem;
+    }
+
+    /* Colores por tipo de pregunta */
+    .tipo-directo    { background: #dbeafe; color: #1d4ed8; }
+    .tipo-completar  { background: #d1fae5; color: #065f46; }
+    .tipo-ordenar    { background: #fef3c7; color: #92400e; }
+    .tipo-relacion   { background: #ede9fe; color: #4c1d95; }
+
+    .num-pregunta {
+      font-size: .78rem;
+      color: var(--texto-medio);
+      font-weight: 700;
+      margin-bottom: .35rem;
+    }
+
+    .enunciado {
+      font-size: clamp(.9rem, 2.5vw, 1.05rem);
+      line-height: 1.6;
+      color: var(--texto-oscuro);
+      font-weight: 600;
+      margin-bottom: 1.1rem;
+    }
+
+    /* Tabla de relación de elementos */
+    .tabla-relacion {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: .85rem;
+    }
+    .tabla-relacion th {
+      background: var(--azul-suave);
+      color: var(--azul-oscuro);
+      padding: .5rem .7rem;
+      text-align: left;
+      font-weight: 700;
+    }
+    .tabla-relacion td {
+      padding: .45rem .7rem;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .tabla-relacion tr:last-child td { border-bottom: none; }
+
+    /* ============================================================
+       OPCIONES DE RESPUESTA
+       ============================================================ */
+    .opciones {
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+    }
+
+    .opcion {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: .8rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color var(--trans), background var(--trans), transform var(--trans);
+      background: var(--azul-palido);
+      /* Evita texto desbordado en móvil */
+      word-break: break-word;
+    }
+
+    .opcion:hover:not(.deshabilitada) {
+      border-color: var(--azul-claro);
+      background: var(--azul-suave);
+      transform: translateX(3px);
+    }
+
+    .opcion-letra {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--azul-suave);
+      color: var(--azul-medio);
+      font-weight: 900;
+      font-size: .82rem;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--azul-claro);
+      transition: background var(--trans), color var(--trans);
+    }
+
+    .opcion-texto {
+      font-size: clamp(.82rem, 2.2vw, .95rem);
+      line-height: 1.5;
+      color: var(--texto-oscuro);
+    }
+
+    /* Estados de selección */
+    .opcion.seleccionada {
+      border-color: var(--azul-medio);
+      background: var(--azul-suave);
+    }
+    .opcion.seleccionada .opcion-letra {
+      background: var(--azul-medio);
+      color: var(--blanco);
+    }
+
+    .opcion.correcta {
+      border-color: var(--acento-verde);
+      background: #d1fae5;
+    }
+    .opcion.correcta .opcion-letra {
+      background: var(--acento-verde);
+      color: var(--blanco);
+    }
+
+    .opcion.incorrecta {
+      border-color: var(--acento-rojo);
+      background: #fee2e2;
+    }
+    .opcion.incorrecta .opcion-letra {
+      background: var(--acento-rojo);
+      color: var(--blanco);
+    }
+
+    .opcion.deshabilitada { cursor: default; }
+
+    /* ============================================================
+       RETROALIMENTACIÓN
+       ============================================================ */
+    .retroalimentacion {
+      margin-top: 1rem;
+      padding: .85rem 1rem;
+      border-radius: 10px;
+      font-size: .88rem;
+      line-height: 1.55;
+      font-weight: 600;
+      display: none; /* Oculta hasta responder */
+    }
+    .retroalimentacion.mostrar { display: block; animation: fadeSlide .3s ease both; }
+    .retroalimentacion.correcto  { background: #d1fae5; color: #064e3b; border-left: 4px solid var(--acento-verde); }
+    .retroalimentacion.incorrecto{ background: #fee2e2; color: #7f1d1d; border-left: 4px solid var(--acento-rojo); }
+
+    /* ============================================================
+       BOTONES DE NAVEGACIÓN
+       ============================================================ */
+    .navegacion {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .75rem;
+      margin-top: .5rem;
+    }
+
+    .btn {
+      padding: .7rem 1.5rem;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: transform var(--trans), box-shadow var(--trans), opacity var(--trans);
+      letter-spacing: .03em;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-primario {
+      background: linear-gradient(135deg, var(--azul-medio), var(--azul-claro));
+      color: var(--blanco);
+    }
+    .btn-secundario {
+      background: var(--blanco);
+      color: var(--azul-medio);
+      border: 2px solid var(--azul-claro);
+    }
+    .btn-naranja {
+      background: linear-gradient(135deg, var(--acento-naranja), #f97316);
+      color: var(--blanco);
+    }
+
+    /* ============================================================
+       PANTALLA DE RESULTADOS
+       ============================================================ */
+    #pantalla-resultado {
+      display: none;
+      background: var(--blanco);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      box-shadow: var(--sombra);
+      text-align: center;
+      animation: fadeSlide .4s ease both;
+    }
+
+    .emoji-resultado { font-size: 3.5rem; margin-bottom: .75rem; }
+
+    .resultado-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--azul-oscuro);
+      margin-bottom: .5rem;
+    }
+
+    .resultado-puntaje {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 900;
+      color: var(--azul-medio);
+      margin: .5rem 0;
+    }
+
+    .resultado-mensaje {
+      font-size: clamp(.9rem, 2.5vw, 1.05rem);
+      color: var(--texto-medio);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* Barras de categorías */
+    .categorias-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: .75rem;
+      margin: 1.2rem 0;
+    }
+    .cat-item {
+      background: var(--azul-palido);
+      border-radius: 10px;
+      padding: .75rem;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--azul-oscuro);
+    }
+    .cat-item span { display: block; font-size: 1.4rem; font-weight: 900; color: var(--azul-medio); }
+
+    /* Tabla de revisión */
+    .revision-titulo {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--azul-oscuro);
+      margin: 1.5rem 0 .75rem;
+      text-align: left;
+    }
+    .revision-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .5rem .75rem;
+      border-radius: 8px;
+      margin-bottom: .4rem;
+      font-size: .82rem;
+      font-weight: 600;
+      text-align: left;
+    }
+    .revision-item.ok  { background: #d1fae5; color: #065f46; }
+    .revision-item.mal { background: #fee2e2; color: #7f1d1d; }
+
+    /* ============================================================
+       PANTALLA DE BIENVENIDA
+       ============================================================ */
+    #pantalla-inicio {
+      background: var(--blanco);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      box-shadow: var(--sombra);
+      text-align: center;
+    }
+
+    .inicio-logo { font-size: 3rem; margin-bottom: .75rem; }
+
+    .inicio-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 4vw, 1.9rem);
+      color: var(--azul-oscuro);
+      margin-bottom: .6rem;
+    }
+
+    .inicio-desc {
+      color: var(--texto-medio);
+      font-size: clamp(.85rem, 2.5vw, 1rem);
+      line-height: 1.65;
+      max-width: 560px;
+      margin: 0 auto 1.4rem;
+    }
+
+    /* Chips de tipos de reactivo */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .5rem;
+      margin-bottom: 1.6rem;
+    }
+    .chip {
+      padding: .3rem .85rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    /* ============================================================
+       RESPONSIVE: ajustes para pantallas pequeñas
+       ============================================================ */
+    @media (max-width: 480px) {
+      .tarjeta { padding: 1.2rem 1rem; }
+      .opcion  { padding: .65rem .85rem; }
+      .navegacion { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+      .categorias-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       ENCABEZADO PRINCIPAL
+       ============================================================ -->
+  <header>
+    <div class="header-badge">Simulador de Examen</div>
+    <h1>🏫 Nueva Escuela Mexicana </h1>
+    <p class="subtitulo">Instrumento de apreciación de conocimientos y aptitudes</p>
+    <p class="autor">Prof. Francisco De Jesus Luna Benitez</p>
+  </header>
+
+  <!-- ============================================================
+       CONTENEDOR CENTRAL (responsivo)
+       ============================================================ -->
+  <main class="contenedor">
+
+    <!-- ========== PANTALLA DE BIENVENIDA ========== -->
+    <div id="pantalla-inicio">
+      <div class="inicio-logo">📚</div>
+      <h2 class="inicio-titulo">Bienvenido al Simulador NEM </h2>
+      <p class="inicio-desc">
+        Este simulador contiene <strong>25 reactivos de opción múltiple</strong> sobre el
+        Plan de Estudio 2022 de la Nueva Escuela Mexicana. Encontrarás los cuatro formatos
+        oficiales de reactivos.
+      </p>
+      <div class="chips">
+        <span class="chip tipo-directo">✦ Cuestionamiento directo</span>
+        <span class="chip tipo-completar">✦ Completamiento</span>
+        <span class="chip tipo-ordenar">✦ Ordenamiento</span>
+        <span class="chip tipo-relacion">✦ Relación de elementos</span>
+      </div>
+      <button class="btn btn-primario" onclick="iniciarExamen()">▶ Comenzar simulador</button>
+    </div>
+
+    <!-- ========== BARRA DE PROGRESO ========== -->
+    <div class="progreso-wrap" id="bloque-progreso" style="display:none;">
+      <div class="progreso-info">
+        <span id="txt-pregunta">Pregunta 1 de 25</span>
+        <span id="txt-aciertos">✔ 0 aciertos</span>
+      </div>
+      <div class="barra-fondo">
+        <div class="barra-relleno" id="barra" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- ========== TARJETA DE PREGUNTA ========== -->
+    <div class="tarjeta" id="tarjeta-pregunta" style="display:none;">
+      <span class="tipo-badge" id="tipo-badge">Tipo</span>
+      <p class="num-pregunta" id="num-pregunta">Pregunta 1 / 25</p>
+      <div class="enunciado" id="enunciado-pregunta"></div>
+      <!-- Tabla especial para relación de elementos -->
+      <div id="tabla-contenedor" style="display:none;"></div>
+      <!-- Opciones de respuesta -->
+      <div class="opciones" id="contenedor-opciones"></div>
+      <!-- Retroalimentación -->
+      <div class="retroalimentacion" id="retroalimentacion"></div>
+    </div>
+
+    <!-- ========== BOTONES DE NAVEGACIÓN ========== -->
+    <div class="navegacion" id="nav-botones" style="display:none;">
+      <button class="btn btn-secundario" id="btn-anterior" onclick="cambiarPregunta(-1)" disabled>← Anterior</button>
+      <button class="btn btn-primario"   id="btn-siguiente" onclick="cambiarPregunta(1)">Siguiente →</button>
+      <button class="btn btn-naranja"    id="btn-finalizar" onclick="mostrarResultados()" style="display:none;">🏁 Ver resultados</button>
+    </div>
+
+    <!-- ========== PANTALLA DE RESULTADOS ========== -->
+    <div id="pantalla-resultado">
+      <div class="emoji-resultado" id="emoji-resultado">🏆</div>
+      <h2 class="resultado-titulo">Resultados del simulador</h2>
+      <div class="resultado-puntaje" id="puntaje-final">0 / 25</div>
+      <p class="resultado-mensaje" id="mensaje-resultado"></p>
+
+      <!-- Resumen por tipo de reactivo -->
+      <div class="categorias-grid" id="categorias-resultado"></div>
+
+      <button class="btn btn-primario" onclick="reiniciar()" style="margin-bottom:.75rem;width:100%;">🔄 Reiniciar simulador</button>
+      <button class="btn btn-secundario" onclick="revisarRespuestas()" style="width:100%;">🔍 Revisar respuestas</button>
+
+      <div id="panel-revision" style="display:none;"></div>
+    </div>
+
+  </main><!-- fin .contenedor -->
+
+  <!-- ============================================================
+       JAVASCRIPT – Lógica completa del simulador
+       ============================================================ -->
+  <script>
+
+    /* ----------------------------------------------------------
+       BANCO DE 25 PREGUNTAS
+       Cada pregunta tiene:
+         tipo  → clase CSS del badge
+         badge → texto del badge
+         base  → enunciado (puede incluir HTML)
+         tabla → objeto {col1, col2, filas} para relación (opcional)
+         opts  → array de 3 opciones
+         corr  → índice (0,1,2) de la opción correcta
+         feed  → retroalimentación
+    ---------------------------------------------------------- */
+    const preguntas = [
+
+      /* ====== CUESTIONAMIENTO DIRECTO (10) ====== */
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cuál es el núcleo integrador de los procesos de enseñanza y aprendizaje según la Nueva Escuela Mexicana (NEM)?',
+        opts: ['La evaluación formativa', 'La comunidad', 'Los campos formativos'],
+        corr: 1,
+        feed: 'La comunidad es el núcleo integrador de la NEM. La escuela ya no es un espacio aislado, sino el centro de las relaciones sociales; el punto de partida de toda enseñanza es la vida comunitaria de las alumnas y alumnos.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cuántos ejes articuladores integran el currículo de la NEM?',
+        opts: ['4 ejes articuladores', '5 ejes articuladores', '7 ejes articuladores'],
+        corr: 2,
+        feed: 'La NEM contempla 7 ejes articuladores: Inclusión, Pensamiento Crítico, Interculturalidad Crítica, Igualdad de Género, Vida Saludable, Apropiación de las Culturas y Artes y Experiencias Estéticas. No son asignaturas, sino perspectivas transversales.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cuántos campos formativos integran la estructura curricular de la NEM, sustituyendo la organización por asignaturas aisladas?',
+        opts: ['4 campos formativos', '6 campos formativos', '7 campos formativos'],
+        corr: 0,
+        feed: 'Los 4 campos formativos son: Lenguajes; Saberes y Pensamiento Científico; Ética, Naturaleza y Sociedades; y De lo Humano y lo Comunitario. Reorganizan los contenidos para que el alumno comprenda la realidad como una totalidad compleja.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Qué eje articulador de la NEM tiene como propósito romper modelos patriarcales y fomentar el respeto mutuo entre mujeres y hombres?',
+        opts: ['Inclusión', 'Igualdad de Género', 'Vida Saludable'],
+        corr: 1,
+        feed: 'El eje Igualdad de Género busca romper esquemas patriarcales y promover el reconocimiento de los mismos derechos para mujeres y hombres dentro y fuera del aula.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cuál es el propósito principal de la evaluación formativa según la NEM?',
+        opts: ['Sustentar el otorgamiento de calificaciones y certificados', 'Retroalimentar el proceso educativo mediante el diálogo', 'Asignar un número requerido por el sistema educativo (LGE)'],
+        corr: 1,
+        feed: 'La evaluación formativa (pedagógica) retroalimenta el proceso educativo mediante el diálogo. El error se interpreta como un peldaño del aprendizaje, no se penaliza, y el enfoque está en qué se ha aprendido y qué obstáculos existen en la vida diaria.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Qué campo formativo integra las disciplinas de Matemáticas, Biología, Física y Química?',
+        opts: ['Lenguajes', 'Ética, Naturaleza y Sociedades', 'Saberes y Pensamiento Científico'],
+        corr: 2,
+        feed: 'Saberes y Pensamiento Científico agrupa Matemáticas, Biología, Física y Química, con el foco de comprender y explicar fenómenos naturales y procesos sociales mediante la indagación.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cuántas fases de aprendizaje contempla la NEM para organizar el continuo educativo desde inicial hasta secundaria?',
+        opts: ['4 fases', '6 fases', '8 fases'],
+        corr: 1,
+        feed: 'La NEM organiza el proceso educativo en 6 fases: Fase 1 (Educación Inicial), Fase 2 (Preescolar), Fase 3 (Primaria 1° y 2°), Fase 4 (Primaria 3° y 4°), Fase 5 (Primaria 5° y 6°) y Fase 6 (Secundaria).'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿A qué fase de aprendizaje de la NEM corresponde la Educación Inicial (de 0 a 2 años, 11 meses)?',
+        opts: ['Fase 1', 'Fase 2', 'Fase 3'],
+        corr: 0,
+        feed: 'La Fase 1 corresponde a la Educación Inicial (0 a 2 años, 11 meses). La Fase 2 es Preescolar y la Fase 3 cubre Primaria 1° y 2°.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Cómo define la NEM el rol del docente en relación con el diseño curricular?',
+        opts: ['Como un ejecutor técnico de programas nacionales', 'Como un diseñador curricular activo', 'Como un administrador de contenidos establecidos por la SEP'],
+        corr: 1,
+        feed: 'La NEM reivindica al docente como diseñador curricular activo. Tiene libertad didáctica para reinventar la docencia y construir saberes según las necesidades vivenciales de sus alumnos, no solo ejecutar un programa.'
+      },
+      {
+        tipo: 'tipo-directo', badge: 'Cuestionamiento directo',
+        base: '¿Qué fase de aprendizaje de la NEM abarca Secundaria (1°, 2° y 3°)?',
+        opts: ['Fase 4', 'Fase 5', 'Fase 6'],
+        corr: 2,
+        feed: 'La Fase 6 corresponde a Secundaria (1°, 2° y 3°). Es la última fase del continuo educativo que contempla la NEM, desde la Educación Inicial hasta la Secundaria.'
+      },
+
+      /* ====== COMPLETAMIENTO (8) ====== */
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'Según el Plan de Estudio 2022, la NEM reorganiza los contenidos en cuatro campos formativos en lugar de asignaturas aisladas. El campo formativo que integra Geografía, Historia y Formación Cívica y Ética es…',
+        opts: ['Lenguajes', 'De lo Humano y lo Comunitario', 'Ética, Naturaleza y Sociedades'],
+        corr: 2,
+        feed: 'Ética, Naturaleza y Sociedades agrupa Geografía, Historia y Formación Cívica y Ética. Su foco es la relación del ser humano con la sociedad y la naturaleza, el sentido de pertenencia e identidad.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'Según la NEM, el proceso de codiseño curricular implica que el maestro no es un ejecutor técnico, sino un ___ curricular activo que adapta los contenidos al contexto de la comunidad escolar.',
+        opts: ['Administrador', 'Diseñador', 'Evaluador'],
+        corr: 1,
+        feed: 'La NEM afirma que el maestro es un diseñador curricular activo. Tiene autonomía profesional para construir el programa analítico incorporando contenidos locales basados en el contexto de su comunidad.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'El campo formativo "De lo Humano y lo Comunitario" integra Tecnología, Educación Física y…',
+        opts: ['Inglés y Lenguas Indígenas', 'Matemáticas y Biología', 'Educación Socioemocional / Tutoría'],
+        corr: 2,
+        feed: 'De lo Humano y lo Comunitario integra Tecnología, Educación Física y Educación Socioemocional / Tutoría. Su foco es la construcción de identidad, el cuidado mutuo y la resolución de retos cognitivos, motrices y afectivos.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'En el Perfil de Egreso de la NEM, los estudiantes que "interactúan con respeto en procesos cooperativos" expresan la capacidad de…',
+        opts: ['Pensamiento Crítico', 'Diálogo', 'Visión Histórica'],
+        corr: 1,
+        feed: 'El Diálogo es una de las capacidades del Perfil de Egreso. Los estudiantes aprenden a interactuar con respeto en procesos cooperativos, lo que favorece la convivencia democrática y la resolución pacífica de conflictos.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'Según la NEM, la evaluación en la que "el error se interpreta como un peldaño del aprendizaje, no se penaliza" y cuyo propósito es retroalimentar el proceso educativo se denomina evaluación…',
+        opts: ['Acreditación (administrativa)', 'Sumativa', 'Formativa (pedagógica)'],
+        corr: 2,
+        feed: 'La evaluación formativa o pedagógica es de naturaleza continua, observación sistemática y personalizada. Contrasta con la acreditación (administrativa), cuyo propósito es sustentar el otorgamiento de calificaciones o certificados.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'El eje articulador de la NEM que busca la "convivencia y diálogo entre diversas matrices culturales" se denomina…',
+        opts: ['Inclusión', 'Interculturalidad Crítica', 'Apropiación de las Culturas'],
+        corr: 1,
+        feed: 'La Interculturalidad Crítica promueve la convivencia y el diálogo entre diversas matrices culturales, reconociendo la riqueza de la diversidad étnica, lingüística y cultural del país.'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'En el proceso de codiseño de la NEM, el "Programa Analítico" corresponde al nivel de la ___ e implica la incorporación de contenidos locales basados en el contexto de la comunidad.',
+        opts: ['Nación (SEP)', 'Escuela', 'Aula (docente individual)'],
+        corr: 1,
+        feed: 'El Programa Analítico es el nivel de la escuela, donde el colectivo docente incorpora contenidos locales. Es el codiseño real. La Planeación Didáctica es el nivel del aula (docente individual).'
+      },
+      {
+        tipo: 'tipo-completar', badge: 'Completamiento',
+        base: 'El campo formativo "Lenguajes" integra Español, Lenguas Indígenas, Inglés, Lengua de Señas y…',
+        opts: ['Matemáticas', 'Artes', 'Educación Física'],
+        corr: 1,
+        feed: 'El campo Lenguajes integra Español, Lenguas Indígenas, Inglés, Lengua de Señas y Artes. Su foco principal es la expresión, comunicación y representación del mundo para propiciar la convivencia.'
+      },
+
+      /* ====== ORDENAMIENTO (4) ====== */
+      {
+        tipo: 'tipo-ordenar', badge: 'Ordenamiento',
+        base: 'Ordene las siguientes fases de aprendizaje de la NEM de la más temprana (inicio) a la más avanzada (fin del ciclo educativo):\n\n1. Fase que corresponde a Primaria 5° y 6°\n2. Fase que corresponde a Educación Inicial (0-2 años)\n3. Fase que corresponde a Primaria 1° y 2°\n4. Fase que corresponde a Secundaria',
+        opts: ['2, 3, 1, 4', '1, 2, 3, 4', '4, 3, 2, 1'],
+        corr: 0,
+        feed: 'El orden correcto es: 2 (Educación Inicial = Fase 1), 3 (Primaria 1°-2° = Fase 3), 1 (Primaria 5°-6° = Fase 5), 4 (Secundaria = Fase 6). La NEM organiza un proceso educativo continuo respetando la evolución de niñas, niños y adolescentes.'
+      },
+      {
+        tipo: 'tipo-ordenar', badge: 'Ordenamiento',
+        base: 'Ordene los pasos del proceso de codiseño curricular de la NEM, desde el nivel nacional hasta el nivel de aula:\n\n1. Planeación Didáctica (Aula)\n2. Programa Analítico (Escuela)\n3. Proceso de Apropiación (Puente)\n4. Programa de Estudio (Nacional)',
+        opts: ['1, 2, 3, 4', '4, 3, 2, 1', '3, 4, 1, 2'],
+        corr: 1,
+        feed: 'El orden correcto es: 4 (Programa de Estudio nacional, SEP) → 3 (Proceso de Apropiación, puente) → 2 (Programa Analítico, escuela) → 1 (Planeación Didáctica, aula). Así fluye el codiseño de lo macro a lo micro.'
+      },
+      {
+        tipo: 'tipo-ordenar', badge: 'Ordenamiento',
+        base: 'Ordene las razones por las que la Comunidad es el núcleo integrador de la NEM, comenzando por la que garantiza el ejercicio de derechos de las alumnas y alumnos:\n\n1. Saberes Sociales: integra conocimientos construidos por la vida comunitaria\n2. Conexión Vital: relaciona la escuela con la vida cotidiana y expectativas del entorno\n3. Sujetos de Derecho: permite que niñas, niños y adolescentes ejerzan su derecho a la educación',
+        opts: ['2, 3, 1', '3, 1, 2', '1, 2, 3'],
+        corr: 1,
+        feed: 'Comenzando por Sujetos de Derecho (3), luego Saberes Sociales (1) y finalmente Conexión Vital (2). Las tres razones justifican por qué la comunidad-territorio es el núcleo integrador de los procesos de enseñanza de la NEM.'
+      },
+      {
+        tipo: 'tipo-ordenar', badge: 'Ordenamiento',
+        base: 'Ordene los elementos de la "Brújula de la NEM" comenzando por el que organiza el tiempo educativo (continuo de fases), seguido de la estructura de contenidos, luego el ADN transversal y finalmente el paradigma de evaluación:\n\n1. Los 7 Ejes Articuladores\n2. La Evaluación Formativa\n3. Las 6 Fases de Aprendizaje\n4. Los 4 Campos Formativos',
+        opts: ['3, 4, 1, 2', '1, 2, 3, 4', '4, 1, 2, 3'],
+        corr: 0,
+        feed: 'El orden es: 3 (Fases = tiempo educativo), 4 (Campos = estructura de contenidos), 1 (Ejes = ADN transversal) y 2 (Evaluación Formativa = paradigma de evaluación). Los cinco elementos orbitan alrededor de La Comunidad como núcleo central.'
+      },
+
+      /* ====== RELACIÓN DE ELEMENTOS (3) ====== */
+      {
+        tipo: 'tipo-relacion', badge: 'Relación de elementos',
+        base: 'Seleccione la opción que relacione correctamente cada campo formativo con su foco principal:',
+        tabla: {
+          col1: 'Campo Formativo', col2: 'Foco Principal',
+          filas: [
+            ['1. Lenguajes', 'a) Comprensión y explicación de fenómenos naturales y procesos sociales mediante la indagación'],
+            ['2. Saberes y Pensamiento Científico', 'b) Expresión, comunicación y representación del mundo para propiciar la convivencia'],
+            ['3. De lo Humano y lo Comunitario', 'c) Construcción de identidad, cuidado mutuo y resolución de retos cognitivos, motrices y afectivos']
+          ]
+        },
+        opts: ['1b, 2a, 3c', '1a, 2c, 3b', '1c, 2b, 3a'],
+        corr: 0,
+        feed: 'La relación correcta es 1b (Lenguajes → expresión y comunicación), 2a (Saberes → indagación de fenómenos), 3c (Humano y Comunitario → identidad y cuidado mutuo). Cada campo integra disciplinas que confluyen en un propósito formativo común.'
+      },
+      {
+        tipo: 'tipo-relacion', badge: 'Relación de elementos',
+        base: 'Seleccione la opción que relacione correctamente cada eje articulador con su descripción:',
+        tabla: {
+          col1: 'Eje Articulador', col2: 'Descripción',
+          filas: [
+            ['1. Pensamiento Crítico', 'a) Explorar la sensibilidad y la creatividad como formas de conocer'],
+            ['2. Apropiación de las Culturas', 'b) Interrogar la realidad y oponerse a la injusticia'],
+            ['3. Artes y Experiencias Estéticas', 'c) Acceder al conocimiento a través de la lectura y la escritura']
+          ]
+        },
+        opts: ['1a, 2c, 3b', '1b, 2c, 3a', '1c, 2b, 3a'],
+        corr: 1,
+        feed: 'La relación correcta es 1b (Pensamiento Crítico → interrogar la realidad), 2c (Apropiación de Culturas → lectura y escritura) y 3a (Artes → sensibilidad y creatividad). Son los tres ejes que trabajan la dimensión intelectual, cultural y estética del currículo.'
+      },
+      {
+        tipo: 'tipo-relacion', badge: 'Relación de elementos',
+        base: 'Seleccione la opción que relacione correctamente cada fase de aprendizaje con el nivel educativo que le corresponde en la NEM:',
+        tabla: {
+          col1: 'Fase', col2: 'Nivel educativo',
+          filas: [
+            ['1. Fase 2', 'a) Primaria 3° y 4°'],
+            ['2. Fase 4', 'b) Secundaria (1°, 2°, 3°)'],
+            ['3. Fase 6', 'c) Preescolar (1°, 2°, 3°)']
+          ]
+        },
+        opts: ['1c, 2a, 3b', '1a, 2b, 3c', '1b, 2c, 3a'],
+        corr: 0,
+        feed: 'La relación correcta es 1c (Fase 2 = Preescolar), 2a (Fase 4 = Primaria 3° y 4°), 3b (Fase 6 = Secundaria). Las 6 fases representan un continuo educativo que respeta los ritmos de aprendizaje y la complejidad del entorno de cada etapa.'
+      }
+    ]; // fin preguntas[]
+
+    /* ----------------------------------------------------------
+       ESTADO DEL SIMULADOR
+    ---------------------------------------------------------- */
+    let indiceActual = 0;
+    let respuestas   = new Array(preguntas.length).fill(null); // null = sin responder
+    let aciertos     = 0;
+
+    /* ----------------------------------------------------------
+       INICIAR EXAMEN
+    ---------------------------------------------------------- */
+    function iniciarExamen() {
+      document.getElementById('pantalla-inicio').style.display   = 'none';
+      document.getElementById('bloque-progreso').style.display   = 'flex';
+      document.getElementById('tarjeta-pregunta').style.display  = 'block';
+      document.getElementById('nav-botones').style.display       = 'flex';
+      renderizarPregunta();
+    }
+
+    /* ----------------------------------------------------------
+       RENDERIZAR PREGUNTA ACTUAL
+    ---------------------------------------------------------- */
+    function renderizarPregunta() {
+      const p = preguntas[indiceActual];
+
+      /* Badge y número */
+      const badge = document.getElementById('tipo-badge');
+      badge.textContent = p.badge;
+      badge.className   = 'tipo-badge ' + p.tipo;
+      document.getElementById('num-pregunta').textContent =
+        `Pregunta ${indiceActual + 1} / ${preguntas.length}`;
+
+      /* Enunciado (respeta saltos de línea) */
+      document.getElementById('enunciado-pregunta').innerHTML =
+        p.base.replace(/\n/g, '<br>');
+
+      /* Tabla de relación (si aplica) */
+      const tablaContenedor = document.getElementById('tabla-contenedor');
+      if (p.tabla) {
+        tablaContenedor.style.display = 'block';
+        tablaContenedor.innerHTML     = generarTabla(p.tabla);
+      } else {
+        tablaContenedor.style.display = 'none';
+        tablaContenedor.innerHTML     = '';
+      }
+
+      /* Opciones */
+      const letras = ['A', 'B', 'C'];
+      const contenedor = document.getElementById('contenedor-opciones');
+      contenedor.innerHTML = '';
+
+      p.opts.forEach((texto, i) => {
+        const div = document.createElement('div');
+        div.className = 'opcion';
+        div.setAttribute('data-idx', i);
+        div.innerHTML = `
+          <span class="opcion-letra">${letras[i]}</span>
+          <span class="opcion-texto">${texto}</span>`;
+        div.addEventListener('click', () => seleccionarOpcion(i));
+        contenedor.appendChild(div);
+      });
+
+      /* Restaurar estado si ya respondió esta pregunta */
+      const ya = respuestas[indiceActual];
+      if (ya !== null) {
+        aplicarEstado(ya);
+      }
+
+      /* Retroalimentación */
+      const retro = document.getElementById('retroalimentacion');
+      retro.className   = 'retroalimentacion';
+      retro.textContent = '';
+
+      if (ya !== null) {
+        const esCorrecta = (ya === p.corr);
+        retro.className  = 'retroalimentacion mostrar ' + (esCorrecta ? 'correcto' : 'incorrecto');
+        retro.innerHTML  = (esCorrecta ? '✅ ' : '❌ Respuesta correcta: ' + ['A','B','C'][p.corr] + '. ') + p.feed;
+      }
+
+      /* Barra de progreso */
+      actualizarProgreso();
+      actualizarBotones();
+
+      /* Animar tarjeta */
+      const tarjeta = document.getElementById('tarjeta-pregunta');
+      tarjeta.style.animation = 'none';
+      tarjeta.offsetHeight; // reflow
+      tarjeta.style.animation = '';
+    }
+
+    /* ----------------------------------------------------------
+       GENERAR TABLA HTML para relación de elementos
+    ---------------------------------------------------------- */
+    function generarTabla(t) {
+      let html = `<table class="tabla-relacion">
+        <thead><tr><th>${t.col1}</th><th>${t.col2}</th></tr></thead><tbody>`;
+      t.filas.forEach(f => {
+        html += `<tr><td>${f[0]}</td><td>${f[1]}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    /* ----------------------------------------------------------
+       SELECCIONAR OPCIÓN
+    ---------------------------------------------------------- */
+    function seleccionarOpcion(idx) {
+      if (respuestas[indiceActual] !== null) return; // ya respondida
+
+      respuestas[indiceActual] = idx;
+      const p = preguntas[indiceActual];
+
+      /* Actualizar aciertos solo si aún no estaba contado */
+      if (idx === p.corr) aciertos++;
+
+      aplicarEstado(idx);
+
+      /* Mostrar retroalimentación */
+      const retro  = document.getElementById('retroalimentacion');
+      const esCorr = (idx === p.corr);
+      retro.className = 'retroalimentacion mostrar ' + (esCorr ? 'correcto' : 'incorrecto');
+      retro.innerHTML = (esCorr ? '✅ ' : '❌ Respuesta correcta: ' + ['A','B','C'][p.corr] + '. ') + p.feed;
+
+      actualizarProgreso();
+      actualizarBotones();
+    }
+
+    /* ----------------------------------------------------------
+       APLICAR ESTILOS DE ESTADO A LAS OPCIONES
+    ---------------------------------------------------------- */
+    function aplicarEstado(selIdx) {
+      const p    = preguntas[indiceActual];
+      const divs = document.querySelectorAll('.opcion');
+      divs.forEach(d => {
+        const i = parseInt(d.getAttribute('data-idx'));
+        d.classList.add('deshabilitada');
+        if (i === p.corr) {
+          d.classList.add('correcta');
+        } else if (i === selIdx && selIdx !== p.corr) {
+          d.classList.add('incorrecta');
+        }
+      });
+    }
+
+    /* ----------------------------------------------------------
+       ACTUALIZAR BARRA DE PROGRESO
+    ---------------------------------------------------------- */
+    function actualizarProgreso() {
+      const respondidas = respuestas.filter(r => r !== null).length;
+      const pct = (respondidas / preguntas.length) * 100;
+      document.getElementById('barra').style.width = pct + '%';
+      document.getElementById('txt-pregunta').textContent =
+        `Pregunta ${indiceActual + 1} de ${preguntas.length}`;
+      document.getElementById('txt-aciertos').textContent =
+        `✔ ${aciertos} aciertos`;
+    }
+
+    /* ----------------------------------------------------------
+       ACTUALIZAR BOTONES DE NAVEGACIÓN
+    ---------------------------------------------------------- */
+    function actualizarBotones() {
+      const btnAnt = document.getElementById('btn-anterior');
+      const btnSig = document.getElementById('btn-siguiente');
+      const btnFin = document.getElementById('btn-finalizar');
+      const todasRespondidas = respuestas.filter(r => r !== null).length === preguntas.length;
+
+      btnAnt.disabled = (indiceActual === 0);
+
+      if (indiceActual === preguntas.length - 1) {
+        btnSig.style.display = 'none';
+        btnFin.style.display = todasRespondidas ? 'block' : 'none';
+      } else {
+        btnSig.style.display = 'block';
+        btnFin.style.display = todasRespondidas ? 'block' : 'none';
+      }
+    }
+
+    /* ----------------------------------------------------------
+       CAMBIAR PREGUNTA  (+1 siguiente / -1 anterior)
+    ---------------------------------------------------------- */
+    function cambiarPregunta(dir) {
+      const nuevo = indiceActual + dir;
+      if (nuevo >= 0 && nuevo < preguntas.length) {
+        indiceActual = nuevo;
+        renderizarPregunta();
+      }
+    }
+
+    /* ----------------------------------------------------------
+       MOSTRAR PANTALLA DE RESULTADOS
+    ---------------------------------------------------------- */
+    function mostrarResultados() {
+      /* Ocultar elementos del quiz */
+      document.getElementById('bloque-progreso').style.display  = 'none';
+      document.getElementById('tarjeta-pregunta').style.display = 'none';
+      document.getElementById('nav-botones').style.display      = 'none';
+
+      /* Calcular estadísticas */
+      const pct = Math.round((aciertos / preguntas.length) * 100);
+
+      /* Emoji y mensaje dinámico según puntaje */
+      let emoji, msg;
+      if (pct === 100)      { emoji = '🏆'; msg = '¡Excelente! Dominas completamente la NEM 2022. ¡Resultado perfecto!'; }
+      else if (pct >= 80)   { emoji = '🌟'; msg = '¡Muy bien! Tienes un sólido dominio de los conceptos de la NEM 2022.'; }
+      else if (pct >= 60)   { emoji = '👍'; msg = 'Buen resultado. Repasa los temas donde tuviste dificultades.'; }
+      else if (pct >= 40)   { emoji = '📖'; msg = 'Necesitas reforzar tu estudio de la NEM 2022. ¡Tú puedes!'; }
+      else                   { emoji = '💪'; msg = 'Sigue estudiando. Cada intento te acerca más a dominar la NEM 2022.'; }
+
+      document.getElementById('emoji-resultado').textContent  = emoji;
+      document.getElementById('puntaje-final').textContent    = `${aciertos} / ${preguntas.length}  (${pct}%)`;
+      document.getElementById('mensaje-resultado').textContent = msg;
+
+      /* Estadísticas por tipo de reactivo */
+      const tipos = {
+        'Cuestionamiento directo': { ok: 0, tot: 0 },
+        'Completamiento':          { ok: 0, tot: 0 },
+        'Ordenamiento':            { ok: 0, tot: 0 },
+        'Relación de elementos':   { ok: 0, tot: 0 }
+      };
+      preguntas.forEach((p, i) => {
+        tipos[p.badge].tot++;
+        if (respuestas[i] === p.corr) tipos[p.badge].ok++;
+      });
+
+      const colores = {
+        'Cuestionamiento directo': '#dbeafe',
+        'Completamiento':          '#d1fae5',
+        'Ordenamiento':            '#fef3c7',
+        'Relación de elementos':   '#ede9fe'
+      };
+
+      let htmlCat = '';
+      for (const [nombre, datos] of Object.entries(tipos)) {
+        htmlCat += `
+          <div class="cat-item" style="background:${colores[nombre]}">
+            <span>${datos.ok}/${datos.tot}</span>
+            ${nombre}
+          </div>`;
+      }
+      document.getElementById('categorias-resultado').innerHTML = htmlCat;
+
+      /* Mostrar resultado */
+      const resultado = document.getElementById('pantalla-resultado');
+      resultado.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ----------------------------------------------------------
+       REVISAR RESPUESTAS (panel expandible)
+    ---------------------------------------------------------- */
+    function revisarRespuestas() {
+      const panel = document.getElementById('panel-revision');
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+        return;
+      }
+      const letras = ['A', 'B', 'C'];
+      let html = '<p class="revision-titulo">📋 Detalle de respuestas</p>';
+      preguntas.forEach((p, i) => {
+        const esCorrecto = (respuestas[i] === p.corr);
+        html += `
+          <div class="revision-item ${esCorrecto ? 'ok' : 'mal'}">
+            <span>${esCorrecto ? '✅' : '❌'}</span>
+            <span><strong>P${i+1}.</strong> ${p.base.substring(0,60)}…
+            ${!esCorrecto ? `(Correcta: ${letras[p.corr]})` : ''}</span>
+          </div>`;
+      });
+      panel.innerHTML     = html;
+      panel.style.display = 'block';
+    }
+
+    /* ----------------------------------------------------------
+       REINICIAR SIMULADOR
+    ---------------------------------------------------------- */
+    function reiniciar() {
+      indiceActual = 0;
+      aciertos     = 0;
+      respuestas   = new Array(preguntas.length).fill(null);
+
+      document.getElementById('pantalla-resultado').style.display = 'none';
+      document.getElementById('panel-revision').style.display     = 'none';
+      document.getElementById('bloque-progreso').style.display    = 'flex';
+      document.getElementById('tarjeta-pregunta').style.display   = 'block';
+      document.getElementById('nav-botones').style.display        = 'flex';
+
+      renderizarPregunta();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+  </script>
+
+</body>
+</html>

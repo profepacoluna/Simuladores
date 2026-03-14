@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ===== META ETIQUETAS PARA RESPONSIVIDAD ===== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Simulador de Resolución de Conflictos Escolares" />
+  <title>Simulador – Resolución de Conflictos Escolares</title>
+
+  <!-- ===== FUENTES DE GOOGLE ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       VARIABLES CSS – Paleta azul clara, accesible y moderna
+    ============================================================ */
+    :root {
+      --blue-900: #0d2d6e;
+      --blue-700: #1a4fa0;
+      --blue-500: #2d7dd2;
+      --blue-300: #72b4f0;
+      --blue-100: #daeeff;
+      --blue-50:  #f0f8ff;
+      --accent:   #f4a261;   /* naranja cálido de acento */
+      --green:    #2ecc71;
+      --red:      #e74c3c;
+      --gray-800: #1e2533;
+      --gray-600: #4a5568;
+      --gray-300: #cbd5e0;
+      --white:    #ffffff;
+      --shadow:   0 4px 24px rgba(13,45,110,.12);
+      --radius:   16px;
+      --font-main: 'Nunito', sans-serif;
+      --font-head: 'Playfair Display', serif;
+    }
+
+    /* ============================================================
+       RESET Y BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-main);
+      background: linear-gradient(135deg, var(--blue-50) 0%, #e8f4fd 60%, #d6ecff 100%);
+      min-height: 100vh;
+      color: var(--gray-800);
+      /* Evita desbordamiento horizontal en móviles */
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       CABECERA FIJA
+    ============================================================ */
+    header {
+      background: linear-gradient(90deg, var(--blue-900) 0%, var(--blue-700) 100%);
+      color: var(--white);
+      padding: .75rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: clamp(.9rem, 2vw, 1.1rem); /* tamaño relativo */
+      line-height: 1.3;
+    }
+
+    .header-sub {
+      font-size: .75rem;
+      opacity: .85;
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       TEMPORIZADOR
+    ============================================================ */
+    #timer-box {
+      background: rgba(255,255,255,.15);
+      border: 2px solid rgba(255,255,255,.4);
+      border-radius: 50px;
+      padding: .35rem .9rem;
+      font-size: clamp(.85rem, 2.5vw, 1rem);
+      font-weight: 800;
+      letter-spacing: .05em;
+      white-space: nowrap;
+      transition: background .3s;
+    }
+    #timer-box.warning  { background: rgba(244,162,97,.5); border-color: var(--accent); }
+    #timer-box.critical { background: rgba(231,76,60,.6);  border-color: var(--red); animation: pulse 1s infinite; }
+
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+    /* ============================================================
+       PANTALLAS (secciones visibles/ocultas por JS)
+    ============================================================ */
+    .screen { display: none; animation: fadeIn .4s ease; }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ============================================================
+       PANTALLA DE BIENVENIDA / NOMBRE
+    ============================================================ */
+    #welcome-screen {
+      max-width: 560px;
+      margin: 3rem auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem 2rem;
+    }
+
+    .card h1 {
+      font-family: var(--font-head);
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--blue-700);
+      text-align: center;
+      margin-bottom: .5rem;
+    }
+
+    .card .subtitle {
+      text-align: center;
+      color: var(--gray-600);
+      font-size: .95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: .75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .info-chip {
+      background: var(--blue-100);
+      border-radius: 12px;
+      padding: .75rem 1rem;
+      text-align: center;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--blue-700);
+    }
+    .info-chip span { display: block; font-size: 1.4rem; margin-bottom: .2rem; }
+
+    /* Campo de nombre */
+    .field-group { margin-bottom: 1.25rem; }
+    .field-group label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: .4rem;
+      color: var(--blue-900);
+      font-size: .9rem;
+    }
+    .field-group input {
+      width: 100%;
+      padding: .75rem 1rem;
+      border: 2px solid var(--blue-300);
+      border-radius: 10px;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      color: var(--gray-800);
+      outline: none;
+      transition: border-color .25s;
+    }
+    .field-group input:focus { border-color: var(--blue-500); }
+
+    /* Botones principales */
+    .btn {
+      display: inline-block;
+      padding: .85rem 2rem;
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s, background .2s;
+    }
+    .btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45,125,210,.35); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--blue-500) 0%, var(--blue-700) 100%);
+      color: var(--white);
+      width: 100%;
+    }
+
+    /* ============================================================
+       PANTALLA DE EXAMEN
+    ============================================================ */
+    #exam-screen {
+      max-width: 720px;
+      margin: 1.5rem auto;
+      padding: 0 1rem 3rem;
+    }
+
+    /* Barra de progreso */
+    .progress-wrap {
+      background: var(--blue-100);
+      border-radius: 50px;
+      height: 10px;
+      margin-bottom: .6rem;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-300), var(--blue-500));
+      border-radius: 50px;
+      transition: width .4s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      text-align: right;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--blue-700);
+      margin-bottom: 1rem;
+    }
+
+    /* Tarjeta de pregunta */
+    .question-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1rem;
+      border-left: 6px solid var(--blue-500);
+    }
+
+    .question-type-badge {
+      display: inline-block;
+      background: var(--blue-100);
+      color: var(--blue-700);
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: .2rem .7rem;
+      border-radius: 50px;
+      margin-bottom: .75rem;
+    }
+
+    .question-number {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--blue-500);
+      margin-bottom: .35rem;
+    }
+
+    .question-text {
+      font-size: clamp(.9rem, 2.5vw, 1.05rem);
+      line-height: 1.65;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Tabla de relación de elementos */
+    .relation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: .88rem;
+    }
+    .relation-table th {
+      background: var(--blue-700);
+      color: var(--white);
+      padding: .5rem .75rem;
+      text-align: left;
+    }
+    .relation-table td {
+      padding: .5rem .75rem;
+      border-bottom: 1px solid var(--blue-100);
+      vertical-align: top;
+    }
+    .relation-table tr:nth-child(even) td { background: var(--blue-50); }
+
+    /* Opciones */
+    .options-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: .85rem 1rem;
+      border: 2px solid var(--gray-300);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, transform .1s;
+      background: var(--white);
+      font-size: clamp(.85rem, 2.3vw, .95rem);
+      line-height: 1.5;
+    }
+    .option-item:hover { border-color: var(--blue-300); background: var(--blue-50); transform: translateX(3px); }
+
+    .option-letter {
+      min-width: 28px;
+      height: 28px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .85rem;
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+
+    /* Estado seleccionado */
+    .option-item.selected {
+      border-color: var(--blue-500);
+      background: var(--blue-100);
+    }
+    .option-item.selected .option-letter { background: var(--blue-500); color: var(--white); }
+
+    /* Estado correcto / incorrecto (retroalimentación) */
+    .option-item.correct   { border-color: var(--green); background: #eafaf1; pointer-events: none; }
+    .option-item.incorrect { border-color: var(--red);   background: #fdecea; pointer-events: none; }
+    .option-item.correct   .option-letter { background: var(--green); color: var(--white); }
+    .option-item.incorrect .option-letter { background: var(--red);   color: var(--white); }
+    .option-item.disabled  { pointer-events: none; opacity: .7; }
+
+    /* Retroalimentación */
+    .feedback-box {
+      border-radius: 12px;
+      padding: .85rem 1.1rem;
+      font-size: .88rem;
+      line-height: 1.55;
+      font-weight: 600;
+      margin-top: 1rem;
+      display: none;
+    }
+    .feedback-box.show { display: block; animation: fadeIn .3s ease; }
+    .feedback-box.ok   { background: #eafaf1; border: 1.5px solid var(--green); color: #1a7a45; }
+    .feedback-box.err  { background: #fdecea; border: 1.5px solid var(--red);   color: #992d2d; }
+
+    /* Navegación */
+    .nav-buttons {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--blue-700);
+      border: 2px solid var(--blue-300);
+    }
+    .btn-secondary:hover { background: var(--blue-50); }
+
+    .btn-sm { padding: .65rem 1.5rem; font-size: .9rem; }
+
+    /* ============================================================
+       PANTALLA DE RESULTADOS
+    ============================================================ */
+    #results-screen {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+    }
+
+    .result-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem 1.75rem;
+      text-align: center;
+    }
+
+    .result-emoji { font-size: 4rem; margin-bottom: .5rem; }
+
+    .result-name {
+      font-family: var(--font-head);
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+      color: var(--blue-900);
+      margin-bottom: .35rem;
+    }
+
+    .score-circle {
+      width: clamp(130px, 30vw, 160px);
+      height: clamp(130px, 30vw, 160px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-300), var(--blue-700));
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.25rem auto;
+      box-shadow: 0 8px 30px rgba(45,125,210,.35);
+    }
+    .score-circle .big { font-size: clamp(2rem, 7vw, 2.8rem); font-weight: 900; }
+    .score-circle .small { font-size: .8rem; opacity: .9; font-weight: 700; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+      margin: 1.25rem 0;
+    }
+    .stat-chip {
+      border-radius: 12px;
+      padding: .75rem .5rem;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .stat-chip.ok  { background: #eafaf1; color: #1a7a45; }
+    .stat-chip.err { background: #fdecea; color: #992d2d; }
+    .stat-chip.neu { background: var(--blue-100); color: var(--blue-700); }
+    .stat-chip span { display: block; font-size: 1.5rem; }
+
+    .verdict {
+      font-size: clamp(.9rem, 2.5vw, 1rem);
+      color: var(--gray-600);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Revisión de respuestas */
+    .review-list { text-align: left; margin-top: 1.5rem; }
+    .review-list h3 { font-size: 1rem; color: var(--blue-900); margin-bottom: .75rem; }
+
+    .review-item {
+      border-radius: 10px;
+      padding: .7rem 1rem;
+      margin-bottom: .5rem;
+      font-size: .85rem;
+      border: 1.5px solid transparent;
+    }
+    .review-item.ok  { background: #eafaf1; border-color: var(--green); }
+    .review-item.err { background: #fdecea; border-color: var(--red); }
+    .review-item strong { font-weight: 800; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      text-align: center;
+      padding: .9rem 1rem;
+      font-size: .78rem;
+      color: var(--blue-900);
+      font-weight: 600;
+      background: rgba(255,255,255,.6);
+      border-top: 1px solid var(--blue-100);
+    }
+
+    /* ============================================================
+       RESPONSIVIDAD ADICIONAL
+    ============================================================ */
+    @media (max-width: 480px) {
+      .card, .question-card, .result-card { padding: 1.25rem 1rem; }
+      .nav-buttons { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+      .stats-grid { grid-template-columns: repeat(3,1fr); gap: .4rem; }
+      header { padding: .6rem 1rem; }
+    }
+
+    @media (min-width: 768px) {
+      .nav-buttons { justify-content: flex-end; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       CABECERA GLOBAL
+  ============================================================ -->
+  <header>
+    <div>
+      <div class="header-title">📘 Simulador de Resolución de Conflictos Escolares</div>
+      <div class="header-sub">Prof. Francisco De Jesus Luna Benitez</div>
+    </div>
+    <!-- Temporizador visible durante el examen -->
+    <div id="timer-box" style="display:none;">⏱ 60:00</div>
+  </header>
+
+
+  <!-- ============================================================
+       PANTALLA 1 – BIENVENIDA Y NOMBRE
+  ============================================================ -->
+  <section id="welcome-screen" class="screen active">
+    <div class="card">
+      <h1>🏫 Bienvenido/a</h1>
+      <p class="subtitle">
+        Evalúa tu conocimiento sobre <strong>Resolución de Conflictos Escolares</strong>.<br>
+        Este instrumento sigue los formatos oficiales de reactivos de opción múltiple.
+      </p>
+
+      <!-- Chips informativos -->
+      <div class="info-grid">
+        <div class="info-chip"><span>📝</span>35 Reactivos</div>
+        <div class="info-chip"><span>⏱</span>60 Minutos</div>
+        <div class="info-chip"><span>🎯</span>3 Opciones c/u</div>
+        <div class="info-chip"><span>🔍</span>4 Formatos</div>
+      </div>
+
+      <!-- Campo de nombre -->
+      <div class="field-group">
+        <label for="student-name">✏️ Escribe tu nombre completo</label>
+        <input type="text" id="student-name" placeholder="Ej. María González López" maxlength="80" autocomplete="name" />
+      </div>
+
+      <button class="btn btn-primary" onclick="startExam()">Comenzar Simulador 🚀</button>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PANTALLA 2 – EXAMEN
+  ============================================================ -->
+  <section id="exam-screen" class="screen">
+
+    <!-- Barra de progreso -->
+    <div class="progress-wrap"><div id="progress-bar"></div></div>
+    <div class="progress-label" id="progress-label">Pregunta 0 de 35</div>
+
+    <!-- Contenido dinámico de la pregunta -->
+    <div id="question-area"></div>
+
+    <!-- Botones de navegación -->
+    <div class="nav-buttons">
+      <button class="btn btn-secondary btn-sm" onclick="prevQuestion()" id="btn-prev">← Anterior</button>
+      <button class="btn btn-primary  btn-sm" onclick="nextQuestion()" id="btn-next">Siguiente →</button>
+      <button class="btn btn-primary  btn-sm" onclick="finishExam()"   id="btn-finish" style="display:none;background:linear-gradient(90deg,#2ecc71,#27ae60)">Finalizar ✔</button>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PANTALLA 3 – RESULTADOS
+  ============================================================ -->
+  <section id="results-screen" class="screen">
+    <div class="result-card">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-name" id="result-name"></div>
+      <p style="color:var(--gray-600);font-size:.9rem;margin-bottom:.5rem;">Tu calificación</p>
+
+      <div class="score-circle">
+        <div class="big" id="score-pct">0%</div>
+        <div class="small" id="score-raw">0 / 35</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-chip ok"> <span id="correct-count">0</span>Correctas</div>
+        <div class="stat-chip err"><span id="wrong-count">0</span>Incorrectas</div>
+        <div class="stat-chip neu"><span id="time-used">—</span>Tiempo</div>
+      </div>
+
+      <p class="verdict" id="verdict-text"></p>
+
+      <button class="btn btn-primary" style="margin-bottom:1rem;" onclick="restartExam()">🔄 Reintentar</button>
+
+      <!-- Revisión por pregunta -->
+      <div class="review-list">
+        <h3>📋 Revisión de Respuestas</h3>
+        <div id="review-area"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer>
+    Prof. Francisco De Jesus Luna Benitez &nbsp;|&nbsp; Resolución de Conflictos Escolares &nbsp;|&nbsp; SEP México
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT – LÓGICA COMPLETA
+  ============================================================ -->
+  <script>
+  /* ================================================================
+     BANCO DE 35 PREGUNTAS
+     Formatos: "directa" | "completamiento" | "ordenamiento" | "relacion"
+  ================================================================ */
+  const QUESTIONS = [
+
+    /* ───────── 1. CUESTIONAMIENTO DIRECTO ───────── */
+    {
+      id: 1,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál es la perspectiva pedagógica correcta sobre los conflictos escolares según la guía de estudio?",
+      opciones: [
+        "Son interrupciones negativas que deben eliminarse para mantener el orden en el aula.",
+        "Son oportunidades educativas que preparan a los estudiantes para hacer valer sus derechos de manera no violenta.",
+        "Son señales de que el docente no maneja bien su grupo y debe reforzar las normas de disciplina."
+      ],
+      correcta: 1,
+      argumento: "El conflicto escolar no es una interrupción sino una oportunidad educativa. Aprender a resolverlos prepara a los alumnos para la vida, enseñándoles a defender sus derechos de forma no violenta."
+    },
+    {
+      id: 2,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál de los siguientes describe correctamente el estilo de afrontamiento 'Cooperación / Negociación' dentro de la Matriz de Diagnóstico?",
+      opciones: [
+        "Renunciar a las propias necesidades y evitar el problema para preservar la armonía del grupo (Pierdo/Pierdes).",
+        "Imponer los propios intereses sobre los demás sin considerar el valor de la relación (Gano/Pierdes).",
+        "Ceder en lo flexible para proteger tanto el objetivo fundamental como la relación con el otro (Gano/Ganas)."
+      ],
+      correcta: 2,
+      argumento: "La Cooperación/Negociación se ubica en el cuadrante Gano/Ganas: ambas partes ceden en lo secundario para proteger lo fundamental y la relación. Exige asertividad y empatía simultáneamente."
+    },
+    {
+      id: 3,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál es la diferencia principal entre la Negociación y la Mediación como estrategias de intervención en conflictos escolares?",
+      opciones: [
+        "En la negociación interviene un tercero neutral que guía el proceso; en la mediación las partes lo resuelven solas.",
+        "En la negociación las partes resuelven directamente con disposición al diálogo; en la mediación un facilitador neutro guía el proceso sin imponer soluciones.",
+        "La mediación se aplica cuando aún existe disposición y capacidad para el diálogo directo entre las partes."
+      ],
+      correcta: 1,
+      argumento: "La Negociación ocurre cuando las partes aún pueden dialogar directamente. La Mediación requiere un facilitador neutral e imparcial cuando el diálogo directo se ha roto, aunque NUNCA impone la solución."
+    },
+    {
+      id: 4,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Qué técnica del Botiquín de Regulación Emocional consiste en cambiar pensamientos irracionales (como 'Me odia') por pensamientos racionales (como 'Tuvo un mal día')?",
+      opciones: [
+        "Tiempo Fuera: distanciamiento temporal para calmar la emoción antes de dialogar.",
+        "Distracción Conductual: enfocar la atención en una actividad con movimiento.",
+        "Reestructuración Cognitiva: cambiar la interpretación irracional por una racional y objetiva."
+      ],
+      correcta: 2,
+      argumento: "La Reestructuración Cognitiva es la tercera herramienta del botiquín. Consiste en identificar pensamientos distorsionados sobre el conflicto y reemplazarlos por interpretaciones más realistas y menos hostiles."
+    },
+    {
+      id: 5,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál es el rol correcto del mediador escolar durante un proceso de mediación entre estudiantes?",
+      opciones: [
+        "Actuar como juez e imponer la solución más justa considerando la versión de ambas partes.",
+        "Ser un facilitador neutral e imparcial que guía el proceso comunicativo, pero que NUNCA impone la solución.",
+        "Ser el docente de mayor autoridad y experiencia que decide el resultado definitivo del conflicto."
+      ],
+      correcta: 1,
+      argumento: "El mediador es un facilitador neutral e imparcial. Su función es crear condiciones para que las partes lleguen a su propio acuerdo. Imponer una solución invalidaría el proceso de mediación."
+    },
+    {
+      id: 6,
+      tipo: "Cuestionamiento Directo",
+      base: "Según la 'Radiografía de un Conflicto', ¿cuál combinación de señales indica que se está ante un conflicto real que requiere intervención docente?",
+      opciones: [
+        "Únicamente cuando hay una confrontación física visible entre dos o más estudiantes dentro del salón de clases.",
+        "Cuando las necesidades de dos partes se contraponen, existe tensión que distorsiona la percepción y hay emociones latentes como enojo, tristeza o frustración.",
+        "Cuando el docente recibe una queja formal por escrito firmada por los alumnos involucrados en el problema."
+      ],
+      correcta: 1,
+      argumento: "Un conflicto puede identificarse antes de que escale físicamente. Las señales clave son: necesidades contrapuestas, tensión que distorsiona la percepción, incomodidad ante la conducta del otro y emociones latentes como enojo o resentimiento."
+    },
+    {
+      id: 7,
+      tipo: "Cuestionamiento Directo",
+      base: "En el Ciclo de la Escucha Activa, ¿qué acción corresponde al Paso 2: Parafrasear?",
+      opciones: [
+        "Hacer preguntas abiertas para clarificar la situación, como '¿Cómo te sientes ahora?'.",
+        "Repetir con palabras propias lo que la otra persona dijo para confirmar que se entendió correctamente.",
+        "Reconocer los sentimientos del otro, por ejemplo preguntando si se sintió avergonzado por lo que le dijeron."
+      ],
+      correcta: 1,
+      argumento: "Parafrasear es el acto de repetir el mensaje recibido con palabras propias para verificar la comprensión, usando frases como 'Si te entendí bien, lo que quieres decir es...'. Esto genera confianza y evita malentendidos."
+    },
+    {
+      id: 8,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Qué estilo de afrontamiento describe el cuadrante 'Evasión' en la Matriz de Diagnóstico?",
+      opciones: [
+        "Gano/Ganas: ceder en lo flexible para proteger el objetivo fundamental y la relación.",
+        "Pierdo/Pierdes: renunciar a las propias necesidades y evitar el problema por completo.",
+        "Gano/Pierdes: imponer los intereses propios sin importar el daño a la relación con el otro."
+      ],
+      correcta: 1,
+      argumento: "La Evasión es el cuadrante Pierdo/Pierdes: la persona renuncia a sus necesidades y evita confrontar el conflicto. Esto no resuelve el problema subyacente y puede generar resentimiento acumulado."
+    },
+    {
+      id: 9,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál de las siguientes acciones corresponde al componente 'Lenguaje Corporal Receptivo' dentro de La Postura de la Empatía?",
+      opciones: [
+        "Establecer el propio punto de vista claramente antes de escuchar al otro para guiar la conversación.",
+        "Interrumpir con preguntas frecuentes para demostrar que se está siguiendo el relato atentamente.",
+        "Asentir con la cabeza e inclinar el cuerpo hacia la persona que habla para mostrar interés genuino."
+      ],
+      correcta: 2,
+      argumento: "El Lenguaje Corporal Receptivo incluye asentir con la cabeza y orientar el cuerpo hacia el interlocutor. Son señales no verbales que transmiten apertura, interés genuino y disposición para escuchar."
+    },
+    {
+      id: 10,
+      tipo: "Cuestionamiento Directo",
+      base: "Según el Flujo de Resolución del Educador (El Acordeón), ¿cuál es la primera acción que debe realizar el docente cuando surge un conflicto?",
+      opciones: [
+        "Aplicar inmediatamente la Negociación o la Mediación según la gravedad del conflicto observado.",
+        "Identificar el estilo de afrontamiento de las partes: Competición, Evasión o Acomodación.",
+        "Realizar de inmediato el Análisis 3P (Persona, Proceso, Problema) para conocer la raíz del conflicto."
+      ],
+      correcta: 1,
+      argumento: "La primera acción del acordeón es identificar el estilo de afrontamiento de las partes involucradas. Conocer si dominan la competición, evasión o acomodación permite elegir la estrategia de intervención adecuada."
+    },
+    {
+      id: 11,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál situación justifica aplicar Mediación en lugar de Negociación en un conflicto escolar?",
+      opciones: [
+        "Cuando las partes aún tienen disposición y capacidad para dialogar directamente entre sí.",
+        "Cuando las partes agotaron sus posibilidades de diálogo y la comunicación directa se ha roto.",
+        "Cuando el conflicto es de poca importancia emocional para las partes involucradas."
+      ],
+      correcta: 1,
+      argumento: "La Mediación se reserva para cuando el diálogo directo ya no es posible. A diferencia de la Negociación, requiere la intervención de un tercero neutral que ayude a restablecer la comunicación."
+    },
+    {
+      id: 12,
+      tipo: "Cuestionamiento Directo",
+      base: "¿Cuál es el enfoque correcto del Modelo de las 3 'P' para el análisis integral de un conflicto escolar?",
+      opciones: [
+        "Analizar únicamente el Problema para encontrar la solución más rápida y eficiente posible.",
+        "Centrarse solo en el Proceso comunicativo sin considerar las emociones de las personas involucradas.",
+        "Analizar de manera simultánea las Personas (emociones e involucrados), el Proceso (factores desencadenantes) y el Problema (intereses ocultos) para llegar a la Resolución."
+      ],
+      correcta: 2,
+      argumento: "El Modelo 3P es integral: analiza simultáneamente las Personas (¿quiénes? ¿qué emociones?), el Proceso (¿qué lo desencadenó?) y el Problema (¿cuáles son los intereses ocultos?). Solo integrando las tres dimensiones se puede llegar a una resolución duradera."
+    },
+
+    /* ───────── 2. COMPLETAMIENTO ───────── */
+    {
+      id: 13,
+      tipo: "Completamiento",
+      base: "El estilo de afrontamiento más deseable en la resolución de conflictos escolares es la Cooperación/Negociación, porque…",
+      opciones: [
+        "…una parte debe sacrificar todos sus intereses para que el conflicto termine sin mayor tensión.",
+        "…ambas partes ganan en lo fundamental, y el proceso exige asertividad para defender lo propio y empatía para ceder en lo secundario.",
+        "…el docente toma la decisión final para ahorrar tiempo y restablecer el orden rápidamente."
+      ],
+      correcta: 1,
+      argumento: "La Cooperación es el estilo Gano/Ganas: exige el equilibrio entre asertividad (defender lo fundamental) y empatía (ceder en lo secundario). Así ambas partes salen fortalecidas y la relación se preserva."
+    },
+    {
+      id: 14,
+      tipo: "Completamiento",
+      base: "En el Ciclo de la Escucha Activa, el Paso 3: Reflejar consiste en…",
+      opciones: [
+        "…hacer preguntas abiertas como '¿Cómo te sientes ahora?' para clarificar la situación inicial.",
+        "…reconocer los sentimientos del otro, por ejemplo preguntando '¿Tú te sentiste avergonzado por lo que te dijo?'",
+        "…hacer una síntesis breve del problema general para cerrar el ciclo de comunicación."
+      ],
+      correcta: 1,
+      argumento: "Reflejar es el paso en que se nombran y validan los sentimientos del interlocutor. Reconocer las emociones del otro ('¿Te sentiste avergonzado?') genera empatía y abre la disposición al diálogo."
+    },
+    {
+      id: 15,
+      tipo: "Completamiento",
+      base: "El 'Botiquín de Primeros Auxilios Emocionales' incluye la técnica 'Tiempo Fuera', que consiste en…",
+      opciones: [
+        "…enfocar la atención en una actividad física o con movimiento para liberar la tensión acumulada.",
+        "…distanciarse temporalmente de la situación para calmar la emoción antes de retomar el diálogo.",
+        "…aceptar la propia responsabilidad preguntándose '¿Qué hice yo para contribuir a este conflicto?'"
+      ],
+      correcta: 1,
+      argumento: "El Tiempo Fuera (herramienta 1 del botiquín) implica un distanciamiento temporal del foco de tensión. No es evasión; es una pausa estratégica para que la emoción disminuya y el diálogo posterior sea más productivo."
+    },
+    {
+      id: 16,
+      tipo: "Completamiento",
+      base: "En la etapa de 'Inicio' del Embudo de la Mediación, la acción principal del mediador es…",
+      opciones: [
+        "…escuchar ambas versiones sin interrupciones para entender los antecedentes y clarificar el problema real.",
+        "…restablecer los canales de comunicación y definir las reglas y objetivos del proceso de mediación.",
+        "…establecer compromisos concretos y redactar el acuerdo final que ambas partes firmarán."
+      ],
+      correcta: 1,
+      argumento: "En la fase de Inicio del Embudo, la prioridad es comunicar y aproximar a las partes: restablecer canales de comunicación y establecer las reglas y objetivos del proceso antes de escuchar los relatos."
+    },
+    {
+      id: 17,
+      tipo: "Completamiento",
+      base: "Según la dimensión 'Problema' del Modelo 3P, el mediador debe cuestionarse…",
+      opciones: [
+        "…quiénes están involucrados, qué emociones predominan y si existen alianzas o diferencias de poder.",
+        "…qué desencadenó el conflicto, qué factores lo empeoraron y cómo está fluyendo la comunicación.",
+        "…cuáles son los intereses ocultos de cada parte y qué recursos u ofertas están dispuestos a ceder."
+      ],
+      correcta: 2,
+      argumento: "La dimensión 'Problema' del modelo 3P indaga los intereses no declarados: ¿qué hay detrás de la posición visible de cada parte? ¿Qué necesidades reales están en juego? ¿Qué están dispuestos a ceder?"
+    },
+    {
+      id: 18,
+      tipo: "Completamiento",
+      base: "En el enfoque pedagógico 'Sembrar la Solidaridad en el Aula', la acción 'Empatizar' significa…",
+      opciones: [
+        "…usar materiales en común para que los alumnos entiendan el beneficio colectivo del trabajo compartido.",
+        "…trabajar en pares para comprender que las emociones del otro son tan válidas como las propias.",
+        "…reconocer que los resultados del grupo mejoran cuando cada alumno aporta su talento único."
+      ],
+      correcta: 1,
+      argumento: "Empatizar en el aula implica trabajar en pares para practicar la comprensión emocional: las emociones ajenas son igualmente válidas a las propias. Esta práctica reduce la competición y construye identidad colectiva."
+    },
+    {
+      id: 19,
+      tipo: "Completamiento",
+      base: "El pilar 'Búsqueda de Consenso' dentro de la Alianza Escuela-Familia se refiere a…",
+      opciones: [
+        "…fomentar el diálogo seguro en el hogar para que los hijos se expresen con confianza y sin miedo.",
+        "…evitar comparaciones entre los hijos y aceptar los errores como parte del proceso de aprendizaje.",
+        "…tomar decisiones familiares en conjunto, lo que refuerza en el hogar las habilidades de negociación trabajadas en la escuela."
+      ],
+      correcta: 2,
+      argumento: "La Búsqueda de Consenso en la Alianza Escuela-Familia invita a las familias a tomar decisiones conjuntas en casa, transfiriendo así las habilidades de resolución cooperativa del aula al contexto familiar."
+    },
+    {
+      id: 20,
+      tipo: "Completamiento",
+      base: "Según la guía de estudio, la resolución de conflictos debe ser una práctica habitual en la escuela porque…",
+      opciones: [
+        "…reduce el número de llamadas de atención que el docente debe hacer durante la clase.",
+        "…es un esfuerzo sostenido para convertir la escuela en un espacio de justicia, solidaridad e igualdad, más allá del horario lectivo.",
+        "…permite al director evaluar el desempeño del docente en el manejo de situaciones difíciles."
+      ],
+      correcta: 1,
+      argumento: "La resolución de conflictos no es una actividad puntual; es un compromiso pedagógico continuo para transformar la cultura escolar en un entorno de justicia, solidaridad e igualdad, fuera y dentro del horario lectivo."
+    },
+
+    /* ───────── 3. ORDENAMIENTO ───────── */
+    {
+      id: 21,
+      tipo: "Ordenamiento",
+      base: "Ordene los 4 pasos del Ciclo de la Escucha Activa en la secuencia correcta, comenzando por el primero:\n\n1. Parafrasear – Repetir para confirmar el entendimiento.\n2. Resumir – Hacer una síntesis breve del problema general.\n3. Clarificar – Hacer preguntas abiertas.\n4. Reflejar – Reconocer los sentimientos del otro.",
+      opciones: [
+        "3, 1, 4, 2  (Clarificar → Parafrasear → Reflejar → Resumir)",
+        "1, 3, 2, 4  (Parafrasear → Clarificar → Resumir → Reflejar)",
+        "3, 4, 1, 2  (Clarificar → Reflejar → Parafrasear → Resumir)"
+      ],
+      correcta: 0,
+      argumento: "El ciclo correcto es: Paso 1 Clarificar (preguntas abiertas) → Paso 2 Parafrasear (confirmar entendimiento) → Paso 3 Reflejar (reconocer sentimientos) → Paso 4 Resumir (síntesis del problema). Este orden garantiza comprensión progresiva."
+    },
+    {
+      id: 22,
+      tipo: "Ordenamiento",
+      base: "Ordene correctamente las tres fases del Embudo de la Mediación, de la primera a la última:\n\n1. Descripción del Conflicto – Recopilar información escuchando ambas versiones.\n2. Inicio – Comunicar y aproximar a las partes.\n3. Obtención de Acuerdos – Clarificar necesidades y establecer compromisos.",
+      opciones: [
+        "2, 1, 3  (Inicio → Descripción del Conflicto → Obtención de Acuerdos)",
+        "1, 2, 3  (Descripción del Conflicto → Inicio → Obtención de Acuerdos)",
+        "3, 1, 2  (Obtención de Acuerdos → Descripción del Conflicto → Inicio)"
+      ],
+      correcta: 0,
+      argumento: "El Embudo de la Mediación sigue el orden: Inicio (restablecer comunicación y reglas) → Descripción del Conflicto (escuchar ambas versiones) → Obtención de Acuerdos (compromisos concretos y firma). El orden refleja el proceso de 'embudarse' desde lo general a lo específico."
+    },
+    {
+      id: 23,
+      tipo: "Ordenamiento",
+      base: "Ordene los 4 pasos de la Negociación en la secuencia correcta:\n\n1. Buscar Soluciones – Usar empatía y creatividad para encontrar alternativas intermedias.\n2. Disposición al Diálogo – Expresar percepciones asertivamente sin ofender.\n3. Establecer Acuerdos – Elegir la mejor solución mutua y definir compromisos.\n4. Identificar el Problema e Intereses – Descubrir el interés común y escuchar necesidades.",
+      opciones: [
+        "2, 4, 1, 3  (Diálogo → Identificar Problema → Buscar Soluciones → Establecer Acuerdos)",
+        "4, 2, 3, 1  (Identificar Problema → Diálogo → Acuerdos → Buscar Soluciones)",
+        "1, 3, 4, 2  (Buscar Soluciones → Acuerdos → Identificar → Diálogo)"
+      ],
+      correcta: 0,
+      argumento: "Los 4 pasos de la Negociación son: Paso 1 Disposición al Diálogo → Paso 2 Identificar el Problema e Intereses → Paso 3 Buscar Soluciones → Paso 4 Establecer Acuerdos. Este orden garantiza que las soluciones se construyan sobre necesidades reales."
+    },
+    {
+      id: 24,
+      tipo: "Ordenamiento",
+      base: "Ordene las primeras cuatro etapas del Flujo de Resolución del Educador (Acordeón) en el orden correcto:\n\n1. Usar Escucha Activa y Empatía\n2. Surge el Conflicto\n3. Aplicar Regulación Emocional (Botiquín)\n4. Identificar el Estilo de Afrontamiento",
+      opciones: [
+        "2, 4, 3, 1  (Surge el Conflicto → Identificar Estilo → Regulación Emocional → Escucha Activa)",
+        "4, 2, 1, 3  (Identificar → Surge → Escucha → Regulación)",
+        "2, 3, 4, 1  (Surge → Regulación → Identificar → Escucha)"
+      ],
+      correcta: 0,
+      argumento: "El Acordeón del Educador sigue: Surge el Conflicto → Identificar el Estilo de Afrontamiento → Aplicar Regulación Emocional → Usar Escucha Activa y Empatía. Luego se evalúa si hay capacidad de diálogo para elegir entre Negociación o Mediación."
+    },
+    {
+      id: 25,
+      tipo: "Ordenamiento",
+      base: "Ordene las 5 herramientas del Botiquín de Regulación Emocional en la secuencia presentada en la guía de estudio:\n\n1. Reestructuración Cognitiva\n2. Círculos de Confianza\n3. Tiempo Fuera\n4. Distracción Conductual\n5. Aceptar Responsabilidad",
+      opciones: [
+        "3, 4, 1, 5, 2  (Tiempo Fuera → Distracción → Reestructuración → Responsabilidad → Círculos)",
+        "1, 2, 3, 4, 5  (Reestructuración → Círculos → Tiempo Fuera → Distracción → Responsabilidad)",
+        "4, 3, 5, 1, 2  (Distracción → Tiempo Fuera → Responsabilidad → Reestructuración → Círculos)"
+      ],
+      correcta: 0,
+      argumento: "El Botiquín tiene 5 herramientas en este orden: 1 Tiempo Fuera, 2 Distracción Conductual, 3 Reestructuración Cognitiva, 4 Aceptar Responsabilidad, 5 Círculos de Confianza. Progresa desde la calma inmediata hasta la reflexión profunda."
+    },
+    {
+      id: 26,
+      tipo: "Ordenamiento",
+      base: "Ordene los tres pilares de 'Sembrar la Solidaridad en el Aula' en el orden presentado en la guía de estudio:\n\n1. Empatizar – Trabajar en pares para validar emociones ajenas.\n2. Compartir – Uso de materiales en común para el beneficio colectivo.\n3. Participar – Reconocer que cada alumno aporta un talento único.",
+      opciones: [
+        "2, 3, 1  (Compartir → Participar → Empatizar)",
+        "1, 2, 3  (Empatizar → Compartir → Participar)",
+        "3, 1, 2  (Participar → Empatizar → Compartir)"
+      ],
+      correcta: 0,
+      argumento: "Los pilares de Solidaridad en el Aula se presentan en este orden: 1 Compartir (materiales en común), 2 Participar (cada talento suma), 3 Empatizar (validar emociones del otro). La secuencia va de lo material a lo emocional."
+    },
+
+    /* ───────── 4. RELACIÓN DE ELEMENTOS ───────── */
+    {
+      id: 27,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada estilo de afrontamiento con su característica principal:\n\nEstilos: 1. Competición  2. Evasión  3. Acomodación  4. Cooperación\n\na) Ceder en lo flexible para proteger el objetivo y la relación (Gano/Ganas)\nb) Imponer intereses propios sin considerar la relación (Gano/Pierdes)\nc) Ceder totalmente para evitar problemas (Pierdo/Ganas)\nd) Renunciar a necesidades y evitar el problema (Pierdo/Pierdes)",
+      opciones: [
+        "1b, 2d, 3c, 4a",
+        "1d, 2b, 3a, 4c",
+        "1c, 2a, 3d, 4b"
+      ],
+      correcta: 0,
+      argumento: "Competición = Gano/Pierdes (imponer); Evasión = Pierdo/Pierdes (evitar); Acomodación = Pierdo/Ganas (ceder totalmente); Cooperación = Gano/Ganas (ceder en lo flexible). Esta matriz permite diagnosticar el estilo dominante de cada parte."
+    },
+    {
+      id: 28,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada paso del Ciclo de la Escucha Activa con su descripción:\n\nPasos: 1. Clarificar  2. Parafrasear  3. Reflejar  4. Resumir\n\na) Hacer una síntesis breve del problema general.\nb) Repetir para confirmar el entendimiento.\nc) Reconocer los sentimientos del otro.\nd) Hacer preguntas abiertas.",
+      opciones: [
+        "1d, 2b, 3c, 4a",
+        "1b, 2a, 3d, 4c",
+        "1c, 2d, 3a, 4b"
+      ],
+      correcta: 0,
+      argumento: "Clarificar = preguntas abiertas (¿Cómo te sientes?); Parafrasear = confirmar entendimiento; Reflejar = reconocer sentimientos; Resumir = síntesis del problema. Este ciclo completo garantiza una escucha genuina y empática."
+    },
+    {
+      id: 29,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada elemento de 'La Postura de la Empatía' con su descripción:\n\nElementos: 1. Frenar Juicios  2. Contacto Visual  3. Honestidad y Asertividad  4. Lenguaje Corporal Receptivo\n\na) Asentir con la cabeza e inclinar el cuerpo hacia la persona.\nb) Nadie tiene la verdad absoluta; ser flexible a otros puntos de vista.\nc) Decir la verdad con respeto para ganar confianza.\nd) Generar confianza e interés genuino, sin distracciones.",
+      opciones: [
+        "1b, 2d, 3c, 4a",
+        "1d, 2c, 3a, 4b",
+        "1c, 2b, 3d, 4a"
+      ],
+      correcta: 0,
+      argumento: "Frenar Juicios = flexibilidad ante otros puntos de vista; Contacto Visual = confianza e interés genuino; Honestidad y Asertividad = decir la verdad con respeto; Lenguaje Corporal Receptivo = asentir e inclinar el cuerpo."
+    },
+    {
+      id: 30,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada fase del Embudo de la Mediación con su actividad principal:\n\nFases: 1. Inicio  2. Descripción del Conflicto  3. Obtención de Acuerdos\n\na) Clarificar necesidades y establecer compromisos concretos; el acuerdo se redacta y firma.\nb) Restablecer canales de comunicación y definir reglas y objetivos del proceso.\nc) Escuchar ambas versiones sin interrupciones para entender los antecedentes.",
+      opciones: [
+        "1b, 2c, 3a",
+        "1c, 2a, 3b",
+        "1a, 2b, 3c"
+      ],
+      correcta: 0,
+      argumento: "Inicio = restablecer comunicación y definir reglas; Descripción del Conflicto = escuchar ambas versiones; Obtención de Acuerdos = compromisos concretos y firma. El proceso es progresivo: de lo general al compromiso específico."
+    },
+    {
+      id: 31,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada pilar de la Alianza Escuela-Familia con su descripción:\n\nPilares: 1. Fomentar Autoestima  2. Búsqueda de Consenso  3. Escuchar con Empatía  4. Colaboración\n\na) Sustituir la competitividad por la ayuda mutua en tareas diarias.\nb) Evitar comparaciones entre los hijos y aceptar sus errores.\nc) Fomentar el diálogo seguro en el hogar.\nd) Tomar decisiones familiares en conjunto.",
+      opciones: [
+        "1b, 2d, 3c, 4a",
+        "1a, 2b, 3d, 4c",
+        "1c, 2a, 3b, 4d"
+      ],
+      correcta: 0,
+      argumento: "Fomentar Autoestima = evitar comparaciones; Consenso = decisiones en familia; Escuchar con Empatía = diálogo seguro en casa; Colaboración = ayuda mutua en tareas. Los cuatro pilares refuerzan en el hogar lo que se practica en la escuela."
+    },
+    {
+      id: 32,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada componente de 'Sembrar la Solidaridad en el Aula' con su descripción:\n\nComponentes: 1. Compartir  2. Participar  3. Empatizar\n\na) Trabajar en pares para comprender que las emociones del otro son tan válidas como las propias.\nb) Uso de materiales en común para entender el beneficio colectivo.\nc) Reconocer que los resultados mejoran cuando cada alumno aporta su talento único.",
+      opciones: [
+        "1b, 2c, 3a",
+        "1c, 2a, 3b",
+        "1a, 2b, 3c"
+      ],
+      correcta: 0,
+      argumento: "Compartir = uso colectivo de materiales; Participar = cada talento enriquece el grupo; Empatizar = validar las emociones del compañero. Estas tres acciones construyen identidad colectiva y reducen la competencia destructiva."
+    },
+    {
+      id: 33,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada 'P' del Modelo de las 3 P con su pregunta diagnóstica:\n\nDimensiones: 1. Personas  2. Proceso  3. Problema\n\na) ¿Cuáles son los intereses ocultos de cada parte? ¿Qué recursos están dispuestos a ceder?\nb) ¿Quiénes están involucrados? ¿Qué emociones predominan? ¿Existen alianzas o diferencias de poder?\nc) ¿Qué desencadenó el conflicto? ¿Qué factores lo empeoraron? ¿Cómo está fluyendo la comunicación?",
+      opciones: [
+        "1b, 2c, 3a",
+        "1a, 2b, 3c",
+        "1c, 2a, 3b"
+      ],
+      correcta: 0,
+      argumento: "Personas = quiénes y qué sienten; Proceso = qué lo desencadenó y cómo fluye la comunicación; Problema = intereses ocultos y disposición a ceder. Las tres dimensiones se intersectan en el centro del diagrama de Venn: la Resolución."
+    },
+    {
+      id: 34,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada herramienta del Botiquín de Regulación Emocional con su descripción:\n\nHerramientas: 1. Tiempo Fuera  2. Distracción Conductual  3. Aceptar Responsabilidad  4. Círculos de Confianza\n\na) Espacios para expresar asertivamente: 'Cuando me enfado yo...'\nb) Distanciamiento temporal para calmar la emoción.\nc) Enfocar la atención en una actividad con movimiento.\nd) Preguntarse: '¿Qué hice yo para contribuir a esto?'",
+      opciones: [
+        "1b, 2c, 3d, 4a",
+        "1a, 2b, 3c, 4d",
+        "1c, 2d, 3a, 4b"
+      ],
+      correcta: 0,
+      argumento: "Tiempo Fuera = pausa para calmar la emoción; Distracción Conductual = actividad con movimiento; Aceptar Responsabilidad = reflexión sobre la propia contribución al conflicto; Círculos de Confianza = expresión asertiva en espacios seguros."
+    },
+    {
+      id: 35,
+      tipo: "Relación de Elementos",
+      base: "Seleccione la opción que relacione correctamente cada dimensión de la Matriz de Intervención con sus características:\n\nDimensiones: 1. ¿Cuándo se utiliza?  2. ¿Quién resuelve el problema?  3. El Rol del Tercero\n\na) Negociación: Las propias partes involucradas / Mediación: Las partes guiadas por un tercero.\nb) Negociación: Cuando aún hay disposición al diálogo directo / Mediación: Cuando el diálogo directo se ha roto.\nc) Negociación: No existe tercero o es observador pasivo / Mediación: Facilitador neutral que guía pero NUNCA impone.",
+      opciones: [
+        "1b, 2a, 3c",
+        "1a, 2c, 3b",
+        "1c, 2b, 3a"
+      ],
+      correcta: 0,
+      argumento: "La Matriz de Intervención diferencia claramente: el cuándo (disposición o ruptura del diálogo), el quién resuelve (partes solas vs. con facilitador) y el rol del tercero (ausente/pasivo vs. facilitador neutral sin poder de decisión)."
+    }
+
+  ]; /* fin del banco de preguntas */
+
+
+  /* ================================================================
+     VARIABLES DE ESTADO
+  ================================================================ */
+  let currentQ      = 0;         // índice de la pregunta actual
+  let userAnswers   = [];        // respuestas del usuario (null = sin responder)
+  let timerInterval = null;      // referencia al intervalo del temporizador
+  let secondsLeft   = 60 * 60;  // 3600 segundos = 60 minutos
+  let startTime     = null;      // fecha de inicio para calcular tiempo usado
+  let studentName   = "";        // nombre del participante
+
+  /* ================================================================
+     FUNCIONES DE TIEMPO
+  ================================================================ */
+  function formatTime(secs) {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function startTimer() {
+    const box = document.getElementById('timer-box');
+    box.style.display = 'block';
+    timerInterval = setInterval(() => {
+      secondsLeft--;
+      box.textContent = `⏱ ${formatTime(secondsLeft)}`;
+
+      // Cambia el color cuando queda poco tiempo
+      if (secondsLeft <= 300) { // últimos 5 min
+        box.className = secondsLeft <= 60 ? 'critical' : 'warning';
+      }
+
+      if (secondsLeft <= 0) {
+        clearInterval(timerInterval);
+        alert('⏰ ¡Tiempo agotado! Se enviarán tus respuestas.');
+        finishExam();
+      }
+    }, 1000);
+  }
+
+  /* ================================================================
+     INICIO DEL EXAMEN
+  ================================================================ */
+  function startExam() {
+    const nameInput = document.getElementById('student-name').value.trim();
+
+    // Validación del nombre
+    if (!nameInput) {
+      document.getElementById('student-name').style.borderColor = 'var(--red)';
+      document.getElementById('student-name').placeholder = '⚠️ Por favor ingresa tu nombre';
+      return;
+    }
+
+    studentName   = nameInput;
+    userAnswers   = new Array(QUESTIONS.length).fill(null); // inicializa sin respuestas
+    currentQ      = 0;
+    startTime     = new Date();
+
+    // Cambia de pantalla
+    showScreen('exam-screen');
+    startTimer();
+    renderQuestion();
+  }
+
+  /* ================================================================
+     RENDERIZAR PREGUNTA ACTUAL
+  ================================================================ */
+  function renderQuestion() {
+    const q    = QUESTIONS[currentQ];
+    const area = document.getElementById('question-area');
+    const pct  = ((currentQ + 1) / QUESTIONS.length) * 100;
+    const answered = userAnswers[currentQ];
+
+    // Actualiza barra de progreso
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent =
+      `Pregunta ${currentQ + 1} de ${QUESTIONS.length}`;
+
+    // Construye las opciones HTML
+    let optionsHTML = QUESTIONS[currentQ].opciones.map((op, i) => {
+      const letter  = String.fromCharCode(65 + i); // A, B, C
+      let classes   = 'option-item';
+
+      // Si ya fue respondida, muestra el estado visual
+      if (answered !== null) {
+        if      (i === q.correcta)          classes += ' correct';
+        else if (i === answered)            classes += ' incorrect';
+        else                               classes += ' disabled';
+      } else if (answered === i) {
+        classes += ' selected';
+      }
+
+      return `
+        <li class="${classes}" onclick="selectOption(${i})" id="opt-${i}">
+          <div class="option-letter">${letter}</div>
+          <div>${op}</div>
+        </li>`;
+    }).join('');
+
+    // Retroalimentación (visible solo si ya respondió)
+    let feedbackHTML = '';
+    if (answered !== null) {
+      const ok = answered === q.correcta;
+      feedbackHTML = `
+        <div class="feedback-box ${ok ? 'ok' : 'err'} show">
+          ${ok ? '✅ <strong>¡Correcto!</strong>' : '❌ <strong>Respuesta incorrecta.</strong>'}
+          La opción correcta es <strong>${String.fromCharCode(65 + q.correcta)}</strong>.<br>
+          <em>${q.argumento}</em>
+        </div>`;
+    }
+
+    // Inyecta el HTML de la pregunta
+    area.innerHTML = `
+      <div class="question-card">
+        <div class="question-type-badge">📋 ${q.tipo}</div>
+        <div class="question-number">Reactivo ${q.id} de ${QUESTIONS.length}</div>
+        <div class="question-text">${q.base.replace(/\n/g, '<br>')}</div>
+        <ul class="options-list">${optionsHTML}</ul>
+        ${feedbackHTML}
+      </div>`;
+
+    // Botones de navegación
+    document.getElementById('btn-prev').style.display   = currentQ === 0 ? 'none' : 'inline-block';
+    document.getElementById('btn-next').style.display   = currentQ < QUESTIONS.length - 1 ? 'inline-block' : 'none';
+    document.getElementById('btn-finish').style.display = currentQ === QUESTIONS.length - 1 ? 'inline-block' : 'none';
+  }
+
+  /* ================================================================
+     SELECCIÓN DE OPCIÓN
+  ================================================================ */
+  function selectOption(index) {
+    if (userAnswers[currentQ] !== null) return; // ya respondió
+    userAnswers[currentQ] = index;
+    renderQuestion(); // re-renderiza con retroalimentación
+  }
+
+  /* ================================================================
+     NAVEGACIÓN
+  ================================================================ */
+  function nextQuestion() {
+    if (currentQ < QUESTIONS.length - 1) { currentQ++; renderQuestion(); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prevQuestion() {
+    if (currentQ > 0) { currentQ--; renderQuestion(); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ================================================================
+     FINALIZAR EXAMEN
+  ================================================================ */
+  function finishExam() {
+    clearInterval(timerInterval);
+
+    const totalTime    = Math.floor((new Date() - startTime) / 1000);
+    const correct      = userAnswers.filter((a, i) => a === QUESTIONS[i].correcta).length;
+    const wrong        = userAnswers.filter((a, i) => a !== null && a !== QUESTIONS[i].correcta).length;
+    const unanswered   = userAnswers.filter(a => a === null).length;
+    const pct          = Math.round((correct / QUESTIONS.length) * 100);
+
+    // Veredicto según calificación
+    const verdicts = [
+      { min: 90, emoji: '🏆', text: `¡Excelente, ${studentName}! Dominas el tema de Resolución de Conflictos Escolares. ¡Eres un referente pedagógico!` },
+      { min: 75, emoji: '🎉', text: `¡Muy bien, ${studentName}! Tienes un sólido manejo del tema. Repasa los conceptos que fallaste para consolidarlos.` },
+      { min: 60, emoji: '📚', text: `Buen esfuerzo, ${studentName}. Aprobado. Te recomendamos repasar las estrategias de mediación y el Modelo 3P.` },
+      { min: 0,  emoji: '💪', text: `No te desanimes, ${studentName}. Revisa la Guía de Estudio con detenimiento y vuelve a intentarlo. ¡Tú puedes!` }
+    ];
+    const v = verdicts.find(x => pct >= x.min);
+
+    document.getElementById('result-emoji').textContent  = v.emoji;
+    document.getElementById('result-name').textContent   = studentName;
+    document.getElementById('score-pct').textContent     = pct + '%';
+    document.getElementById('score-raw').textContent     = `${correct} / ${QUESTIONS.length}`;
+    document.getElementById('correct-count').textContent = correct;
+    document.getElementById('wrong-count').textContent   = wrong + (unanswered ? ` (+${unanswered} sin resp.)` : '');
+    document.getElementById('time-used').textContent     = formatTime(totalTime);
+    document.getElementById('verdict-text').textContent  = v.text;
+
+    // Revisión detallada por pregunta
+    const reviewArea = document.getElementById('review-area');
+    reviewArea.innerHTML = QUESTIONS.map((q, i) => {
+      const ua  = userAnswers[i];
+      const ok  = ua === q.correcta;
+      const ans = ua !== null
+        ? `Tu respuesta: <strong>${String.fromCharCode(65 + ua)}</strong>`
+        : `<strong>Sin respuesta</strong>`;
+      const cor = `Correcta: <strong>${String.fromCharCode(65 + q.correcta)}</strong>`;
+      return `
+        <div class="review-item ${ok ? 'ok' : 'err'}">
+          ${ok ? '✅' : '❌'} <strong>P${q.id}.</strong> ${q.tipo} &nbsp;|&nbsp; ${ans} &nbsp;|&nbsp; ${cor}
+        </div>`;
+    }).join('');
+
+    showScreen('results-screen');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ================================================================
+     REINICIAR EXAMEN
+  ================================================================ */
+  function restartExam() {
+    secondsLeft = 60 * 60;
+    document.getElementById('timer-box').className   = '';
+    document.getElementById('timer-box').style.display = 'none';
+    document.getElementById('student-name').value    = '';
+    showScreen('welcome-screen');
+  }
+
+  /* ================================================================
+     UTILIDAD: MOSTRAR PANTALLA
+  ================================================================ */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  </script>
+</body>
+</html>

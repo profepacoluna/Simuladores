@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ============================================================
+       META Y CONFIGURACIÓN BÁSICA
+       ============================================================ -->
+  <meta charset="UTF-8" />
+  <!-- Viewport: evita que el contenido se deforme en celulares -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador — Protocolo de Erradicación del Acoso Escolar</title>
+
+  <!-- Google Fonts: Lexend (display) + Nunito (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- ============================================================
+       ESTILOS CSS — todo en un solo archivo
+       ============================================================ -->
+  <style>
+    /* ──────────────────────────────────────────
+       VARIABLES DE COLOR Y TIPOGRAFÍA
+    ────────────────────────────────────────── */
+    :root {
+      --blue-900: #0a2240;
+      --blue-800: #103561;
+      --blue-700: #1a4f8a;
+      --blue-600: #1e6abf;
+      --blue-500: #2e82d9;
+      --blue-400: #5ba3e8;
+      --blue-100: #deeeff;
+      --blue-50:  #f0f7ff;
+      --teal:     #00bfa6;
+      --coral:    #ff6b6b;
+      --gold:     #f5a623;
+      --success:  #28a745;
+      --error:    #dc3545;
+      --neutral:  #f4f8fd;
+      --text:     #0d1b2a;
+      --muted:    #5a7090;
+      --border:   #c4d9f0;
+
+      --font-display: 'Lexend', sans-serif;
+      --font-body:    'Nunito', sans-serif;
+      --radius:       14px;
+      --shadow:       0 4px 24px rgba(10,34,64,0.10);
+      --shadow-lg:    0 8px 40px rgba(10,34,64,0.16);
+    }
+
+    /* ──────────────────────────────────────────
+       RESET Y BASE
+    ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--blue-50);
+      color: var(--text);
+      min-height: 100vh;
+      /* fondo decorativo tipo cuadrícula sutil */
+      background-image:
+        linear-gradient(var(--blue-100) 1px, transparent 1px),
+        linear-gradient(90deg, var(--blue-100) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ──────────────────────────────────────────
+       ENCABEZADO SUPERIOR
+    ────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      text-align: center;
+      box-shadow: 0 3px 16px rgba(10,34,64,0.35);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header .badge {
+      background: var(--teal);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    header .prof {
+      font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+      opacity: 0.82;
+      font-weight: 500;
+    }
+
+    /* ──────────────────────────────────────────
+       BARRA DE PROGRESO + TIMER (barra fija)
+    ────────────────────────────────────────── */
+    #quiz-bar {
+      background: #fff;
+      border-bottom: 2px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 80px; /* debajo del header */
+      z-index: 90;
+      box-shadow: 0 2px 10px rgba(10,34,64,0.06);
+    }
+
+    /* Contador de preguntas */
+    #quiz-bar .q-counter {
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--blue-700);
+      white-space: nowrap;
+    }
+
+    /* Barra de avance */
+    #progress-wrap {
+      flex: 1;
+      min-width: 100px;
+      background: var(--blue-100);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-600), var(--teal));
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Temporizador */
+    #timer {
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: var(--blue-900);
+      color: #fff;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      transition: background 0.3s;
+    }
+    #timer.warning { background: var(--gold); color: var(--blue-900); }
+    #timer.danger  { background: var(--coral); color: #fff; animation: pulse 0.8s infinite alternate; }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+
+    /* ──────────────────────────────────────────
+       CONTENEDOR PRINCIPAL (centrado, responsive)
+    ────────────────────────────────────────── */
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    /* ──────────────────────────────────────────
+       PANTALLA DE BIENVENIDA
+    ────────────────────────────────────────── */
+    #screen-welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: center;
+      padding-top: 2rem;
+    }
+
+    .welcome-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(1.5rem, 5vw, 3rem);
+      width: 100%;
+      max-width: 560px;
+      border-top: 6px solid var(--blue-600);
+    }
+
+    .welcome-card .icon-big {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .welcome-card h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      color: var(--blue-900);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-card p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Grid de datos del simulador */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+      background: var(--blue-50);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .info-item .val {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--blue-600);
+    }
+
+    .info-item .lbl {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Input de nombre */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      text-align: left;
+      margin-bottom: 1.25rem;
+    }
+
+    .field-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--blue-800);
+      letter-spacing: 0.04em;
+    }
+
+    .field-group input {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--text);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: var(--neutral);
+    }
+
+    .field-group input:focus {
+      border-color: var(--blue-500);
+      box-shadow: 0 0 0 3px rgba(46,130,217,0.18);
+    }
+
+    /* Botones */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.75rem 2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(30,106,191,0.35);
+    }
+
+    .btn-primary:hover { box-shadow: 0 6px 24px rgba(30,106,191,0.45); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--blue-700);
+      border: 2px solid var(--blue-400);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn-full { width: 100%; }
+
+    /* ──────────────────────────────────────────
+       PANTALLA DE QUIZ
+    ────────────────────────────────────────── */
+    #screen-quiz { display: none; }
+
+    /* Tipo de reactivo badge */
+    .q-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+
+    .type-directo    { background: #dbeafe; color: #1e40af; }
+    .type-complete   { background: #d1fae5; color: #065f46; }
+    .type-order      { background: #fef3c7; color: #92400e; }
+    .type-relation   { background: #ede9fe; color: #5b21b6; }
+
+    /* Tarjeta de pregunta */
+    .question-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(1.25rem, 4vw, 2rem);
+      margin-bottom: 1.25rem;
+      border-left: 5px solid var(--blue-500);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-num {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--blue-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .question-text {
+      font-family: var(--font-display);
+      font-size: clamp(0.9rem, 2.4vw, 1.05rem);
+      font-weight: 600;
+      color: var(--blue-900);
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Tabla de relación de elementos */
+    .relation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.1rem;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1.5px var(--border);
+    }
+
+    .relation-table th {
+      background: var(--blue-800);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.55rem 0.9rem;
+      text-align: left;
+    }
+
+    .relation-table td {
+      padding: 0.55rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    .relation-table tr:last-child td { border-bottom: none; }
+
+    .relation-table tr:nth-child(even) td { background: var(--blue-50); }
+
+    /* Opciones de respuesta */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--neutral);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: clamp(0.82rem, 2vw, 0.92rem);
+      color: var(--text);
+      line-height: 1.45;
+      transition: border-color 0.18s, background 0.18s, transform 0.12s;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--blue-400);
+      background: var(--blue-50);
+      transform: translateX(2px);
+    }
+
+    .option-btn .opt-letter {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue-100);
+      color: var(--blue-700);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Estados de respuesta */
+    .option-btn.selected {
+      border-color: var(--blue-500);
+      background: var(--blue-50);
+    }
+
+    .option-btn.selected .opt-letter {
+      background: var(--blue-600);
+      color: #fff;
+    }
+
+    .option-btn.correct {
+      border-color: var(--success);
+      background: #e6f9ec;
+    }
+
+    .option-btn.correct .opt-letter {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .option-btn.incorrect {
+      border-color: var(--error);
+      background: #fdecea;
+    }
+
+    .option-btn.incorrect .opt-letter {
+      background: var(--error);
+      color: #fff;
+    }
+
+    .option-btn:disabled { cursor: default; }
+
+    /* Panel de retroalimentación */
+    .feedback-box {
+      margin-top: 1rem;
+      padding: 0.9rem 1.1rem;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      display: none;
+    }
+
+    .feedback-box.correct-fb {
+      background: #e6f9ec;
+      border: 1.5px solid var(--success);
+      color: #145c25;
+    }
+
+    .feedback-box.incorrect-fb {
+      background: #fdecea;
+      border: 1.5px solid var(--error);
+      color: #831a1a;
+    }
+
+    .feedback-box strong { font-weight: 700; }
+
+    /* Botones de navegación */
+    .nav-btns {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+    }
+
+    /* ──────────────────────────────────────────
+       PANTALLA DE RESULTADOS
+    ────────────────────────────────────────── */
+    #screen-results { display: none; }
+
+    .result-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(1.5rem, 5vw, 2.5rem);
+      text-align: center;
+      border-top: 6px solid var(--blue-600);
+      animation: slideIn 0.4s ease;
+    }
+
+    .score-circle {
+      width: clamp(110px, 28vw, 150px);
+      height: clamp(110px, 28vw, 150px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+      box-shadow: 0 6px 28px rgba(30,106,191,0.4);
+    }
+
+    .score-circle .score-num {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-circle .score-total {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
+    .result-card h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3vw, 1.45rem);
+      color: var(--blue-900);
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-card .result-msg {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
+    }
+
+    /* Tabla resumen de respuestas */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+      gap: 6px;
+      margin: 1.25rem 0;
+    }
+
+    .summary-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .summary-dot.ok  { background: var(--success); }
+    .summary-dot.err { background: var(--error); }
+    .summary-dot.skip{ background: var(--muted); }
+
+    .stats-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-pill {
+      background: var(--blue-50);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--blue-800);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .stat-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* ──────────────────────────────────────────
+       UTILIDADES
+    ────────────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* Scroll suave */
+    html { scroll-behavior: smooth; }
+
+    /* ──────────────────────────────────────────
+       RESPONSIVE — ajustes para pantallas pequeñas
+    ────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      #quiz-bar { top: 70px; flex-wrap: nowrap; }
+      .nav-btns { flex-direction: column-reverse; }
+      .btn      { font-size: 0.88rem; padding: 0.7rem 1.2rem; }
+      .relation-table { font-size: 0.78rem; }
+      .relation-table td, .relation-table th { padding: 0.45rem 0.65rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       ENCABEZADO FIJO
+       ============================================================ -->
+  <header>
+    <span class="badge">Acuerdo 14/12/23 · Educación Básica</span>
+    <h1>Simulador — Protocolo de Erradicación del Acoso Escolar</h1>
+    <span class="prof">Prof. Francisco De Jesus Luna Benitez</span>
+  </header>
+
+  <!-- ============================================================
+       BARRA DE PROGRESO + TIMER (visible durante el quiz)
+       ============================================================ -->
+  <div id="quiz-bar" class="hidden">
+    <span class="q-counter" id="q-counter">Pregunta 1 / 30</span>
+    <div id="progress-wrap"><div id="progress-fill"></div></div>
+    <span id="timer">⏱ 60:00</span>
+  </div>
+
+  <!-- ============================================================
+       CONTENIDO PRINCIPAL
+       ============================================================ -->
+  <main>
+
+    <!-- ── PANTALLA 1: BIENVENIDA ── -->
+    <div id="screen-welcome">
+      <div class="welcome-card">
+        <div class="icon-big">🛡️</div>
+        <h2>Simulador de Evaluación Docente</h2>
+        <p>
+          Evalúa tus conocimientos sobre el <strong>Protocolo de Erradicación
+          del Acoso Escolar</strong> (Acuerdo 14/12/23) con 30 reactivos
+          de opción múltiple: cuestionamiento directo, completamiento,
+          ordenamiento y relación de elementos.
+        </p>
+
+        <div class="info-grid">
+          <div class="info-item"><span class="val">30</span><span class="lbl">Preguntas</span></div>
+          <div class="info-item"><span class="val">60'</span><span class="lbl">Tiempo</span></div>
+          <div class="info-item"><span class="val">4</span><span class="lbl">Formatos</span></div>
+          <div class="info-item"><span class="val">3</span><span class="lbl">Opciones c/u</span></div>
+        </div>
+
+        <div class="field-group">
+          <label for="input-name">Tu nombre completo</label>
+          <input
+            type="text"
+            id="input-name"
+            placeholder="Escribe tu nombre aquí…"
+            autocomplete="off"
+          />
+        </div>
+
+        <button class="btn btn-primary btn-full" id="btn-start" onclick="startQuiz()">
+          🚀 Iniciar Simulador
+        </button>
+      </div>
+    </div><!-- /screen-welcome -->
+
+    <!-- ── PANTALLA 2: QUIZ ── -->
+    <div id="screen-quiz">
+      <div class="question-card" id="question-card">
+        <!-- Contenido inyectado por JS -->
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" id="btn-prev" onclick="prevQuestion()">← Anterior</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Siguiente →</button>
+      </div>
+    </div><!-- /screen-quiz -->
+
+    <!-- ── PANTALLA 3: RESULTADOS ── -->
+    <div id="screen-results">
+      <div class="result-card" id="result-card">
+        <!-- Contenido inyectado por JS -->
+      </div>
+    </div><!-- /screen-results -->
+
+  </main><!-- /main -->
+
+  <!-- ============================================================
+       JAVASCRIPT — Lógica del simulador
+       ============================================================ -->
+  <script>
+  // ═══════════════════════════════════════════════════════════════
+  // BANCO DE 30 PREGUNTAS
+  // Formatos: "directo" | "completamiento" | "ordenamiento" | "relacion"
+  // ═══════════════════════════════════════════════════════════════
+  const questions = [
+
+    /* ─── 1–10: CUESTIONAMIENTO DIRECTO ─── */
+    {
+      id: 1,
+      type: "directo",
+      text: "¿Cuál es el elemento que distingue al acoso escolar de una pelea aislada o riña común?",
+      options: [
+        "Que ocurra únicamente dentro de las instalaciones del plantel escolar.",
+        "Que combine poder desigual, intención, repetición y duración sostenida.",
+        "Que involucre necesariamente a más de dos estudiantes al mismo tiempo."
+      ],
+      correct: 1,
+      feedback: "El Protocolo establece que el acoso escolar se define por cuatro elementos simultáneos: poder desigual, intención de dañar, repetición de la conducta y duración sostenida en el tiempo. La ausencia de alguno de estos elementos lo convierte en un conflicto ordinario."
+    },
+    {
+      id: 2,
+      type: "directo",
+      text: "¿Qué tipo de acoso escolar se caracteriza por el uso de plataformas digitales para amenazar, difundir rumores o compartir imágenes sin consentimiento?",
+      options: [
+        "Acoso físico, ya que afecta la integridad corporal del estudiante.",
+        "Acoso socioemocional, porque daña las relaciones interpersonales.",
+        "Ciberacoso, cuyo alcance es virtual y trasciende el espacio escolar."
+      ],
+      correct: 2,
+      feedback: "El ciberacoso utiliza plataformas digitales para amenazar, difundir rumores, humillar o compartir imágenes sin consentimiento. Su característica principal es el alcance virtual, que extiende el daño más allá del entorno escolar."
+    },
+    {
+      id: 3,
+      type: "directo",
+      text: "¿Cuál es el propósito principal del Protocolo de Erradicación del Acoso Escolar según el Acuerdo 14/12/23?",
+      options: [
+        "Establecer acciones claras de prevención, atención y no repetición, sin limitarse a sancionar.",
+        "Expulsar de forma definitiva a los estudiantes que cometan actos de violencia.",
+        "Centralizar todas las decisiones disciplinarias en la supervisión de zona escolar."
+      ],
+      correct: 0,
+      feedback: "El Protocolo busca ir más allá de la sanción: establece acciones de prevención, atención oportuna y medidas de no repetición, garantizando a niñas, niños y adolescentes el derecho a una educación libre de violencia."
+    },
+    {
+      id: 4,
+      type: "directo",
+      text: "¿Quiénes son los espectadores pasivos en una situación de acoso escolar?",
+      options: [
+        "Docentes que no se encuentran presentes en el momento del incidente.",
+        "Educandos que no participan directamente, pero actúan de manera pasiva o incitadora.",
+        "Padres de familia que no asisten a las reuniones convocadas por la escuela."
+      ],
+      correct: 1,
+      feedback: "Los espectadores pasivos son los educandos que presencian el acoso sin participar directamente, pero cuyo silencio o indiferencia lo alimenta. Intervenirlos es clave para erradicar el fenómeno."
+    },
+    {
+      id: 5,
+      type: "directo",
+      text: "¿Cuál de las siguientes situaciones es un ejemplo claro de acoso socioemocional?",
+      options: [
+        "Golpear repetidamente a un compañero durante el recreo.",
+        "Insultar a un alumno con sobrenombres ofensivos frente al grupo.",
+        "Aislar, marginar e ignorar a un estudiante de manera sistemática y deliberada."
+      ],
+      correct: 2,
+      feedback: "El acoso socioemocional se manifiesta en comportamientos que lesionan las relaciones interpersonales: aislar, marginar, ignorar o avergonzar en público. Su daño es relacional y afecta profundamente el bienestar emocional del estudiante."
+    },
+    {
+      id: 6,
+      type: "directo",
+      text: "¿Qué fase del Protocolo corresponde a la 'observación activa y reconocimiento' de comportamientos de vulnerabilidad en víctimas, agresores y espectadores?",
+      options: [
+        "Fase 2: Notificación a autoridades y familias.",
+        "Fase 1: Detección a través de la observación activa.",
+        "Fase 4: Seguimiento para la sanación continua."
+      ],
+      correct: 1,
+      feedback: "La Fase 1 de Detección es el Radar del protocolo. Su objetivo es reconocer comportamientos de vulnerabilidad sin prejuzgar la veracidad de los hechos, usando guías de observación e indicadores de riesgo."
+    },
+    {
+      id: 7,
+      type: "directo",
+      text: "¿Cuál es el principio rector que busca proteger la identidad y los datos personales de todos los involucrados en un caso de acoso escolar?",
+      options: [
+        "Acción sin daño: intervenciones que sanen en lugar de castigar destructivamente.",
+        "Perspectiva de género: eliminar causas de opresión y desigualdad.",
+        "Confidencialidad: proteger la identidad y los datos de los involucrados."
+      ],
+      correct: 2,
+      feedback: "La Confidencialidad es un principio rector que garantiza la protección de la identidad y los datos de todas las personas involucradas durante todo el proceso de atención al caso."
+    },
+    {
+      id: 8,
+      type: "directo",
+      text: "Al confirmarse un caso de acoso escolar, ¿a quiénes debe informarse de manera inmediata en la Fase 2 del Protocolo?",
+      options: [
+        "Únicamente al agresor y a su familia para responsabilizarlos del hecho.",
+        "A los medios de comunicación locales para visibilizar la problemática.",
+        "A las madres, padres o tutores de todos los involucrados, bajo estricta confidencialidad."
+      ],
+      correct: 2,
+      feedback: "La acción inmediata de la Fase 2 es informar a las madres, padres o tutores de todos los involucrados —víctima y agresor—, garantizando la confidencialidad y la no revictimización en todo momento."
+    },
+    {
+      id: 9,
+      type: "directo",
+      text: "¿Cuál es la meta final del Protocolo de Erradicación del Acoso Escolar, más allá de resolver el caso presente?",
+      options: [
+        "Documentar estadísticamente los casos para elaborar informes anuales.",
+        "Evitar que se repitan actos de acoso escolar en el futuro (no repetición).",
+        "Transferir al agresor a otra institución educativa para proteger a la víctima."
+      ],
+      correct: 1,
+      feedback: "El objetivo definitivo del Protocolo no es solo resolver el caso, sino garantizar la no repetición mediante acciones diseñadas a la medida del entorno escolar específico, sin estigmatizar a ninguna de las personas involucradas."
+    },
+    {
+      id: 10,
+      type: "directo",
+      text: "¿Qué tipo de acoso escolar implica agresiones físicas repetidas como golpes, empujones, zancadillas, encierros o el robo de pertenencias personales?",
+      options: [
+        "Acoso verbal, ya que busca humillar con palabras y acciones directas.",
+        "Acoso físico, caracterizado por agresiones corporales y materiales directas.",
+        "Acoso socioemocional, porque genera miedo y aislamiento en la víctima."
+      ],
+      correct: 1,
+      feedback: "El acoso físico se caracteriza por agresiones repetidas y directas al cuerpo o pertenencias del estudiante: golpes, empujones, zancadillas, encierros, robo y destrucción de objetos personales."
+    },
+
+    /* ─── 11–18: COMPLETAMIENTO ─── */
+    {
+      id: 11,
+      type: "completamiento",
+      text: "El acoso escolar generalmente ocurre en _______, lejos de la mirada de los adultos, lo que lo distingue de las riñas o conflictos ordinarios.",
+      options: [
+        "…el salón de clases durante el desarrollo de las actividades académicas.",
+        "…privado, en espacios sin supervisión adulta.",
+        "…presencia de otros docentes que fungen como testigos del incidente."
+      ],
+      correct: 1,
+      feedback: "Una nota diagnóstica clave del Protocolo señala que el acoso ocurre generalmente en privado, lejos de la mirada de los adultos, lo que dificulta su detección y justifica la importancia de la observación activa."
+    },
+    {
+      id: 12,
+      type: "completamiento",
+      text: "En la Fase 3 de Intervención, la Ruta Administrativa incluye la firma de Cartas de compromisos donde el educando agresor y su familia se responsabilizan de…",
+      options: [
+        "…cubrir una compensación económica a favor de la institución escolar.",
+        "…cumplir los acuerdos establecidos para restaurar la convivencia.",
+        "…solicitar el cambio de institución educativa en un plazo no mayor a 30 días."
+      ],
+      correct: 1,
+      feedback: "Las Cartas de compromisos son instrumentos de la Ruta Administrativa donde el educando agresor y su familia se responsabilizan de cumplir los acuerdos pactados, garantizando la restauración del entorno escolar."
+    },
+    {
+      id: 13,
+      type: "completamiento",
+      text: "La Ruta Formativa en la Fase de Intervención se enfoca en implementar prácticas restaurativas para subsanar los daños, en lugar de…",
+      options: [
+        "…documentar minuciosamente el caso en las bitácoras escolares.",
+        "…notificar de inmediato a las autoridades educativas de zona.",
+        "…infligir castigos que no contribuyen a la restauración del vínculo."
+      ],
+      correct: 2,
+      feedback: "La Ruta Formativa apuesta por prácticas restaurativas —sanar el daño y recomponer las relaciones— en lugar de aplicar castigos que, según el Protocolo, no contribuyen a la convivencia pacífica ni a la no repetición."
+    },
+    {
+      id: 14,
+      type: "completamiento",
+      text: "El principio de 'Acción sin daño' establece que las intervenciones durante el proceso deben sanar, no…",
+      options: [
+        "…documentar los hechos en el expediente del estudiante involucrado.",
+        "…castigar destructivamente ni generar más daño del existente.",
+        "…notificar inmediatamente a las familias de los involucrados."
+      ],
+      correct: 1,
+      feedback: "El principio de Acción sin daño garantiza que todas las intervenciones institucionales busquen la sanación y restauración, evitando castigos destructivos que agraven la situación de cualquiera de las partes."
+    },
+    {
+      id: 15,
+      type: "completamiento",
+      text: "En la Fase 4 de Seguimiento, el Paso 3 de Verificación consiste en confirmar que los acuerdos firmados en las cartas de compromiso se estén…",
+      options: [
+        "…archivando de manera correcta en el expediente escolar.",
+        "…comunicando públicamente a la comunidad educativa.",
+        "…cumpliendo por parte del educando agresor y su familia."
+      ],
+      correct: 2,
+      feedback: "La Verificación (Paso 3 del Seguimiento) garantiza que los compromisos adquiridos en la Fase de Intervención se estén cumpliendo de manera efectiva, como condición para el cierre del caso."
+    },
+    {
+      id: 16,
+      type: "completamiento",
+      text: "En situaciones de ciberacoso, la detección en la Fase 1 ocurre mediante la observación de material multimedia presentado ante la…",
+      options: [
+        "…comunidad de madres y padres de familia en reunión ordinaria.",
+        "…autoridad escolar competente dentro del plantel.",
+        "…dirección de zona o supervisión escolar correspondiente."
+      ],
+      correct: 1,
+      feedback: "Para el ciberacoso, el Protocolo establece que la detección ocurre cuando el material multimedia (mensajes, imágenes, videos) es presentado ante la autoridad escolar, quien inicia el proceso de atención."
+    },
+    {
+      id: 17,
+      type: "completamiento",
+      text: "La 'Regla de Oro' de las medidas de no repetición establece que cualquier medida implementada debe evitar absolutamente la estigmatización de los involucrados y salvaguardar su…",
+      options: [
+        "…expediente académico y trayectoria escolar en la institución.",
+        "…dignidad como persona, independientemente de su rol en el caso.",
+        "…permanencia física dentro de la institución educativa."
+      ],
+      correct: 1,
+      feedback: "La Regla de Oro del Protocolo: ninguna medida puede estigmatizar a los involucrados. La dignidad humana es el valor supremo que debe salvaguardarse en todas las acciones de no repetición."
+    },
+    {
+      id: 18,
+      type: "completamiento",
+      text: "El Receptor Central en la Fase de Notificación está conformado por el Cuerpo Colegiado y las…",
+      options: [
+        "…familias de las víctimas como representantes de la comunidad.",
+        "…Autoridades Escolares del plantel educativo.",
+        "…instancias externas de Derechos Humanos o protección civil."
+      ],
+      correct: 1,
+      feedback: "El Receptor Central es la instancia escolar que recibe y canaliza las quejas, denuncias y solicitudes de atención. Está conformado por el Cuerpo Colegiado y las Autoridades Escolares del plantel."
+    },
+
+    /* ─── 19–23: ORDENAMIENTO ─── */
+    {
+      id: 19,
+      type: "ordenamiento",
+      text: "Ordene los 4 momentos de atención del Protocolo de Erradicación del Acoso Escolar en la secuencia correcta de aplicación:",
+      items: ["Seguimiento", "Detección", "Intervención", "Notificación"],
+      options: [
+        "Detección → Notificación → Intervención → Seguimiento",
+        "Notificación → Detección → Seguimiento → Intervención",
+        "Detección → Intervención → Notificación → Seguimiento"
+      ],
+      correct: 0,
+      feedback: "El mapa de acción del Protocolo sigue este orden lógico: 1) Detección (identificar), 2) Notificación (informar), 3) Intervención (actuar), 4) Seguimiento (acompañar). Cada momento prepara el siguiente."
+    },
+    {
+      id: 20,
+      type: "ordenamiento",
+      text: "Ordene los 4 pasos de la Fase de Seguimiento para la sanación continua en el orden correcto:",
+      items: ["Comunicación abierta", "Verificación", "Acompañamiento", "Documentación"],
+      options: [
+        "Acompañamiento → Documentación → Verificación → Comunicación abierta",
+        "Verificación → Comunicación abierta → Acompañamiento → Documentación",
+        "Documentación → Acompañamiento → Comunicación abierta → Verificación"
+      ],
+      correct: 0,
+      feedback: "La Fase 4 avanza así: Paso 1 Acompañamiento (apoyo pedagógico), Paso 2 Documentación (bitácoras), Paso 3 Verificación (cumplimiento de acuerdos), Paso 4 Comunicación abierta (escuela-familia-instituciones)."
+    },
+    {
+      id: 21,
+      type: "ordenamiento",
+      text: "Ordene los elementos que, según el Protocolo, conforman la 'anatomía del acoso escolar' en la secuencia en que son presentados en la guía:",
+      items: ["Duración", "Poder desigual", "Repetición", "Intención"],
+      options: [
+        "Poder desigual → Intención → Repetición → Duración",
+        "Intención → Duración → Poder desigual → Repetición",
+        "Repetición → Poder desigual → Duración → Intención"
+      ],
+      correct: 0,
+      feedback: "La guía presenta la 'ecuación del acoso' en este orden: Poder Desigual + Intención + Repetición + Duración = Acoso Escolar. Esta secuencia refleja la construcción conceptual del fenómeno."
+    },
+    {
+      id: 22,
+      type: "ordenamiento",
+      text: "Ordene la secuencia de la Ruta Formativa dentro de la Fase 3 de Intervención:",
+      items: ["Establecer reglas de convivencia claras", "Confirmar el caso", "Implementar prácticas restaurativas"],
+      options: [
+        "Confirmar el caso → Implementar prácticas restaurativas → Establecer reglas de convivencia",
+        "Implementar prácticas restaurativas → Confirmar el caso → Establecer reglas de convivencia",
+        "Establecer reglas de convivencia → Confirmar el caso → Implementar prácticas restaurativas"
+      ],
+      correct: 0,
+      feedback: "La Ruta Formativa comienza con la Confirmación del caso, luego aplica Prácticas restaurativas para subsanar daños y finalmente establece Reglas de convivencia claras con todos los actores involucrados."
+    },
+    {
+      id: 23,
+      type: "ordenamiento",
+      text: "Ordene las 4 fases del Seguimiento (Fase 4) de acuerdo con su descripción funcional como instrumentos del proceso:",
+      items: ["La Brújula (acompañamiento continuo)", "El Radar (detección)", "La Red de Alerta (información)", "La Acción (intervención)"],
+      options: [
+        "El Radar → La Red de Alerta → La Acción → La Brújula",
+        "La Brújula → El Radar → La Acción → La Red de Alerta",
+        "La Acción → La Brújula → La Red de Alerta → El Radar"
+      ],
+      correct: 0,
+      feedback: "Cada fase tiene un nombre metafórico: Fase 1 El Radar (Detección), Fase 2 La Red de Alerta (Notificación), Fase 3 La Acción (Intervención), Fase 4 La Brújula (Seguimiento). Este orden refleja la lógica de respuesta del Protocolo."
+    },
+
+    /* ─── 24–30: RELACIÓN DE ELEMENTOS ─── */
+    {
+      id: 24,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada Fase del Protocolo con su descripción funcional:",
+      tableLeft:  ["1. Detección", "2. Notificación", "3. Intervención", "4. Seguimiento"],
+      tableRight: [
+        "a) La Brújula: Acompañamiento y verificación continua.",
+        "b) El Radar: Observación activa y reconocimiento.",
+        "c) La Red de Alerta: Información a autoridades y familias.",
+        "d) La Acción: Respuesta institucional y restaurativa."
+      ],
+      options: [
+        "1b, 2c, 3d, 4a",
+        "1c, 2b, 3a, 4d",
+        "1d, 2a, 3c, 4b"
+      ],
+      correct: 0,
+      feedback: "La correspondencia correcta es: Detección = El Radar (1b), Notificación = La Red de Alerta (2c), Intervención = La Acción (3d), Seguimiento = La Brújula (4a). Cada nombre metafórico describe el rol de la fase."
+    },
+    {
+      id: 25,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada tipo de acoso escolar con su descripción según la Matriz de Diagnóstico:",
+      tableLeft:  ["1. Físico", "2. Verbal", "3. Socioemocional", "4. Ciberacoso"],
+      tableRight: [
+        "a) Uso de plataformas digitales para amenazar, humillar o compartir imágenes sin consentimiento.",
+        "b) Comportamientos dirigidos a aislar, marginar, ignorar o avergonzar en público.",
+        "c) Agresiones repetidas: golpes, empujones, zancadillas, robo de pertenencias.",
+        "d) Expresiones con palabras agresivas: burlas, insultos, sobrenombres o amenazas."
+      ],
+      options: [
+        "1c, 2d, 3b, 4a",
+        "1d, 2c, 3a, 4b",
+        "1b, 2a, 3d, 4c"
+      ],
+      correct: 0,
+      feedback: "La relación correcta es: Físico = agresiones directas (1c), Verbal = palabras agresivas (2d), Socioemocional = daño relacional (3b), Ciberacoso = alcance virtual (4a)."
+    },
+    {
+      id: 26,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada Principio Rector del Protocolo con su descripción:",
+      tableLeft:  ["1. No revictimización", "2. Confidencialidad", "3. Inclusión y No Discriminación", "4. Perspectiva de Género"],
+      tableRight: [
+        "a) Proteger la identidad y los datos de los involucrados en el proceso.",
+        "b) Eliminar causas de opresión, desigualdad y estereotipos en el entorno escolar.",
+        "c) Evitar causar más daño a la víctima durante el proceso de atención.",
+        "d) Eliminar barreras al aprendizaje y participación de todos los educandos."
+      ],
+      options: [
+        "1c, 2a, 3d, 4b",
+        "1a, 2c, 3b, 4d",
+        "1d, 2b, 3c, 4a"
+      ],
+      correct: 0,
+      feedback: "La relación correcta: No revictimización = evitar más daño (1c), Confidencialidad = proteger datos (2a), Inclusión y No Discriminación = eliminar barreras (3d), Perspectiva de Género = combatir desigualdad (4b)."
+    },
+    {
+      id: 27,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada elemento de la anatomía del acoso escolar con su definición:",
+      tableLeft:  ["1. Poder desigual", "2. Intención", "3. Repetición", "4. Duración"],
+      tableRight: [
+        "a) Sostenido durante un tiempo transcurrido; no es un hecho aislado.",
+        "b) Conducta violenta que es persistente y se reitera constantemente.",
+        "c) Desventaja física, de edad, social o económica entre los involucrados.",
+        "d) Voluntad consciente de someter, explotar y causar daño al otro."
+      ],
+      options: [
+        "1c, 2d, 3b, 4a",
+        "1d, 2c, 3a, 4b",
+        "1b, 2a, 3d, 4c"
+      ],
+      correct: 0,
+      feedback: "Cada elemento de la anatomía: Poder desigual = desventaja (1c), Intención = voluntad de dañar (2d), Repetición = conducta persistente (3b), Duración = sostenida en el tiempo (4a)."
+    },
+    {
+      id: 28,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada vía de notificación de la Fase 2 con su descripción:",
+      tableLeft:  ["1. Quejas", "2. Denuncias", "3. Solicitud de Atención"],
+      tableRight: [
+        "a) Derivada de organismos externos como instancias de Derechos Humanos.",
+        "b) Presentadas directamente por la víctima, madres, padres o tutores.",
+        "c) Presentadas por terceros: espectadores, otros docentes u otros actores."
+      ],
+      options: [
+        "1b, 2c, 3a",
+        "1c, 2a, 3b",
+        "1a, 2b, 3c"
+      ],
+      correct: 0,
+      feedback: "Las tres vías de notificación son: Quejas (víctima o familia directa = 1b), Denuncias (terceros como espectadores u otros docentes = 2c), Solicitud de Atención (organismos externos = 3a)."
+    },
+    {
+      id: 29,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente el rol del espectador pasivo con cada concepto del Protocolo:",
+      tableLeft:  ["1. ¿Quiénes son?", "2. La Complicidad del Silencio", "3. El Riesgo Creciente"],
+      tableRight: [
+        "a) La indiferencia y apatía pueden convertirlos eventualmente en agresores directos.",
+        "b) Al permitir que los hechos continúen por miedo, se vuelven cómplices del entorno.",
+        "c) Educandos que no participan directamente pero actúan de manera pasiva o incitadora."
+      ],
+      options: [
+        "1c, 2b, 3a",
+        "1a, 2c, 3b",
+        "1b, 2a, 3c"
+      ],
+      correct: 0,
+      feedback: "El modelo del espectador: son educandos pasivos o incitadores (1c), su silencio los vuelve cómplices (2b), y su indiferencia los pone en riesgo de convertirse en agresores (3a)."
+    },
+    {
+      id: 30,
+      type: "relacion",
+      text: "Seleccione la opción que relacione correctamente cada paso de la Fase 4 (Seguimiento) con su descripción:",
+      tableLeft:  ["1. Acompañamiento", "2. Documentación", "3. Verificación", "4. Comunicación abierta"],
+      tableRight: [
+        "a) Confirmar que los acuerdos firmados en las cartas de compromiso se estén cumpliendo.",
+        "b) Registrar meticulosamente el progreso del caso mediante el uso de bitácoras.",
+        "c) Mantener rutas periódicas entre la escuela, la familia y las instituciones externas.",
+        "d) Brindar apoyo pedagógico y socioemocional a todos los involucrados en el caso."
+      ],
+      options: [
+        "1d, 2b, 3a, 4c",
+        "1b, 2d, 3c, 4a",
+        "1c, 2a, 3d, 4b"
+      ],
+      correct: 0,
+      feedback: "Los pasos del Seguimiento: Acompañamiento = apoyo pedagógico-socioemocional (1d), Documentación = bitácoras del caso (2b), Verificación = cumplimiento de acuerdos (3a), Comunicación abierta = red continua de contacto (4c)."
+    }
+  ]; // fin questions
+
+  // ═══════════════════════════════════════════════════════════════
+  // ESTADO DEL SIMULADOR
+  // ═══════════════════════════════════════════════════════════════
+  let currentQ    = 0;          // índice pregunta actual
+  let answers     = new Array(questions.length).fill(null); // respuestas del usuario
+  let timer       = null;       // referencia setInterval
+  let timeLeft    = 60 * 60;    // segundos restantes (60 min)
+  let quizStarted = false;
+  let userName    = "";
+
+  // Etiquetas de tipo de reactivo
+  const typeLabels = {
+    directo:       { label: "Cuestionamiento Directo", css: "type-directo",  icon: "❓" },
+    completamiento:{ label: "Completamiento",          css: "type-complete", icon: "✏️" },
+    ordenamiento:  { label: "Ordenamiento",            css: "type-order",    icon: "🔢" },
+    relacion:      { label: "Relación de Elementos",   css: "type-relation", icon: "🔗" }
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // INICIAR QUIZ
+  // ═══════════════════════════════════════════════════════════════
+  function startQuiz() {
+    const nameInput = document.getElementById("input-name");
+    userName = nameInput.value.trim();
+    if (!userName) {
+      nameInput.focus();
+      nameInput.style.borderColor = "var(--coral)";
+      setTimeout(() => nameInput.style.borderColor = "", 1200);
+      return;
+    }
+
+    // Mostrar pantallas correctas
+    document.getElementById("screen-welcome").style.display = "none";
+    document.getElementById("screen-quiz").style.display    = "block";
+    document.getElementById("quiz-bar").classList.remove("hidden");
+
+    quizStarted = true;
+    currentQ    = 0;
+    answers     = new Array(questions.length).fill(null);
+    renderQuestion();
+    startTimer();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // TEMPORIZADOR
+  // ═══════════════════════════════════════════════════════════════
+  function startTimer() {
+    const el = document.getElementById("timer");
+    timer = setInterval(() => {
+      timeLeft--;
+      const m = Math.floor(timeLeft / 60).toString().padStart(2, "0");
+      const s = (timeLeft % 60).toString().padStart(2, "0");
+      el.textContent = `⏱ ${m}:${s}`;
+
+      // Cambio de color
+      el.classList.remove("warning", "danger");
+      if (timeLeft <= 300 && timeLeft > 60) el.classList.add("warning");
+      if (timeLeft <= 60)  el.classList.add("danger");
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        showResults();
+      }
+    }, 1000);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDERIZAR PREGUNTA
+  // ═══════════════════════════════════════════════════════════════
+  function renderQuestion() {
+    const q    = questions[currentQ];
+    const card = document.getElementById("question-card");
+    const tInfo= typeLabels[q.type];
+
+    // Actualizar barra de progreso
+    document.getElementById("q-counter").textContent = `Pregunta ${currentQ + 1} / ${questions.length}`;
+    document.getElementById("progress-fill").style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+
+    // Construir HTML de la pregunta
+    let html = `
+      <span class="q-type-badge ${tInfo.css}">${tInfo.icon} ${tInfo.label}</span>
+      <div class="question-num">Pregunta ${q.id} de ${questions.length}</div>
+      <div class="question-text">${q.text}</div>
+    `;
+
+    // Tabla para "relacion de elementos"
+    if (q.type === "relacion") {
+      html += `<table class="relation-table"><thead><tr><th>Fase / Elemento</th><th>Descripción</th></tr></thead><tbody>`;
+      const maxRows = Math.max(q.tableLeft.length, q.tableRight.length);
+      for (let i = 0; i < maxRows; i++) {
+        html += `<tr>
+          <td>${q.tableLeft[i]  || ""}</td>
+          <td>${q.tableRight[i] || ""}</td>
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+    }
+
+    // Tabla para "ordenamiento" (muestra los ítems a ordenar)
+    if (q.type === "ordenamiento") {
+      html += `<p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.6rem;font-weight:600;">Elementos a ordenar:</p>`;
+      html += `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">`;
+      q.items.forEach(item => {
+        html += `<span style="background:var(--blue-100);color:var(--blue-800);border-radius:6px;padding:0.3rem 0.65rem;font-size:0.8rem;font-weight:700;">${item}</span>`;
+      });
+      html += `</div>`;
+    }
+
+    // Opciones
+    const answered = answers[currentQ] !== null;
+    const letters  = ["A", "B", "C"];
+
+    html += `<div class="options-list">`;
+    q.options.forEach((opt, i) => {
+      let cls = "option-btn";
+      if (answered) {
+        if (i === q.correct) cls += " correct";
+        else if (i === answers[currentQ]) cls += " incorrect";
+      } else if (answers[currentQ] === i) {
+        cls += " selected";
+      }
+      html += `
+        <button class="${cls}" ${answered ? "disabled" : ""} onclick="selectAnswer(${i})">
+          <span class="opt-letter">${letters[i]}</span>
+          <span>${opt}</span>
+        </button>`;
+    });
+    html += `</div>`;
+
+    // Retroalimentación (visible si ya respondió)
+    if (answered) {
+      const isCorrect = answers[currentQ] === q.correct;
+      html += `
+        <div class="feedback-box ${isCorrect ? "correct-fb" : "incorrect-fb"}" style="display:block;">
+          <strong>${isCorrect ? "✅ ¡Correcto!" : "❌ Respuesta incorrecta."}</strong><br/>
+          ${q.feedback}
+        </div>`;
+    }
+
+    card.innerHTML = html;
+
+    // Botones de navegación
+    document.getElementById("btn-prev").style.visibility = currentQ > 0 ? "visible" : "hidden";
+    const isLast = currentQ === questions.length - 1;
+    const btnNext = document.getElementById("btn-next");
+    btnNext.textContent = isLast ? "Ver Resultados 🏁" : "Siguiente →";
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SELECCIONAR RESPUESTA
+  // ═══════════════════════════════════════════════════════════════
+  function selectAnswer(idx) {
+    if (answers[currentQ] !== null) return; // ya respondió
+    answers[currentQ] = idx;
+    renderQuestion();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // NAVEGACIÓN
+  // ═══════════════════════════════════════════════════════════════
+  function nextQuestion() {
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      showResults();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentQ > 0) {
+      currentQ--;
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MOSTRAR RESULTADOS
+  // ═══════════════════════════════════════════════════════════════
+  function showResults() {
+    clearInterval(timer);
+    document.getElementById("screen-quiz").style.display    = "none";
+    document.getElementById("quiz-bar").classList.add("hidden");
+    document.getElementById("screen-results").style.display = "block";
+
+    // Calcular puntuación
+    let correct = 0;
+    let skipped = 0;
+    answers.forEach((a, i) => {
+      if (a === null) skipped++;
+      else if (a === questions[i].correct) correct++;
+    });
+    const wrong    = questions.length - correct - skipped;
+    const pct      = Math.round((correct / questions.length) * 100);
+
+    // Mensaje según resultado
+    let msg = "";
+    let emoji = "";
+    if (pct >= 90) { msg = "¡Excelente dominio del Protocolo! Estás muy bien preparado/a."; emoji = "🏆"; }
+    else if (pct >= 70) { msg = "Buen desempeño. Repasa los temas donde tuviste errores."; emoji = "🎯"; }
+    else if (pct >= 50) { msg = "Resultado regular. Es recomendable revisar la guía completa."; emoji = "📚"; }
+    else { msg = "Necesitas reforzar el estudio del Protocolo. ¡Inténtalo de nuevo!"; emoji = "💪"; }
+
+    // Minutos usados
+    const usedSec = 3600 - timeLeft;
+    const usedMin = Math.floor(usedSec / 60);
+    const usedS   = usedSec % 60;
+
+    // Puntos de resumen
+    let dots = "";
+    answers.forEach((a, i) => {
+      if (a === null)                        dots += `<div class="summary-dot skip">${i+1}</div>`;
+      else if (a === questions[i].correct)   dots += `<div class="summary-dot ok">${i+1}</div>`;
+      else                                   dots += `<div class="summary-dot err">${i+1}</div>`;
+    });
+
+    document.getElementById("result-card").innerHTML = `
+      <div class="score-circle">
+        <span class="score-num">${correct}</span>
+        <span class="score-total">de ${questions.length}</span>
+      </div>
+      <h2>${emoji} ${pct}% — ${userName}</h2>
+      <p class="result-msg">${msg}</p>
+
+      <div class="stats-row">
+        <div class="stat-pill"><span class="dot" style="background:var(--success)"></span>${correct} correctas</div>
+        <div class="stat-pill"><span class="dot" style="background:var(--error)"></span>${wrong} incorrectas</div>
+        <div class="stat-pill"><span class="dot" style="background:var(--muted)"></span>${skipped} sin responder</div>
+        <div class="stat-pill">⏱ ${usedMin}m ${usedS}s</div>
+      </div>
+
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Resumen por pregunta</p>
+      <div class="summary-grid">${dots}</div>
+
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem;">
+        <button class="btn btn-primary" onclick="restartQuiz()">🔄 Reintentar</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+
+      <p style="margin-top:1.25rem;font-size:0.75rem;color:var(--muted);">
+        Prof. Francisco De Jesus Luna Benitez &nbsp;·&nbsp; Acuerdo 14/12/23 · SEP
+      </p>
+    `;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // REINICIAR
+  // ═══════════════════════════════════════════════════════════════
+  function restartQuiz() {
+    timeLeft  = 60 * 60;
+    currentQ  = 0;
+    answers   = new Array(questions.length).fill(null);
+    quizStarted = false;
+
+    document.getElementById("screen-results").style.display = "none";
+    document.getElementById("screen-welcome").style.display = "flex";
+
+    document.getElementById("timer").textContent = "⏱ 60:00";
+    document.getElementById("timer").classList.remove("warning","danger");
+    document.getElementById("progress-fill").style.width = "0%";
+  }
+  </script>
+
+</body>
+</html>

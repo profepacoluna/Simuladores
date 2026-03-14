@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- =============================================
+       META Y CONFIGURACIÓN BÁSICA
+  ============================================= -->
+  <meta charset="UTF-8" />
+  <!-- Viewport esencial para diseño responsive en móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Vygotsky | Prof. Francisco De Jesus Luna Benitez</title>
+
+  <!-- Fuente externa distintiva -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- =============================================
+       ESTILOS CSS — TODO EN UN SOLO ARCHIVO
+  ============================================= -->
+  <style>
+    /* ---- VARIABLES DE COLOR Y TEMA AZUL CLARO ---- */
+    :root {
+      --azul-oscuro:   #1a3a5c;
+      --azul-medio:    #2563a8;
+      --azul-claro:    #4a90d9;
+      --azul-suave:    #ddeeff;
+      --azul-fondo:    #eef4fb;
+      --dorado:        #c8832a;
+      --dorado-claro:  #f5ddb0;
+      --blanco:        #ffffff;
+      --gris-texto:    #3a3a4a;
+      --gris-claro:    #f0f4f8;
+      --correcto:      #1d7d4e;
+      --correcto-bg:   #d4f0e4;
+      --incorrecto:    #b52a2a;
+      --incorrecto-bg: #fde8e8;
+      --radio:         0.75rem;
+      --sombra:        0 4px 20px rgba(26,58,92,0.12);
+      --transicion:    0.3s ease;
+    }
+
+    /* ---- RESET Y BOX-SIZING GLOBAL ---- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Evita desbordamiento horizontal en móvil */
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--azul-fondo);
+      color: var(--gris-texto);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* =============================================
+       ENCABEZADO — HEADER
+    ============================================= */
+    header {
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+      color: var(--blanco);
+      padding: 1.5rem 1rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decoración geométrica de fondo */
+    header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* Nombre del profesor — pequeño y elegante */
+    .header-prof {
+      font-size: clamp(0.7rem, 2vw, 0.85rem);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dorado-claro);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Título principal con fuente Playfair */
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 5vw, 2.4rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Subtítulo temático */
+    header p.subtitulo {
+      font-size: clamp(0.8rem, 2.5vw, 1rem);
+      opacity: 0.85;
+      max-width: 540px;
+      margin: 0 auto 1rem;
+    }
+
+    /* Insignias de info del examen */
+    .header-badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;          /* se ajustan en pantalla pequeña */
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 2rem;
+      padding: 0.3rem 0.9rem;
+      font-size: clamp(0.7rem, 2vw, 0.82rem);
+      font-weight: 500;
+    }
+
+    /* =============================================
+       CONTENEDOR PRINCIPAL — LAYOUT
+    ============================================= */
+    .contenedor {
+      max-width: 820px;          /* centra el contenido en pantallas grandes */
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem; /* unidades relativas */
+    }
+
+    /* =============================================
+       BARRA DE PROGRESO
+    ============================================= */
+    .progreso-wrapper {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;           /* responsive */
+    }
+    .progreso-texto {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--azul-medio);
+      white-space: nowrap;
+    }
+    .barra-fondo {
+      flex: 1;
+      min-width: 120px;          /* no colapsa en móvil */
+      height: 10px;
+      background: var(--azul-suave);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .barra-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+      border-radius: 5px;
+      width: 0%;                 /* controlado por JS */
+      transition: width 0.5s ease;
+    }
+    .progreso-num {
+      font-size: 0.85rem;
+      color: var(--gris-texto);
+      white-space: nowrap;
+    }
+
+    /* =============================================
+       TARJETA DE PREGUNTA
+    ============================================= */
+    .tarjeta-pregunta {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.2rem, 4vw, 2rem);  /* padding fluido */
+      margin-bottom: 1.2rem;
+      animation: aparecer 0.4s ease forwards;
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Etiqueta de tipo de reactivo */
+    .tipo-reactivo {
+      display: inline-block;
+      background: var(--azul-suave);
+      color: var(--azul-medio);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 2rem;
+      padding: 0.2rem 0.7rem;
+      margin-bottom: 0.8rem;
+    }
+
+    /* Número y enunciado de la pregunta */
+    .num-pregunta {
+      font-size: 0.8rem;
+      color: var(--azul-claro);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .enunciado-pregunta {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      margin-bottom: 1.2rem;
+      line-height: 1.45;
+    }
+
+    /* =============================================
+       TABLA PARA REACTIVOS DE RELACIÓN
+    ============================================= */
+    .tabla-relacion {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: clamp(0.78rem, 2vw, 0.88rem);
+      overflow-x: auto;          /* scroll horizontal en móvil si es necesario */
+      display: block;
+    }
+    .tabla-relacion th {
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+    }
+    .tabla-relacion td {
+      border: 1px solid #d0dce8;
+      padding: 0.45rem 0.8rem;
+      vertical-align: top;
+    }
+    .tabla-relacion tr:nth-child(even) td {
+      background: var(--azul-fondo);
+    }
+
+    /* =============================================
+       OPCIONES DE RESPUESTA
+    ============================================= */
+    .opciones-lista {
+      display: flex;
+      flex-direction: column;    /* apiladas en columna = responsive por defecto */
+      gap: 0.65rem;
+      list-style: none;
+    }
+
+    /* Botón de opción */
+    .opcion-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      width: 100%;
+      text-align: left;
+      background: var(--gris-claro);
+      border: 2px solid transparent;
+      border-radius: 0.6rem;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.82rem, 2.2vw, 0.93rem);
+      color: var(--gris-texto);
+      cursor: pointer;
+      transition: background var(--transicion), border-color var(--transicion), transform var(--transicion);
+      line-height: 1.4;
+    }
+    .opcion-btn:hover:not(:disabled) {
+      background: var(--azul-suave);
+      border-color: var(--azul-claro);
+      transform: translateX(3px);
+    }
+
+    /* Letra indicadora A) B) C) */
+    .opcion-letra {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--azul-medio);
+      color: var(--blanco);
+      font-weight: 700;
+      font-size: 0.78rem;
+      flex-shrink: 0;
+      transition: background var(--transicion);
+    }
+
+    /* Estado: seleccionada */
+    .opcion-btn.seleccionada {
+      background: var(--azul-suave);
+      border-color: var(--azul-medio);
+    }
+
+    /* Estado: correcta */
+    .opcion-btn.correcta {
+      background: var(--correcto-bg);
+      border-color: var(--correcto);
+    }
+    .opcion-btn.correcta .opcion-letra { background: var(--correcto); }
+
+    /* Estado: incorrecta */
+    .opcion-btn.incorrecta {
+      background: var(--incorrecto-bg);
+      border-color: var(--incorrecto);
+    }
+    .opcion-btn.incorrecta .opcion-letra { background: var(--incorrecto); }
+
+    /* Deshabilita clics después de responder */
+    .opcion-btn:disabled { cursor: default; transform: none; }
+
+    /* =============================================
+       RETROALIMENTACIÓN
+    ============================================= */
+    .retroalimentacion {
+      display: none;             /* JS la muestra */
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.6rem;
+      font-size: clamp(0.8rem, 2.2vw, 0.88rem);
+      line-height: 1.5;
+      border-left: 4px solid;
+    }
+    .retroalimentacion.correcto {
+      background: var(--correcto-bg);
+      border-color: var(--correcto);
+      color: var(--correcto);
+    }
+    .retroalimentacion.incorrecto {
+      background: var(--incorrecto-bg);
+      border-color: var(--incorrecto);
+      color: var(--incorrecto);
+    }
+    .retroalimentacion.visible { display: block; }
+
+    /* Ícono en la retroalimentación */
+    .retro-icono { font-size: 1.1em; margin-right: 0.3rem; }
+
+    /* =============================================
+       BOTONES DE NAVEGACIÓN
+    ============================================= */
+    .controles {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;           /* bajan en móvil si no caben */
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border: none;
+      border-radius: 0.55rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.82rem, 2.2vw, 0.9rem);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transicion), transform var(--transicion), opacity var(--transicion);
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* Botón primario azul */
+    .btn-primario {
+      background: var(--azul-medio);
+      color: var(--blanco);
+    }
+    .btn-primario:hover:not(:disabled) { background: var(--azul-oscuro); }
+
+    /* Botón secundario contorno */
+    .btn-secundario {
+      background: var(--blanco);
+      color: var(--azul-medio);
+      border: 2px solid var(--azul-medio);
+    }
+    .btn-secundario:hover:not(:disabled) {
+      background: var(--azul-suave);
+    }
+
+    /* =============================================
+       PANTALLA DE RESULTADOS FINALES
+    ============================================= */
+    #pantalla-resultados {
+      display: none;
+      text-align: center;
+      animation: aparecer 0.5s ease;
+    }
+
+    .resultado-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.5rem, 5vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Círculo de puntuación */
+    .circulo-score {
+      width: clamp(100px, 25vw, 140px);
+      height: clamp(100px, 25vw, 140px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul-medio), var(--azul-oscuro));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 8px 24px rgba(37,99,168,0.3);
+    }
+    .score-numero {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 900;
+      color: var(--blanco);
+      line-height: 1;
+    }
+    .score-total {
+      font-size: clamp(0.7rem, 2vw, 0.85rem);
+      color: rgba(255,255,255,0.75);
+    }
+
+    .resultado-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.5rem;
+    }
+    .resultado-desc {
+      font-size: clamp(0.83rem, 2.2vw, 0.95rem);
+      color: var(--gris-texto);
+      max-width: 420px;
+      margin: 0 auto 1.5rem;
+    }
+
+    /* Desglose de resultados */
+    .resumen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    .resumen-item {
+      background: var(--azul-fondo);
+      border-radius: 0.6rem;
+      padding: 0.9rem 0.5rem;
+      text-align: center;
+    }
+    .resumen-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      font-weight: 700;
+    }
+    .resumen-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--azul-medio);
+      font-weight: 600;
+    }
+    .color-correcto { color: var(--correcto); }
+    .color-incorrecto { color: var(--incorrecto); }
+    .color-azul { color: var(--azul-medio); }
+
+    /* =============================================
+       PANTALLA DE BIENVENIDA
+    ============================================= */
+    #pantalla-inicio {
+      text-align: center;
+      animation: aparecer 0.5s ease;
+    }
+    .inicio-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.5rem, 5vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+    .inicio-icono {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .inicio-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.75rem;
+    }
+    .inicio-desc {
+      font-size: clamp(0.83rem, 2.2vw, 0.95rem);
+      color: var(--gris-texto);
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.7;
+    }
+
+    /* Lista de tipos de reactivos en inicio */
+    .tipos-lista {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+    }
+    .tipo-chip {
+      background: var(--azul-suave);
+      color: var(--azul-medio);
+      border-radius: 2rem;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    /* =============================================
+       PIE DE PÁGINA
+    ============================================= */
+    footer {
+      background: var(--azul-oscuro);
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 1rem;
+      font-size: clamp(0.7rem, 2vw, 0.82rem);
+    }
+    footer strong { color: var(--dorado-claro); }
+
+    /* =============================================
+       CONTADOR REGRESIVO — TIMER
+    ============================================= */
+
+    /* Barra fija en la parte superior del viewport */
+    .timer-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--blanco);
+      box-shadow: 0 2px 10px rgba(26,58,92,0.12);
+      padding: 0.55rem 1rem;
+      display: none;                /* JS la muestra al iniciar */
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Ícono + dígitos del cronómetro */
+    .timer-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 4vw, 1.35rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      letter-spacing: 0.03em;
+    }
+    .timer-icono { font-size: 1.1em; }
+
+    /* Cambia a naranja cuando quedan ≤ 10 minutos */
+    .timer-display.advertencia { color: #b55e00; }
+
+    /* Rojo parpadeante cuando quedan ≤ 5 minutos */
+    .timer-display.urgente {
+      color: var(--incorrecto);
+      animation: parpadeo 1s ease infinite;
+    }
+    @keyframes parpadeo {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.45; }
+    }
+
+    /* Mini barra de progreso del tiempo */
+    .timer-progreso-fondo {
+      flex: 1;
+      min-width: 80px;
+      max-width: 260px;
+      height: 6px;
+      background: var(--azul-suave);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .timer-progreso-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+      border-radius: 3px;
+      width: 100%;              /* se reduce con el tiempo */
+      transition: width 1s linear, background 1s ease;
+    }
+
+    /* Etiqueta de tiempo agotado */
+    .timer-agotado {
+      display: none;
+      font-weight: 700;
+      color: var(--incorrecto);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay modal cuando el tiempo se agota */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,58,92,0.65);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.activo { display: flex; }
+
+    .modal-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      padding: clamp(1.5rem, 5vw, 2.5rem);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      animation: aparecer 0.4s ease;
+    }
+    .modal-icono  { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+    .modal-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.5rem;
+    }
+    .modal-desc {
+      font-size: clamp(0.82rem, 2.2vw, 0.92rem);
+      color: var(--gris-texto);
+      margin-bottom: 1.4rem;
+      line-height: 1.6;
+    }
+
+    /* =============================================
+       UTILIDADES RESPONSIVE — BREAKPOINTS
+    ============================================= */
+    /* En pantallas < 480px: márgenes más compactos */
+    @media (max-width: 480px) {
+      .controles { justify-content: stretch; }
+      .btn { flex: 1; justify-content: center; }
+      .opcion-btn { padding: 0.65rem 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =============================================
+       ENCABEZADO PRINCIPAL
+  ============================================= -->
+  <header>
+    <!-- Nombre del profesor en la parte superior -->
+    <p class="header-prof">Prof. Francisco De Jesus Luna Benitez</p>
+    <h1>Simulador de Reactivos</h1>
+    <p class="subtitulo">Implicaciones Educativas de la Teoría Sociocultural de Lev Vygotsky</p>
+    <div class="header-badges">
+      <span class="badge">📝 25 Preguntas</span>
+      <span class="badge">🧠 4 Tipos de Reactivo</span>
+      <span class="badge">⭐ Con Retroalimentación</span>
+    </div>
+  </header>
+
+  <!-- =============================================
+       BARRA DE TEMPORIZADOR (sticky, visible al iniciar)
+  ============================================= -->
+  <div class="timer-bar" id="timer-bar">
+    <!-- Ícono + tiempo restante -->
+    <div class="timer-display" id="timer-display">
+      <span class="timer-icono">⏱</span>
+      <span id="timer-texto">45:00</span>
+    </div>
+    <!-- Mini barra de progreso del tiempo transcurrido -->
+    <div class="timer-progreso-fondo">
+      <div class="timer-progreso-relleno" id="timer-progreso"></div>
+    </div>
+    <!-- Etiqueta de tiempo agotado (oculta hasta llegar a 0) -->
+    <span class="timer-agotado" id="timer-agotado">⛔ Tiempo agotado</span>
+  </div>
+
+  <!-- =============================================
+       MODAL: TIEMPO AGOTADO
+  ============================================= -->
+  <div class="modal-overlay" id="modal-tiempo" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <span class="modal-icono">⏰</span>
+      <h2 class="modal-titulo">¡Tiempo agotado!</h2>
+      <p class="modal-desc">
+        Los 45 minutos han concluido. Se registrarán las respuestas
+        que completaste hasta este momento.
+      </p>
+      <button class="btn btn-primario" onclick="cerrarModalYResultados()" style="width:100%; justify-content:center;">
+        📊 Ver mis resultados
+      </button>
+    </div>
+  </div>
+
+  <!-- =============================================
+       CONTENIDO PRINCIPAL
+  ============================================= -->
+  <main class="contenedor">
+
+    <!-- ---- PANTALLA DE BIENVENIDA ---- -->
+    <div id="pantalla-inicio">
+      <div class="inicio-card">
+        <span class="inicio-icono">🏗️</span>
+        <h2 class="inicio-titulo">La Arquitectura del Aprendizaje</h2>
+        <p class="inicio-desc">
+          Pon a prueba tus conocimientos sobre la teoría sociocultural de Vygotsky.
+          Este simulador incluye <strong>25 reactivos</strong> con los mismos formatos
+          del instrumento oficial: cuestionamiento directo, completamiento,
+          ordenamiento y relación de elementos.
+        </p>
+        <div class="tipos-lista">
+          <span class="tipo-chip">🎯 Cuestionamiento Directo</span>
+          <span class="tipo-chip">✏️ Completamiento</span>
+          <span class="tipo-chip">🔢 Ordenamiento</span>
+          <span class="tipo-chip">🔗 Relación de Elementos</span>
+        </div>
+        <!-- Botón que inicia el simulador — JS escucha este evento -->
+        <button class="btn btn-primario" onclick="iniciarSimulador()" style="font-size:1rem; padding:0.8rem 2rem;">
+          ▶ Comenzar Simulación
+        </button>
+      </div>
+    </div>
+
+    <!-- ---- SIMULADOR (oculto hasta iniciar) ---- -->
+    <div id="pantalla-simulador" style="display:none;">
+
+      <!-- Barra de progreso -->
+      <div class="progreso-wrapper">
+        <span class="progreso-texto">Progreso</span>
+        <div class="barra-fondo">
+          <div class="barra-relleno" id="barra-relleno"></div>
+        </div>
+        <span class="progreso-num" id="progreso-num">0 / 25</span>
+      </div>
+
+      <!-- Contenedor donde JS inyecta la pregunta activa -->
+      <div id="contenedor-pregunta"></div>
+
+      <!-- Botones de navegación -->
+      <div class="controles">
+        <button class="btn btn-secundario" id="btn-anterior" onclick="preguntaAnterior()" disabled>
+          ← Anterior
+        </button>
+        <button class="btn btn-primario" id="btn-siguiente" onclick="preguntaSiguiente()">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+
+    <!-- ---- PANTALLA DE RESULTADOS ---- -->
+    <div id="pantalla-resultados">
+      <div class="resultado-card">
+        <!-- Círculo con puntuación -->
+        <div class="circulo-score">
+          <span class="score-numero" id="score-num">0</span>
+          <span class="score-total">de 25</span>
+        </div>
+
+        <h2 class="resultado-titulo" id="resultado-titulo">¡Simulación completada!</h2>
+        <p class="resultado-desc" id="resultado-desc">Aquí tienes tu desempeño:</p>
+
+        <!-- Resumen de aciertos / errores / porcentaje -->
+        <div class="resumen-grid">
+          <div class="resumen-item">
+            <div class="resumen-num color-correcto" id="res-correctas">0</div>
+            <div class="resumen-label">Correctas</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-num color-incorrecto" id="res-incorrectas">0</div>
+            <div class="resumen-label">Incorrectas</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-num color-azul" id="res-porcentaje">0%</div>
+            <div class="resumen-label">Calificación</div>
+          </div>
+        </div>
+
+        <!-- Botón para reiniciar — ejemplo de contenido dinámico con JS -->
+        <button class="btn btn-primario" onclick="reiniciarSimulador()" style="font-size:1rem; padding:0.8rem 2rem;">
+          🔄 Intentar de nuevo
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =============================================
+       PIE DE PÁGINA
+  ============================================= -->
+  <footer>
+    <strong>Prof. Francisco De Jesus Luna Benitez</strong> &nbsp;|&nbsp;
+    Simulador basado en la Teoría Sociocultural de Vygotsky &nbsp;|&nbsp; 2025
+  </footer>
+
+
+  <!-- =============================================
+       JAVASCRIPT — LÓGICA DEL SIMULADOR
+  ============================================= -->
+  <script>
+    /*
+     * ============================================================
+     *  BANCO DE 25 PREGUNTAS
+     *  Cada objeto tiene:
+     *    tipo      — etiqueta visible del tipo de reactivo
+     *    enunciado — texto de la pregunta (puede incluir HTML para tablas)
+     *    opciones  — array [{letra, texto}]
+     *    correcta  — letra de la opción correcta
+     *    feedback  — explicación de la respuesta correcta
+     * ============================================================
+     */
+    const preguntas = [
+
+      /* ===== CUESTIONAMIENTO DIRECTO (1-10) ===== */
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es el concepto vygotskiano que describe el espacio entre lo que un alumno puede hacer de manera independiente y lo que puede lograr con ayuda de un adulto o par más capaz?",
+        opciones: [
+          { letra: "A", texto: "Zona de Desarrollo Real: lo que el alumno ya domina sin apoyo externo alguno." },
+          { letra: "B", texto: "Zona de Desarrollo Próximo (ZDP): el espacio entre el nivel real y el potencial con ayuda." },
+          { letra: "C", texto: "Zona de Confort Cognitivo: área en la que el alumno trabaja sin esfuerzo ni reto." }
+        ],
+        correcta: "B",
+        feedback: "La ZDP es el núcleo de la propuesta educativa vygotskiana. Es justo en este espacio donde ocurre el aprendizaje real y se forma el potencial del alumno, siempre mediado por la interacción social."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes situaciones describe mejor el papel del docente como mediador sociocultural según Vygotsky?",
+        opciones: [
+          { letra: "A", texto: "El docente transmite los contenidos de forma expositiva y los alumnos los memorizan para el examen." },
+          { letra: "B", texto: "El docente diseña retos, brinda andamiaje, usa el diálogo y sabe cuándo retirar el apoyo para fomentar la autonomía." },
+          { letra: "C", texto: "El docente evalúa únicamente los resultados finales sin involucrarse en el proceso de aprendizaje." }
+        ],
+        correcta: "B",
+        feedback: "El docente vygotskiano asume cuatro roles simultáneos: diseñador de retos, proveedor de soportes, estratega del lenguaje y espectador empático. Nunca sustituye la actividad mental constructiva del estudiante."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la principal diferencia entre herramientas y signos en la teoría sociocultural de Vygotsky?",
+        opciones: [
+          { letra: "A", texto: "Las herramientas tienen orientación externa (transforman objetos y el entorno), mientras que los signos tienen orientación interna (transforman la mente del sujeto)." },
+          { letra: "B", texto: "Las herramientas producen cambios en el sujeto, mientras que los signos transforman el entorno físico y los objetos materiales." },
+          { letra: "C", texto: "Las herramientas y los signos son conceptos equivalentes y Vygotsky los usa de manera intercambiable en toda su teoría." }
+        ],
+        correcta: "A",
+        feedback: "Las herramientas (martillo, computadora) producen cambios en el mundo externo. Los signos (lenguaje, escritura, números) son instrumentos psicológicos que transforman internamente la mente y la estructura del pensamiento."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "Según Vygotsky, ¿cuándo se produce el momento clave del desarrollo cognitivo del niño?",
+        opciones: [
+          { letra: "A", texto: "Cuando el niño alcanza la madurez biológica que le permite incorporar conocimientos de forma autónoma." },
+          { letra: "B", texto: "Cuando el lenguaje y la actividad práctica convergen, transformando el pensamiento en pensamiento verbal racional." },
+          { letra: "C", texto: "Cuando el docente presenta contenidos de manera estructurada, secuencial y libre de ambigüedades." }
+        ],
+        correcta: "B",
+        feedback: "Para Vygotsky, la convergencia del lenguaje y la acción práctica es el punto de inflexión del desarrollo. El lenguaje deja de ser solo comunicación y se convierte en la herramienta que reorganiza el pensamiento."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes afirmaciones refleja correctamente la relación entre aprendizaje y desarrollo en la perspectiva vygotskiana?",
+        opciones: [
+          { letra: "A", texto: "El desarrollo biológico precede al aprendizaje; hay que esperar que el niño madure para enseñarle nuevos contenidos." },
+          { letra: "B", texto: "Aprendizaje y desarrollo son procesos independientes que no guardan ninguna relación entre sí." },
+          { letra: "C", texto: "El aprendizaje precede y jala al desarrollo; una buena enseñanza apunta a lo que el alumno aún no domina pero puede alcanzar con guía." }
+        ],
+        correcta: "C",
+        feedback: "Vygotsky invirtió la relación tradicional: no esperamos a que el niño esté listo, sino que una enseñanza adecuada sirve de imán para que el nivel potencial de desarrollo se integre con el actual."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de los siguientes roles NO corresponde al docente como mediador sociocultural en la teoría de Vygotsky?",
+        opciones: [
+          { letra: "A", texto: "Diseñador de retos que obligan al alumno a implicarse en un esfuerzo de comprensión." },
+          { letra: "B", texto: "Receptor pasivo de los aprendizajes del alumno sin intervenir en el proceso educativo." },
+          { letra: "C", texto: "Espectador empático que sabe cuándo retirar la ayuda para consolidar la autonomía del estudiante." }
+        ],
+        correcta: "B",
+        feedback: "El docente vygotskiano es siempre activo y mediador. Un 'receptor pasivo' describe exactamente lo contrario de la mediación sociocultural: el maestro ayuda al proceso pero nunca sustituye la actividad mental del estudiante."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Qué significa que el alumno es un 'ente social historizado' dentro de la teoría sociocultural de Vygotsky?",
+        opciones: [
+          { letra: "A", texto: "Que el alumno memoriza hechos históricos de su comunidad para aprobar los exámenes estandarizados." },
+          { letra: "B", texto: "Que el alumno es el producto de múltiples interrelaciones sociales y culturales acumuladas a lo largo de su vida." },
+          { letra: "C", texto: "Que el alumno aprende únicamente a través de la historia oral transmitida por su familia." }
+        ],
+        correcta: "B",
+        feedback: "El alumno no es una pizarra en blanco. Llega al aula con una historia de interacciones sociales y culturales que moldean sus esquemas de conocimiento. La escuela debe partir de esas realidades."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes prácticas docentes es INCOMPATIBLE con el enfoque sociocultural de Vygotsky?",
+        opciones: [
+          { letra: "A", texto: "Fomentar el trabajo colaborativo entre pares para construir conocimiento de forma conjunta." },
+          { letra: "B", texto: "Esperar a que el alumno madure biológicamente antes de introducir contenidos más complejos." },
+          { letra: "C", texto: "Diseñar actividades que partan de los conocimientos previos y del contexto cultural del alumno." }
+        ],
+        correcta: "B",
+        feedback: "Esperar la maduración biológica es la postura contraria a Vygotsky. Él sostiene que la enseñanza debe operar siempre en la ZDP, apuntando a lo que el alumno aún no domina para jalarlo hacia el desarrollo."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la función principal de la escuela desde la perspectiva sociocultural vygotskiana?",
+        opciones: [
+          { letra: "A", texto: "Transmitir conocimientos de forma estandarizada e igual para todos los alumnos, sin considerar el contexto." },
+          { letra: "B", texto: "Ser un laboratorio cultural en el que el contexto sociocultural es la materia prima del aprendizaje." },
+          { letra: "C", texto: "Evaluar el nivel de madurez biológica de cada alumno para determinar qué contenidos puede aprender." }
+        ],
+        correcta: "B",
+        feedback: "Para Vygotsky, la escuela es mucho más que un espacio de instrucción. Es el laboratorio donde la cultura plural, los contenidos con sentido y la comunidad integradora se articulan para producir aprendizaje real."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes situaciones ejemplifica mejor la Zona de Desarrollo Próximo (ZDP) en el aula?",
+        opciones: [
+          { letra: "A", texto: "Un alumno resuelve ejercicios de matemáticas que ya domina perfectamente sin ninguna dificultad." },
+          { letra: "B", texto: "Un docente asigna tareas tan complejas que los alumnos no pueden resolverlas ni con orientación especializada." },
+          { letra: "C", texto: "Un docente guía a sus alumnos en la resolución de problemas que aún no resuelven solos, pero sí con apoyo." }
+        ],
+        correcta: "C",
+        feedback: "La ZDP existe solo cuando hay un reto alcanzable con ayuda. Si ya se domina (opción A) o es inalcanzable incluso con ayuda (opción B), no se produce aprendizaje en el sentido vygotskiano."
+      },
+
+      /* ===== COMPLETAMIENTO (11-17) ===== */
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "En la teoría sociocultural de Vygotsky, la conciencia se forma cuando…",
+        opciones: [
+          { letra: "A", texto: "…el individuo aísla su pensamiento del entorno social para reflexionar de manera completamente independiente." },
+          { letra: "B", texto: "…el principio social domina sobre lo biológico y el aprendizaje ocurre en interacción con la cultura y los signos." },
+          { letra: "C", texto: "…el alumno memoriza y repite los contenidos presentados por el docente en el aula de clase." }
+        ],
+        correcta: "B",
+        feedback: "Vygotsky afirmó que 'la conciencia es un reflejo subjetivo de la realidad objetiva'. El desarrollo cognitivo no es un proceso solitario: emerge del encuentro entre el individuo, la cultura y la historia compartida."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El proceso de internalización en Vygotsky se completa cuando…",
+        opciones: [
+          { letra: "A", texto: "…el docente evalúa formalmente al alumno con un examen escrito y le asigna una calificación numérica." },
+          { letra: "B", texto: "…el aprendizaje que ocurrió en el plano social (interpsíquico) se transforma en conocimiento autónomo en el plano psicológico (intrapsíquico)." },
+          { letra: "C", texto: "…el alumno puede explicar verbalmente el contenido aprendido a sus compañeros de equipo." }
+        ],
+        correcta: "B",
+        feedback: "La internalización es el corazón de la Ley Genética del Desarrollo: todo aprendizaje ocurre dos veces. Primero entre personas (interpsíquico) y luego dentro del individuo (intrapsíquico), donde el proceso se vuelve autónomo."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "La fase final del andamiaje, denominada 'Espectador Empático', se alcanza cuando…",
+        opciones: [
+          { letra: "A", texto: "…el docente brinda instrucción directa y muy detallada para guiar al alumno en la resolución del problema." },
+          { letra: "B", texto: "…el docente retira el andamio y el estudiante asume el control total y autónomo de su propio aprendizaje." },
+          { letra: "C", texto: "…el docente aplica una evaluación sumativa para verificar los aprendizajes adquiridos al final del ciclo." }
+        ],
+        correcta: "B",
+        feedback: "El andamiaje es temporal por definición. El objetivo es siempre la autonomía del aprendiz. El 'Espectador Empático' sabe exactamente cuándo retirar la ayuda: es quien construyó bien el andamio para después poder quitarlo."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "En la construcción de la ZDP, el nivel de desarrollo potencial se define como…",
+        opciones: [
+          { letra: "A", texto: "…lo que el alumno ya puede hacer de forma completamente independiente sin ningún tipo de apoyo externo." },
+          { letra: "B", texto: "…lo que el alumno puede lograr con la guía y ayuda de adultos o pares más capaces en una situación colaborativa." },
+          { letra: "C", texto: "…lo que el alumno aún no puede hacer ni siquiera con la ayuda de los mejores especialistas educativos." }
+        ],
+        correcta: "B",
+        feedback: "El nivel de desarrollo potencial es el techo alcanzable de la ZDP. Aquí es donde el aprendizaje real ocurre y el potencial se forma. La clave es la ayuda ajustada: ni demasiada (que no aprende) ni demasiado poca (que frustra)."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El lenguaje egocéntrico, según Vygotsky, es la fase en la que el niño…",
+        opciones: [
+          { letra: "A", texto: "…usa el lenguaje exclusivamente para comunicarse con otras personas sobre temas de su interés." },
+          { letra: "B", texto: "…interioriza completamente el lenguaje y este se convierte en pensamiento verbal racional y abstracto." },
+          { letra: "C", texto: "…comienza a dirigir su propia actividad hablando en voz alta mientras realiza tareas prácticas." }
+        ],
+        correcta: "C",
+        feedback: "El lenguaje egocéntrico es la fase de transición entre el lenguaje social (dirigido a otros) y el lenguaje interiorizado (pensamiento). El niño 'se piensa en voz alta', usando el habla para autorregular su acción."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "En la perspectiva de Vygotsky, el alumno es un 'reconstructor' del conocimiento porque…",
+        opciones: [
+          { letra: "A", texto: "…copia y reproduce fielmente los contenidos que le transmite el docente en el aula." },
+          { letra: "B", texto: "…no absorbe pasivamente; reorganiza y reconceptualiza los significados que la cultura le presenta." },
+          { letra: "C", texto: "…destruye los conocimientos previos antes de incorporar los nuevos aprendizajes escolares." }
+        ],
+        correcta: "B",
+        feedback: "El alumno no es un recipiente vacío. Es un sujeto activo que toma los significados culturales y los reorganiza a través de su propia historia de interacciones, creando nueva comprensión que enriquece a su vez la cultura."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "La escuela como 'comunidad integradora', según el enfoque vygotskiano, requiere que…",
+        opciones: [
+          { letra: "A", texto: "…el proceso educativo se realice únicamente dentro del aula, separado del entorno familiar y comunitario." },
+          { letra: "B", texto: "…el proceso educativo tenga porosidad y conexión con padres, profesionales e instituciones de la comunidad." },
+          { letra: "C", texto: "…el docente seleccione únicamente los elementos culturales universales para incluir en el currículo escolar." }
+        ],
+        correcta: "B",
+        feedback: "Para Vygotsky, el contexto sociocultural no es un telón de fondo: es la materia prima del aprendizaje. La escuela debe abrirse a la comunidad porque el aprendizaje significativo siempre está enraizado en la cultura local."
+      },
+
+      /* ===== ORDENAMIENTO (18-21) ===== */
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene las fases del desarrollo del lenguaje según Vygotsky, de la primera a la última:
+          <br><br>
+          <strong>1.</strong> El lenguaje se interioriza y guía el pensamiento racional (pensamiento verbal).<br>
+          <strong>2.</strong> El niño usa el lenguaje para actuar sobre los otros en el entorno exterior.<br>
+          <strong>3.</strong> El niño habla en voz alta para dirigir su propia actividad (lenguaje egocéntrico).`,
+        opciones: [
+          { letra: "A", texto: "1 → 3 → 2 (Interiorizado, Egocéntrico, Social)" },
+          { letra: "B", texto: "2 → 3 → 1 (Social, Egocéntrico, Interiorizado)" },
+          { letra: "C", texto: "3 → 2 → 1 (Egocéntrico, Social, Interiorizado)" }
+        ],
+        correcta: "B",
+        feedback: "El lenguaje nace social (medio de vinculación y acción sobre otros), luego se vuelve egocéntrico (el niño habla para guiar su propia acción) y finalmente se interioriza convirtiéndose en pensamiento verbal racional."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene los pasos para crear una Zona de Desarrollo Próximo efectiva, del primero al último:
+          <br><br>
+          <strong>1.</strong> Evaluar la ejecución autónoma e independiente del estudiante.<br>
+          <strong>2.</strong> Diseñar un nivel de dificultad desafiante pero alcanzable para el alumno.<br>
+          <strong>3.</strong> Proporcionar práctica guiada con instrumentos y objetivos claros.`,
+        opciones: [
+          { letra: "A", texto: "1 → 2 → 3 (Evaluar, Diseñar reto, Práctica guiada)" },
+          { letra: "B", texto: "3 → 1 → 2 (Práctica guiada, Evaluar, Diseñar reto)" },
+          { letra: "C", texto: "2 → 3 → 1 (Diseñar reto, Práctica guiada, Evaluar independencia)" }
+        ],
+        correcta: "C",
+        feedback: "Primero se establece el reto desafiante pero alcanzable, luego se proporciona el desempeño con ayuda (andamiaje y práctica guiada), y finalmente se evalúa la independencia: el resultado lógico de la ZDP bien trabajada."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene los niveles de la evolución de la mente según Vygotsky, desde el más básico al más complejo:
+          <br><br>
+          <strong>1.</strong> Funciones Psíquicas Superiores (memoria consciente, razonamiento, solución de problemas).<br>
+          <strong>2.</strong> Funciones Naturales (capacidades biológicas innatas y reactivas).<br>
+          <strong>3.</strong> Interacción Cultural (contacto con la red de influencias culturales).`,
+        opciones: [
+          { letra: "A", texto: "1 → 3 → 2 (Superiores, Cultural, Naturales)" },
+          { letra: "B", texto: "2 → 3 → 1 (Naturales, Cultural, Superiores)" },
+          { letra: "C", texto: "3 → 2 → 1 (Cultural, Naturales, Superiores)" }
+        ],
+        correcta: "B",
+        feedback: "Se parte de las funciones biológicas innatas (Naturales), el contacto con la cultura transforma esas funciones (Interacción Cultural) y el resultado es el surgimiento de las Funciones Psíquicas Superiores como producto de la apropiación social."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene las fases del andamiaje de la primera a la última, según Vygotsky:
+          <br><br>
+          <strong>1.</strong> Fase de Transición (Guiada): el soporte se reduce paulatinamente con preguntas clave.<br>
+          <strong>2.</strong> Fase Inicial (Directiva): mayor soporte instruccional frente a contenido completamente nuevo.<br>
+          <strong>3.</strong> Fase Final (Espectador Empático): el estudiante asume control total y autónomo.`,
+        opciones: [
+          { letra: "A", texto: "3 → 1 → 2 (Final, Transición, Inicial)" },
+          { letra: "B", texto: "1 → 2 → 3 (Transición, Inicial, Final)" },
+          { letra: "C", texto: "2 → 1 → 3 (Inicial, Transición, Final)" }
+        ],
+        correcta: "C",
+        feedback: "El andamiaje sigue una lógica de reducción progresiva del apoyo: primero es directivo (máximo soporte), luego guiado (soporte parcial con autocuestionamiento) y finalmente el docente se retira como espectador empático."
+      },
+
+      /* ===== RELACIÓN DE ELEMENTOS (22-25) ===== */
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Seleccione la opción que relacione correctamente el concepto vygotskiano con su descripción:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Concepto</th><th>Descripción</th></tr>
+            <tr><td>1. ZDP</td><td>a) Soporte temporal y estratégico ajustado al nivel del estudiante.</td></tr>
+            <tr><td>2. Andamiaje</td><td>b) Espacio entre lo que el alumno hace solo y lo que logra con ayuda.</td></tr>
+            <tr><td>3. Internalización</td><td>c) Proceso por el que el conocimiento pasa del plano social al individual.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1b, 2a, 3c" },
+          { letra: "B", texto: "1a, 2b, 3c" },
+          { letra: "C", texto: "1c, 2b, 3a" }
+        ],
+        correcta: "A",
+        feedback: "ZDP = espacio entre desarrollo real y potencial (b). Andamiaje = soporte temporal ajustado (a). Internalización = tránsito del plano social al psicológico individual (c)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Seleccione la opción que relacione correctamente el rol del docente mediador con su función:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Rol</th><th>Función</th></tr>
+            <tr><td>1. Diseñador de Retos</td><td>a) Usa el diálogo para que los participantes contrasten y modifiquen esquemas.</td></tr>
+            <tr><td>2. Estratega del Lenguaje</td><td>b) Sabe cuándo retirar la ayuda para consolidar la autonomía del estudiante.</td></tr>
+            <tr><td>3. Espectador Empático</td><td>c) Provoca desafíos que obligan al alumno a implicarse en la comprensión.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1c, 2a, 3b" },
+          { letra: "B", texto: "1a, 2b, 3c" },
+          { letra: "C", texto: "1b, 2c, 3a" }
+        ],
+        correcta: "A",
+        feedback: "Diseñador de Retos provoca desafíos (c). Estratega del Lenguaje usa el diálogo para cuestionar esquemas (a). Espectador Empático sabe cuándo retirar la ayuda (b)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Seleccione la opción que relacione correctamente la fase del lenguaje con su característica principal:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Fase</th><th>Característica</th></tr>
+            <tr><td>1. Lenguaje Social</td><td>a) Guía la acción; se convierte en pensamiento verbal racional e interno.</td></tr>
+            <tr><td>2. Lenguaje Egocéntrico</td><td>b) Medio inicial de vinculación; actúa sobre los otros en el entorno.</td></tr>
+            <tr><td>3. Lenguaje Interiorizado</td><td>c) Acompaña la acción; el niño dirige su actividad hablando en voz alta.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1a, 2c, 3b" },
+          { letra: "B", texto: "1b, 2c, 3a" },
+          { letra: "C", texto: "1c, 2a, 3b" }
+        ],
+        correcta: "B",
+        feedback: "Lenguaje Social = medio de vinculación con otros (b). Lenguaje Egocéntrico = guía la acción propia en voz alta (c). Lenguaje Interiorizado = pensamiento verbal racional y silencioso (a)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Seleccione la opción que relacione correctamente el elemento del Ecosistema Vygotskiano con su descripción:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Elemento</th><th>Descripción</th></tr>
+            <tr><td>1. Contexto y Cultura</td><td>a) Apropiación e internalización del conocimiento social para usarlo autónomamente.</td></tr>
+            <tr><td>2. El Alumno</td><td>b) Mediación y andamiaje que opera dentro de la ZDP.</td></tr>
+            <tr><td>3. El Docente</td><td>c) Signos y herramientas que median el aprendizaje y transforman la mente.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1a, 2b, 3c" },
+          { letra: "B", texto: "1b, 2a, 3c" },
+          { letra: "C", texto: "1c, 2a, 3b" }
+        ],
+        correcta: "C",
+        feedback: "Contexto y Cultura = signos y herramientas que median (c). El Alumno = quien se apropia e internaliza el conocimiento (a). El Docente = quien media y andamiaje la ZDP (b)."
+      }
+    ]; // fin del banco de preguntas
+
+    /* ============================================================
+       VARIABLES DE ESTADO DEL SIMULADOR
+    ============================================================ */
+    let preguntaActual = 0;       // índice de la pregunta actual
+    let respuestas = [];          // array con la letra respondida por pregunta
+    let respondidas = new Array(preguntas.length).fill(false); // ¿ya se respondió?
+
+    /* ============================================================
+       VARIABLES Y LÓGICA DEL TEMPORIZADOR DE 45 MINUTOS
+    ============================================================ */
+    const TIEMPO_TOTAL = 45 * 60;   // 2700 segundos
+    let segundosRestantes = TIEMPO_TOTAL;
+    let intervaloTimer = null;       // referencia al setInterval
+
+    /**
+     * Formatea segundos como MM:SS
+     */
+    function formatearTiempo(seg) {
+      const m = Math.floor(seg / 60);
+      const s = seg % 60;
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    /**
+     * Inicia el temporizador y actualiza el DOM cada segundo
+     */
+    function iniciarTimer() {
+      segundosRestantes = TIEMPO_TOTAL;
+
+      // Mostrar la barra del timer
+      const bar = document.getElementById('timer-bar');
+      bar.style.display = 'flex';
+
+      // Resetear estilos
+      const display = document.getElementById('timer-display');
+      display.className = 'timer-display';
+      document.getElementById('timer-agotado').style.display = 'none';
+      document.getElementById('timer-texto').textContent = formatearTiempo(segundosRestantes);
+      document.getElementById('timer-progreso').style.width = '100%';
+      document.getElementById('timer-progreso').style.background =
+        'linear-gradient(90deg, var(--azul-claro), var(--azul-medio))';
+
+      // Limpiar cualquier intervalo previo
+      if (intervaloTimer) clearInterval(intervaloTimer);
+
+      intervaloTimer = setInterval(() => {
+        segundosRestantes--;
+
+        const pct = (segundosRestantes / TIEMPO_TOTAL) * 100;
+        const textoEl    = document.getElementById('timer-texto');
+        const displayEl  = document.getElementById('timer-display');
+        const progresoEl = document.getElementById('timer-progreso');
+
+        // Actualizar texto
+        textoEl.textContent = formatearTiempo(segundosRestantes);
+
+        // Actualizar barra de progreso del tiempo
+        progresoEl.style.width = pct + '%';
+
+        // Cambiar color según urgencia
+        if (segundosRestantes <= 5 * 60 && segundosRestantes > 0) {
+          // ≤ 5 minutos: rojo parpadeante
+          displayEl.className = 'timer-display urgente';
+          progresoEl.style.background = 'linear-gradient(90deg, #e05252, #b52a2a)';
+        } else if (segundosRestantes <= 10 * 60) {
+          // ≤ 10 minutos: naranja de advertencia
+          displayEl.className = 'timer-display advertencia';
+          progresoEl.style.background = 'linear-gradient(90deg, #e08a2a, #b55e00)';
+        }
+
+        // Tiempo agotado
+        if (segundosRestantes <= 0) {
+          clearInterval(intervaloTimer);
+          textoEl.textContent = '00:00';
+          progresoEl.style.width = '0%';
+          document.getElementById('timer-agotado').style.display = 'inline';
+          displayEl.className = 'timer-display urgente';
+          // Mostrar modal
+          document.getElementById('modal-tiempo').classList.add('activo');
+        }
+      }, 1000);
+    }
+
+    /**
+     * Detiene el temporizador (al terminar el simulador)
+     */
+    function detenerTimer() {
+      if (intervaloTimer) {
+        clearInterval(intervaloTimer);
+        intervaloTimer = null;
+      }
+    }
+
+    /**
+     * Cierra el modal de tiempo agotado y va directo a resultados
+     */
+    function cerrarModalYResultados() {
+      document.getElementById('modal-tiempo').classList.remove('activo');
+      mostrarResultados();
+    }
+
+    /* ============================================================
+       FUNCIÓN: iniciar el simulador
+       Oculta la pantalla de bienvenida y muestra el simulador
+    ============================================================ */
+    function iniciarSimulador() {
+      document.getElementById('pantalla-inicio').style.display = 'none';
+      document.getElementById('pantalla-simulador').style.display = 'block';
+      respuestas = new Array(preguntas.length).fill(null);
+      respondidas = new Array(preguntas.length).fill(false);
+      preguntaActual = 0;
+      iniciarTimer();   // ← arrancar el contador de 45 min
+      renderizarPregunta();
+    }
+
+    /* ============================================================
+       FUNCIÓN: renderizar la pregunta activa
+       Construye el HTML de la tarjeta y lo inyecta en el DOM
+    ============================================================ */
+    function renderizarPregunta() {
+      const p = preguntas[preguntaActual];
+      const yaRespondida = respondidas[preguntaActual];
+      const respuestaGuardada = respuestas[preguntaActual];
+
+      // Actualizar barra de progreso
+      const pct = ((preguntaActual + 1) / preguntas.length) * 100;
+      document.getElementById('barra-relleno').style.width = pct + '%';
+      document.getElementById('progreso-num').textContent =
+        (preguntaActual + 1) + ' / ' + preguntas.length;
+
+      // Construir HTML de las opciones
+      let opcionesHTML = '';
+      p.opciones.forEach(op => {
+        let claseExtra = '';
+        let deshabilitado = '';
+
+        if (yaRespondida) {
+          deshabilitado = 'disabled';
+          if (op.letra === p.correcta) {
+            claseExtra = 'correcta';
+          } else if (op.letra === respuestaGuardada && op.letra !== p.correcta) {
+            claseExtra = 'incorrecta';
+          }
+        }
+
+        opcionesHTML += `
+          <li>
+            <button class="opcion-btn ${claseExtra}"
+                    onclick="seleccionarRespuesta('${op.letra}')"
+                    ${deshabilitado}>
+              <span class="opcion-letra">${op.letra}</span>
+              <span>${op.texto}</span>
+            </button>
+          </li>`;
+      });
+
+      // Determinar si mostrar retroalimentación
+      let retroClass = '';
+      let retroIcono = '';
+      let retroTexto = '';
+      let retroVisible = '';
+
+      if (yaRespondida) {
+        retroVisible = 'visible';
+        if (respuestaGuardada === p.correcta) {
+          retroClass = 'correcto';
+          retroIcono = '✅';
+          retroTexto = `<span class="retro-icono">${retroIcono}</span><strong>¡Correcto!</strong> ${p.feedback}`;
+        } else {
+          retroClass = 'incorrecto';
+          retroIcono = '❌';
+          retroTexto = `<span class="retro-icono">${retroIcono}</span><strong>Incorrecto.</strong> La respuesta correcta es la opción <strong>${p.correcta}</strong>. ${p.feedback}`;
+        }
+      }
+
+      // Inyectar HTML completo de la tarjeta
+      document.getElementById('contenedor-pregunta').innerHTML = `
+        <div class="tarjeta-pregunta">
+          <span class="tipo-reactivo">${p.tipo}</span>
+          <p class="num-pregunta">Pregunta ${preguntaActual + 1} de ${preguntas.length}</p>
+          <p class="enunciado-pregunta">${p.enunciado}</p>
+          <ul class="opciones-lista">${opcionesHTML}</ul>
+          <div class="retroalimentacion ${retroClass} ${retroVisible}">
+            ${retroTexto}
+          </div>
+        </div>`;
+
+      // Actualizar estados de los botones de navegación
+      document.getElementById('btn-anterior').disabled = (preguntaActual === 0);
+      actualizarBotonSiguiente();
+    }
+
+    /* ============================================================
+       FUNCIÓN: actualizar el texto/estado del botón "Siguiente"
+    ============================================================ */
+    function actualizarBotonSiguiente() {
+      const btn = document.getElementById('btn-siguiente');
+      const esUltima = (preguntaActual === preguntas.length - 1);
+
+      if (esUltima) {
+        btn.textContent = '📊 Ver resultados';
+        // Habilitar solo si ya respondió la última
+        btn.disabled = !respondidas[preguntaActual];
+      } else {
+        btn.textContent = 'Siguiente →';
+        btn.disabled = false;
+      }
+    }
+
+    /* ============================================================
+       FUNCIÓN: seleccionar una respuesta
+       Marca la opción, guarda la respuesta y muestra retroalimentación
+    ============================================================ */
+    function seleccionarRespuesta(letra) {
+      if (respondidas[preguntaActual]) return; // ya respondida, ignorar
+
+      respuestas[preguntaActual] = letra;
+      respondidas[preguntaActual] = true;
+
+      // Re-renderizar para mostrar el resultado visualmente
+      renderizarPregunta();
+    }
+
+    /* ============================================================
+       FUNCIÓN: ir a la pregunta siguiente (o mostrar resultados)
+    ============================================================ */
+    function preguntaSiguiente() {
+      if (preguntaActual < preguntas.length - 1) {
+        preguntaActual++;
+        renderizarPregunta();
+        // Scroll al inicio de la tarjeta en móvil
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        mostrarResultados();
+      }
+    }
+
+    /* ============================================================
+       FUNCIÓN: ir a la pregunta anterior
+    ============================================================ */
+    function preguntaAnterior() {
+      if (preguntaActual > 0) {
+        preguntaActual--;
+        renderizarPregunta();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ============================================================
+       FUNCIÓN: calcular y mostrar la pantalla de resultados
+       Ejemplo de contenido dinámico generado con JavaScript
+    ============================================================ */
+    function mostrarResultados() {
+      detenerTimer();   // ← detener el contador al terminar
+      // Calcular aciertos
+      let correctas = 0;
+      respuestas.forEach((resp, i) => {
+        if (resp === preguntas[i].correcta) correctas++;
+      });
+
+      const incorrectas = preguntas.length - correctas;
+      const porcentaje = Math.round((correctas / preguntas.length) * 100);
+
+      // Determinar mensaje según calificación
+      let titulo, desc;
+      if (porcentaje >= 90) {
+        titulo = '🏆 ¡Excelente desempeño!';
+        desc = 'Dominas los conceptos centrales de la teoría sociocultural de Vygotsky. ¡Estás muy bien preparado!';
+      } else if (porcentaje >= 70) {
+        titulo = '👍 ¡Buen trabajo!';
+        desc = 'Tienes una comprensión sólida de los temas. Repasa los reactivos que marcaste incorrectamente para reforzar.';
+      } else if (porcentaje >= 50) {
+        titulo = '📚 En proceso de aprendizaje';
+        desc = 'Estás dentro de tu propia ZDP. Con un poco más de estudio y práctica, alcanzarás el nivel potencial.';
+      } else {
+        titulo = '💪 ¡Sigue adelante!';
+        desc = 'No te desanimes. Revisa la guía de estudio sobre Vygotsky y vuelve a intentarlo. El andamiaje que necesitas está aquí.';
+      }
+
+      // Actualizar DOM con resultados — esto es el "contenido dinámico" con JS
+      document.getElementById('score-num').textContent = correctas;
+      document.getElementById('resultado-titulo').textContent = titulo;
+      document.getElementById('resultado-desc').textContent = desc;
+      document.getElementById('res-correctas').textContent = correctas;
+      document.getElementById('res-incorrectas').textContent = incorrectas;
+      document.getElementById('res-porcentaje').textContent = porcentaje + '%';
+
+      // Cambiar pantallas
+      document.getElementById('pantalla-simulador').style.display = 'none';
+      document.getElementById('pantalla-resultados').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ============================================================
+       FUNCIÓN: reiniciar todo el simulador
+    ============================================================ */
+    function reiniciarSimulador() {
+      respuestas = new Array(preguntas.length).fill(null);
+      respondidas = new Array(preguntas.length).fill(false);
+      preguntaActual = 0;
+
+      document.getElementById('pantalla-resultados').style.display = 'none';
+      document.getElementById('pantalla-simulador').style.display = 'block';
+      iniciarTimer();   // ← reiniciar el contador
+      renderizarPregunta();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+  </script>
+</body>
+</html>

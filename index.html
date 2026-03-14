@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Actividades Interactivas</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f0f4ff;
+      --surface:   #ffffff;
+      --header-h:  72px;
+      --nav-h:     auto;
+      --radius:    18px;
+      --shadow:    0 8px 30px rgba(0,0,0,.10);
+      --shadow-lg: 0 16px 48px rgba(0,0,0,.16);
+      --transition: .35s cubic-bezier(.4,0,.2,1);
+
+      /* card accent colors */
+      --c1: #3b5bdb; /* LGDNNA – blue */
+      --c2: #0ca678; /* Metodologías – teal */
+      --c3: #e8590c; /* Acoso Escolar – coral */
+      --c4: #f59f00; /* NEM 2022 – amber */
+      --c5: #7048e8; /* Conflictos – purple */
+      --c6: #1098ad; /* Metodologías 2 – cyan */
+      --c7: #2f9e44; /* Vygotsky – green */
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--bg);
+      color: #1a1a2e;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(120deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4dabf7, #748ffc);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.5px;
+      line-height: 1.2;
+    }
+
+    .header-title span {
+      display: block;
+      font-family: 'Nunito', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      color: #74c0fc;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .header-back-btn {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.12);
+      border: 1.5px solid rgba(255,255,255,.25);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 8px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+      white-space: nowrap;
+    }
+    .header-back-btn:hover { background: rgba(255,255,255,.22); transform: scale(1.04); }
+    .header-back-btn.visible { display: flex; }
+
+    /* ── MAIN WRAPPER ── */
+    .wrapper {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      animation: fadeUp .5s ease both;
+    }
+
+    .section-label h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      font-weight: 800;
+      color: #1a1a2e;
+    }
+
+    .section-label .badge {
+      background: #1a1a2e;
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 50px;
+    }
+
+    /* ── GRID ── */
+    #menu-panel {
+      transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px 24px 24px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      animation: fadeUp .5s ease both;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--accent);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent) 8%, transparent), transparent 65%);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: var(--shadow-lg);
+      border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--accent) 15%, white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+      transition: transform var(--transition);
+    }
+    .card:hover .card-icon { transform: scale(1.1) rotate(-4deg); }
+
+    .card-tag {
+      display: inline-block;
+      font-size: .65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, white);
+      padding: 3px 9px;
+      border-radius: 50px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.3;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: .8rem;
+      color: #5c6070;
+      line-height: 1.55;
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 18px;
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .card-cta svg {
+      transition: transform var(--transition);
+    }
+    .card:hover .card-cta svg { transform: translateX(4px); }
+
+    /* stagger */
+    .card:nth-child(1) { animation-delay: .05s }
+    .card:nth-child(2) { animation-delay: .10s }
+    .card:nth-child(3) { animation-delay: .15s }
+    .card:nth-child(4) { animation-delay: .20s }
+    .card:nth-child(5) { animation-delay: .25s }
+    .card:nth-child(6) { animation-delay: .30s }
+    .card:nth-child(7) { animation-delay: .35s }
+
+    /* ── VIEWER PANEL ── */
+    #viewer-panel {
+      display: none;
+      animation: fadeUp .4s ease both;
+    }
+
+    #viewer-panel.visible { display: block; }
+
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .viewer-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .viewer-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      font-weight: 800;
+      color: #1a1a2e;
+    }
+
+    .viewer-subtitle {
+      font-size: .78rem;
+      color: #7a7d8a;
+    }
+
+    .iframe-wrapper {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 2px solid #e8eaf5;
+      position: relative;
+    }
+
+    .iframe-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      gap: 16px;
+      z-index: 10;
+      transition: opacity .4s;
+    }
+
+    .iframe-loader.hidden { opacity: 0; pointer-events: none; }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #e8eaf5;
+      border-top-color: var(--accent, #3b5bdb);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    .iframe-loader p {
+      font-size: .85rem;
+      font-weight: 700;
+      color: #7a7d8a;
+    }
+
+    iframe#viewer-frame {
+      width: 100%;
+      height: calc(100vh - var(--header-h) - 160px);
+      min-height: 520px;
+      border: none;
+      display: block;
+      opacity: 0;
+      transition: opacity .4s ease;
+    }
+
+    iframe#viewer-frame.loaded { opacity: 1; }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── RESPONSIVE TWEAKS ── */
+    @media (max-width: 640px) {
+      .wrapper { padding: 20px 14px 36px; }
+      .grid { grid-template-columns: 1fr; gap: 14px; }
+      .card { padding: 22px 18px 18px; }
+      iframe#viewer-frame { height: calc(100vh - var(--header-h) - 130px); min-height: 420px; }
+    }
+
+    @media (min-width: 641px) and (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <div class="header-brand">
+    <div class="header-logo">🎓</div>
+    <div class="header-title">
+      Actividades Interactivas
+      <span>Prof. Francisco De Jesús Luna Benítez</span>
+    </div>
+  </div>
+  <button class="header-back-btn" id="backBtn" onclick="showMenu()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Regresar al menú
+  </button>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="wrapper">
+
+  <!-- MENU PANEL -->
+  <div id="menu-panel">
+    <div class="section-label">
+      <h2>Selecciona una actividad</h2>
+      <span class="badge">7 simuladores</span>
+    </div>
+
+    <div class="grid" id="cardGrid">
+      <!-- Cards rendered by JS -->
+    </div>
+  </div>
+
+  <!-- VIEWER PANEL -->
+  <div id="viewer-panel">
+    <div class="viewer-header">
+      <div class="viewer-icon" id="viewerIcon"></div>
+      <div>
+        <div class="viewer-title" id="viewerTitle"></div>
+        <div class="viewer-subtitle" id="viewerSubtitle"></div>
+      </div>
+    </div>
+    <div class="iframe-wrapper">
+      <div class="iframe-loader" id="iframeLoader">
+        <div class="spinner" id="loaderSpinner"></div>
+        <p>Cargando actividad…</p>
+      </div>
+      <iframe id="viewer-frame" title="Visor de actividad" allowfullscreen></iframe>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCRIPT ═══════════ -->
+<script>
+  const activities = [
+    {
+      file:    'Simulador_LGDNNA.html',
+      emoji:   '⚖️',
+      tag:     'Legislación',
+      title:   'Simulador LGDNNA',
+      desc:    'Ley General de los Derechos de Niñas, Niños y Adolescentes. Practica situaciones y aplica la normativa vigente.',
+      accent:  'var(--c1)'
+    },
+    {
+      file:    'Simulador_Metodologias.html',
+      emoji:   '🧠',
+      tag:     'Didáctica',
+      title:   'Metodologías Sociocríticas',
+      desc:    'Explora enfoques pedagógicos críticos y reflexivos para la transformación educativa y social.',
+      accent:  'var(--c2)'
+    },
+    {
+      file:    'Simulador_Acoso_Escolar.html',
+      emoji:   '🛡️',
+      tag:     'Convivencia',
+      title:   'Protocolo: Acoso Escolar',
+      desc:    'Simula el protocolo oficial de erradicación del bullying y aprende a intervenir correctamente.',
+      accent:  'var(--c3)'
+    },
+    {
+      file:    'simulador_NEM_2022.html',
+      emoji:   '🎒',
+      tag:     'Reforma',
+      title:   'Simulador NEM 2022',
+      desc:    'Conoce y practica los fundamentos de la Nueva Escuela Mexicana y su marco curricular.',
+      accent:  'var(--c4)'
+    },
+    {
+      file:    'simulador_conflictos_escolares.html',
+      emoji:   '🤝',
+      tag:     'Mediación',
+      title:   'Resolución de Conflictos',
+      desc:    'Aprende estrategias y técnicas de mediación para resolver conflictos escolares de forma pacífica.',
+      accent:  'var(--c5)'
+    },
+    {
+      file:    'simulador_metodologias_2_.html',
+      emoji:   '🔬',
+      tag:     'Didáctica II',
+      title:   'Metodologías Sociocríticas II',
+      desc:    'Segunda parte del simulador de metodologías: profundiza en la práctica docente transformadora.',
+      accent:  'var(--c6)'
+    },
+    {
+      file:    'simulador_vygotsky.html',
+      emoji:   '🧩',
+      tag:     'Psicología',
+      title:   'Simulador Vygotsky',
+      desc:    'Zona de desarrollo próximo, andamiaje y aprendizaje social. Pon en práctica la teoría vygotskyiana.',
+      accent:  'var(--c7)'
+    }
+  ];
+
+  /* ── Build cards ── */
+  const grid = document.getElementById('cardGrid');
+
+  activities.forEach((act, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.setProperty('--accent', act.accent);
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', 'Abrir ' + act.title);
+    card.innerHTML = `
+      <div class="card-icon">${act.emoji}</div>
+      <span class="card-tag">${act.tag}</span>
+      <div class="card-title">${act.title}</div>
+      <p class="card-desc">${act.desc}</p>
+      <span class="card-cta">
+        Iniciar actividad
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    `;
+    card.addEventListener('click', () => openActivity(act));
+    card.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') openActivity(act); });
+    grid.appendChild(card);
+  });
+
+  /* ── Open activity ── */
+  function openActivity(act) {
+    const menuPanel   = document.getElementById('menu-panel');
+    const viewerPanel = document.getElementById('viewer-panel');
+    const frame       = document.getElementById('viewer-frame');
+    const loader      = document.getElementById('iframeLoader');
+    const spinner     = document.getElementById('loaderSpinner');
+    const backBtn     = document.getElementById('backBtn');
+
+    // update viewer info
+    document.getElementById('viewerIcon').textContent    = act.emoji;
+    document.getElementById('viewerIcon').style.background = `color-mix(in srgb, ${act.accent} 15%, white)`;
+    document.getElementById('viewerTitle').textContent   = act.title;
+    document.getElementById('viewerSubtitle').textContent = act.tag + ' · ' + act.file;
+    spinner.style.borderTopColor = act.accent;
+
+    // reset frame
+    frame.classList.remove('loaded');
+    loader.classList.remove('hidden');
+    frame.src = '';
+
+    // switch panels
+    menuPanel.style.opacity = '0';
+    menuPanel.style.transform = 'translateY(-12px)';
+    menuPanel.style.transition = 'opacity .3s ease, transform .3s ease';
+
+    setTimeout(() => {
+      menuPanel.style.display = 'none';
+      viewerPanel.classList.add('visible');
+      backBtn.classList.add('visible');
+      // load iframe
+      requestAnimationFrame(() => { frame.src = act.file; });
+    }, 280);
+  }
+
+  /* ── Frame loaded ── */
+  document.getElementById('viewer-frame').addEventListener('load', () => {
+    const frame  = document.getElementById('viewer-frame');
+    const loader = document.getElementById('iframeLoader');
+    loader.classList.add('hidden');
+    frame.classList.add('loaded');
+  });
+
+  /* ── Back to menu ── */
+  function showMenu() {
+    const menuPanel   = document.getElementById('menu-panel');
+    const viewerPanel = document.getElementById('viewer-panel');
+    const frame       = document.getElementById('viewer-frame');
+    const backBtn     = document.getElementById('backBtn');
+
+    viewerPanel.classList.remove('visible');
+    backBtn.classList.remove('visible');
+    frame.src = '';
+
+    menuPanel.style.display = 'block';
+    menuPanel.style.opacity  = '0';
+    menuPanel.style.transform = 'translateY(12px)';
+
+    requestAnimationFrame(() => {
+      menuPanel.style.transition = 'opacity .35s ease, transform .35s ease';
+      menuPanel.style.opacity    = '1';
+      menuPanel.style.transform  = 'translateY(0)';
+    });
+  }
+</script>
+
+</body>
+</html>

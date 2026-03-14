@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- =============================================
+       META Y CONFIGURACIÓN BÁSICA
+  ============================================= -->
+  <meta charset="UTF-8" />
+  <!-- Meta viewport: ESENCIAL para que no se deforme en móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Metodologías Sociocríticas | Prof. Francisco De Jesus Luna Benitez</title>
+
+  <!-- Tipografías externas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- =============================================
+       ESTILOS CSS — TODO EN UN SOLO ARCHIVO
+       Unidades relativas: rem, %, vw, clamp()
+  ============================================= -->
+  <style>
+
+    /* ================================================
+       VARIABLES GLOBALES — TEMA AZUL + CORAL/NARANJA
+       (acordes con la paleta de la guía del Prof.)
+    ================================================ */
+    :root {
+      --azul-oscuro:    #1a3a5c;
+      --azul-medio:     #2563a8;
+      --azul-claro:     #4a90d9;
+      --azul-suave:     #ddeeff;
+      --azul-fondo:     #eef4fb;
+      --coral:          #e07b5a;
+      --coral-suave:    #fde8e0;
+      --verde:          #2e7d52;
+      --verde-suave:    #d4f0e4;
+      --dorado:         #c8832a;
+      --dorado-claro:   #f5ddb0;
+      --gris-texto:     #3a3a4a;
+      --gris-claro:     #f0f4f8;
+      --blanco:         #ffffff;
+      --correcto:       #1d7d4e;
+      --correcto-bg:    #d4f0e4;
+      --incorrecto:     #b52a2a;
+      --incorrecto-bg:  #fde8e8;
+      --radio:          0.75rem;
+      --sombra:         0 4px 20px rgba(26,58,92,0.12);
+      --transicion:     0.3s ease;
+    }
+
+    /* ================================================
+       RESET GLOBAL
+    ================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; overflow-x: hidden; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--azul-fondo);
+      color: var(--gris-texto);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    /* ================================================
+       ENCABEZADO
+    ================================================ */
+    header {
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, #1e5590 60%, #2563a8 100%);
+      color: var(--blanco);
+      padding: 1.5rem 1rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; top: -50px; right: -50px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+    header::after {
+      content: '';
+      position: absolute; bottom: -40px; left: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .header-prof {
+      font-size: clamp(0.65rem, 2vw, 0.8rem);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dorado-claro);
+      margin-bottom: 0.4rem;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 4.5vw, 2.1rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+    .subtitulo {
+      font-size: clamp(0.76rem, 2.4vw, 0.95rem);
+      opacity: 0.85;
+      max-width: 580px;
+      margin: 0 auto 0.9rem;
+    }
+    .header-badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 2rem;
+      padding: 0.25rem 0.8rem;
+      font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+      font-weight: 500;
+    }
+
+    /* ================================================
+       BARRA DE TEMPORIZADOR — sticky
+    ================================================ */
+    .timer-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--blanco);
+      box-shadow: 0 2px 12px rgba(26,58,92,0.14);
+      padding: 0.5rem 1rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    /* Nombre del usuario en la barra del timer */
+    .timer-nombre {
+      font-size: clamp(0.72rem, 2vw, 0.82rem);
+      font-weight: 600;
+      color: var(--azul-medio);
+      white-space: nowrap;
+    }
+    .timer-display {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      letter-spacing: 0.03em;
+    }
+    .timer-display.advertencia { color: #b55e00; }
+    .timer-display.urgente {
+      color: var(--incorrecto);
+      animation: parpadeo 1s ease infinite;
+    }
+    @keyframes parpadeo { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .timer-prog-fondo {
+      flex: 1;
+      min-width: 80px;
+      max-width: 240px;
+      height: 7px;
+      background: var(--azul-suave);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .timer-prog-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+      border-radius: 4px;
+      width: 100%;
+      transition: width 1s linear, background 0.8s ease;
+    }
+    .timer-agotado {
+      display: none;
+      font-weight: 700;
+      color: var(--incorrecto);
+      font-size: 0.82rem;
+    }
+
+    /* ================================================
+       MODAL — TIEMPO AGOTADO
+    ================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,58,92,0.65);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.activo { display: flex; }
+    .modal-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+      padding: clamp(1.5rem, 5vw, 2.5rem);
+      max-width: 420px; width: 100%;
+      text-align: center;
+      animation: aparecer 0.4s ease;
+    }
+    .modal-icono  { font-size: 3rem; margin-bottom: 0.7rem; display: block; }
+    .modal-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.5rem;
+    }
+    .modal-desc {
+      font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+      color: var(--gris-texto);
+      margin-bottom: 1.4rem;
+      line-height: 1.65;
+    }
+
+    /* ================================================
+       CONTENEDOR PRINCIPAL
+    ================================================ */
+    .contenedor {
+      max-width: 840px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================================================
+       PANTALLA DE BIENVENIDA — Solicitud de nombre
+    ================================================ */
+    #pantalla-inicio { text-align: center; animation: aparecer 0.5s ease; }
+    .inicio-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.5rem, 5vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+    .inicio-icono { font-size: clamp(2.5rem, 8vw, 4rem); margin-bottom: 1rem; display: block; }
+    .inicio-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.75rem;
+    }
+    .inicio-desc {
+      font-size: clamp(0.82rem, 2.2vw, 0.93rem);
+      color: var(--gris-texto);
+      max-width: 520px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.75;
+    }
+
+    /* Las 4 rutas en la pantalla de inicio */
+    .rutas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.7rem;
+      margin-bottom: 1.8rem;
+    }
+    .ruta-item {
+      border-radius: 0.6rem;
+      padding: 0.85rem 0.5rem;
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--blanco);
+      line-height: 1.35;
+    }
+    .ruta-item span { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .r1 { background: #2d6e8e; }
+    .r2 { background: #c85f3a; }
+    .r3 { background: #5a7e38; }
+    .r4 { background: #7b4fa0; }
+
+    /* Chips de tipos de reactivo */
+    .tipos-lista {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 0.5rem;
+      margin-bottom: 1.8rem;
+    }
+    .tipo-chip {
+      background: var(--azul-suave);
+      color: var(--azul-medio);
+      border-radius: 2rem;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* ── Campo de nombre ── */
+    .campo-nombre {
+      background: var(--azul-fondo);
+      border-radius: 0.6rem;
+      padding: 1.2rem 1rem;
+      max-width: 440px;
+      margin: 0 auto 1.5rem;
+      text-align: left;
+    }
+    .campo-nombre label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--azul-oscuro);
+      margin-bottom: 0.5rem;
+    }
+    .campo-nombre input[type="text"] {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 2px solid #c5d9f0;
+      border-radius: 0.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--gris-texto);
+      background: var(--blanco);
+      transition: border-color var(--transicion);
+      outline: none;
+    }
+    .campo-nombre input[type="text"]:focus { border-color: var(--azul-claro); }
+    .error-nombre {
+      font-size: 0.78rem;
+      color: var(--incorrecto);
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+    /* ================================================
+       BARRA DE PROGRESO DE PREGUNTAS
+    ================================================ */
+    .progreso-wrapper {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: 0.85rem 1.2rem;
+      margin-bottom: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .progreso-texto {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--azul-medio);
+      white-space: nowrap;
+    }
+    .barra-fondo {
+      flex: 1;
+      min-width: 100px;
+      height: 10px;
+      background: var(--azul-suave);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .barra-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+      border-radius: 5px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .progreso-num {
+      font-size: 0.8rem;
+      color: var(--gris-texto);
+      white-space: nowrap;
+    }
+
+    /* ================================================
+       TARJETA DE PREGUNTA
+    ================================================ */
+    .tarjeta-pregunta {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.2rem, 4vw, 2rem);
+      margin-bottom: 1.2rem;
+      animation: aparecer 0.4s ease;
+    }
+    .tipo-reactivo {
+      display: inline-block;
+      background: var(--azul-suave);
+      color: var(--azul-medio);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 2rem;
+      padding: 0.2rem 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+    .num-pregunta {
+      font-size: 0.76rem;
+      color: var(--azul-claro);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .enunciado-pregunta {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.9rem, 2.4vw, 1.06rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      margin-bottom: 1.2rem;
+      line-height: 1.45;
+    }
+
+    /* ── Tabla de relación ── */
+    .tabla-relacion {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: clamp(0.73rem, 1.9vw, 0.84rem);
+      display: block;
+      overflow-x: auto;
+    }
+    .tabla-relacion th {
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .tabla-relacion td {
+      border: 1px solid #d0dce8;
+      padding: 0.42rem 0.8rem;
+      vertical-align: top;
+    }
+    .tabla-relacion tr:nth-child(even) td { background: var(--azul-fondo); }
+
+    /* ── Opciones ── */
+    .opciones-lista { display: flex; flex-direction: column; gap: 0.65rem; list-style: none; }
+    .opcion-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      width: 100%;
+      text-align: left;
+      background: var(--gris-claro);
+      border: 2px solid transparent;
+      border-radius: 0.6rem;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.79rem, 2.1vw, 0.91rem);
+      color: var(--gris-texto);
+      cursor: pointer;
+      transition: background var(--transicion), border-color var(--transicion), transform var(--transicion);
+      line-height: 1.45;
+    }
+    .opcion-btn:hover:not(:disabled) {
+      background: var(--azul-suave);
+      border-color: var(--azul-claro);
+      transform: translateX(3px);
+    }
+    .opcion-letra {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--azul-medio);
+      color: var(--blanco);
+      font-weight: 700;
+      font-size: 0.74rem;
+      flex-shrink: 0;
+      transition: background var(--transicion);
+    }
+    .opcion-btn.correcta  { background: var(--correcto-bg); border-color: var(--correcto); }
+    .opcion-btn.correcta  .opcion-letra { background: var(--correcto); }
+    .opcion-btn.incorrecta { background: var(--incorrecto-bg); border-color: var(--incorrecto); }
+    .opcion-btn.incorrecta .opcion-letra { background: var(--incorrecto); }
+    .opcion-btn:disabled { cursor: default; transform: none; }
+
+    /* ── Retroalimentación ── */
+    .retroalimentacion {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.6rem;
+      font-size: clamp(0.77rem, 2.1vw, 0.86rem);
+      line-height: 1.55;
+      border-left: 4px solid;
+    }
+    .retroalimentacion.correcto  { background: var(--correcto-bg); border-color: var(--correcto); color: #155334; }
+    .retroalimentacion.incorrecto{ background: var(--incorrecto-bg); border-color: var(--incorrecto); color: #7a1a1a; }
+    .retroalimentacion.visible   { display: block; }
+
+    /* ================================================
+       BOTONES DE NAVEGACIÓN
+    ================================================ */
+    .controles {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border: none;
+      border-radius: 0.55rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.79rem, 2.1vw, 0.9rem);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transicion), transform var(--transicion), opacity var(--transicion);
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none; }
+    .btn-primario  { background: var(--azul-medio); color: var(--blanco); }
+    .btn-primario:hover:not(:disabled)  { background: var(--azul-oscuro); }
+    .btn-secundario { background: var(--blanco); color: var(--azul-medio); border: 2px solid var(--azul-medio); }
+    .btn-secundario:hover:not(:disabled){ background: var(--azul-suave); }
+
+    /* ================================================
+       PANTALLA DE RESULTADOS
+    ================================================ */
+    #pantalla-resultados { display: none; text-align: center; animation: aparecer 0.5s ease; }
+    .resultado-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      padding: clamp(1.5rem, 5vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+    /* Nombre del usuario en resultados */
+    .resultado-saludo {
+      font-size: clamp(0.82rem, 2.2vw, 0.94rem);
+      color: var(--azul-medio);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    .circulo-score {
+      width: clamp(100px, 25vw, 140px);
+      height: clamp(100px, 25vw, 140px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul-medio), var(--azul-oscuro));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.4rem;
+      box-shadow: 0 8px 24px rgba(37,99,168,0.3);
+    }
+    .score-numero {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 900;
+      color: var(--blanco);
+      line-height: 1;
+    }
+    .score-total { font-size: 0.8rem; color: rgba(255,255,255,0.75); }
+    .resultado-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.55rem);
+      color: var(--azul-oscuro);
+      margin-bottom: 0.45rem;
+    }
+    .resultado-desc {
+      font-size: clamp(0.8rem, 2.1vw, 0.92rem);
+      color: var(--gris-texto);
+      max-width: 460px;
+      margin: 0 auto 1.4rem;
+      line-height: 1.65;
+    }
+    .resumen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.7rem;
+      margin-bottom: 1.5rem;
+    }
+    .resumen-item {
+      background: var(--azul-fondo);
+      border-radius: 0.6rem;
+      padding: 0.85rem 0.5rem;
+      text-align: center;
+    }
+    .resumen-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      font-weight: 700;
+    }
+    .resumen-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--azul-medio);
+      font-weight: 600;
+    }
+    .color-correcto  { color: var(--correcto); }
+    .color-incorrecto{ color: var(--incorrecto); }
+    .color-azul      { color: var(--azul-medio); }
+
+    /* ================================================
+       PIE DE PÁGINA
+    ================================================ */
+    footer {
+      background: var(--azul-oscuro);
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 1rem;
+      font-size: clamp(0.65rem, 2vw, 0.8rem);
+    }
+    footer strong { color: var(--dorado-claro); }
+
+    /* ================================================
+       RESPONSIVE — móvil
+    ================================================ */
+    @media (max-width: 480px) {
+      .controles { justify-content: stretch; }
+      .btn { flex: 1; justify-content: center; }
+      .opcion-btn { padding: 0.65rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =============================================
+       ENCABEZADO
+  ============================================= -->
+  <header>
+    <p class="header-prof">Prof. Francisco De Jesus Luna Benitez</p>
+    <h1>Simulador de Reactivos</h1>
+    <p class="subtitulo">Metodologías Sociocríticas y el Diseño Creativo — Nueva Escuela Mexicana</p>
+    <div class="header-badges">
+      <span class="badge">📝 35 Preguntas</span>
+      <span class="badge">🔧 Proyectos · STEAM · ABP · AS</span>
+      <span class="badge">⏱ 60 Minutos</span>
+      <span class="badge">⭐ Con Retroalimentación</span>
+    </div>
+  </header>
+
+  <!-- =============================================
+       BARRA DEL TEMPORIZADOR (sticky)
+  ============================================= -->
+  <div class="timer-bar" id="timer-bar">
+    <span class="timer-nombre" id="timer-nombre-txt">👤 —</span>
+    <div class="timer-display" id="timer-display">
+      <span>⏱</span>
+      <span id="timer-texto">60:00</span>
+    </div>
+    <div class="timer-prog-fondo">
+      <div class="timer-prog-relleno" id="timer-prog"></div>
+    </div>
+    <span class="timer-agotado" id="timer-agotado">⛔ Tiempo agotado</span>
+  </div>
+
+  <!-- =============================================
+       MODAL — TIEMPO AGOTADO
+  ============================================= -->
+  <div class="modal-overlay" id="modal-tiempo" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <span class="modal-icono">⏰</span>
+      <h2 class="modal-titulo">¡Tiempo agotado!</h2>
+      <p class="modal-desc">
+        Los 60 minutos han concluido. Se contabilizarán las respuestas
+        que registraste hasta este momento.
+      </p>
+      <button class="btn btn-primario"
+              onclick="cerrarModalYResultados()"
+              style="width:100%;justify-content:center;font-size:1rem;padding:.8rem 2rem;">
+        📊 Ver mis resultados
+      </button>
+    </div>
+  </div>
+
+  <!-- =============================================
+       CONTENIDO PRINCIPAL
+  ============================================= -->
+  <main class="contenedor">
+
+    <!-- ── PANTALLA DE BIENVENIDA ── -->
+    <div id="pantalla-inicio">
+      <div class="inicio-card">
+        <span class="inicio-icono">⚙️</span>
+        <h2 class="inicio-titulo">Metodologías Sociocríticas y Diseño Creativo</h2>
+        <p class="inicio-desc">
+          Pon a prueba tu dominio de las <strong>4 rutas metodológicas</strong> de la NEM
+          (Proyectos Comunitarios, STEAM, ABP, Aprendizaje Servicio) y el
+          <strong>Diseño Creativo del Programa Analítico</strong>.
+          <br><br>
+          <strong>35 reactivos · 60 minutos · Retroalimentación inmediata.</strong>
+        </p>
+
+        <!-- Las 4 rutas -->
+        <div class="rutas-grid">
+          <div class="ruta-item r1"><span>🏘️</span>Proyectos<br>Comunitarios</div>
+          <div class="ruta-item r2"><span>⚙️</span>Indagación<br>STEAM</div>
+          <div class="ruta-item r3"><span>🧩</span>Aprendizaje<br>Basado en Problemas</div>
+          <div class="ruta-item r4"><span>🤝</span>Aprendizaje<br>Servicio</div>
+        </div>
+
+        <!-- Tipos de reactivo -->
+        <div class="tipos-lista">
+          <span class="tipo-chip">🎯 Cuestionamiento Directo</span>
+          <span class="tipo-chip">✏️ Completamiento</span>
+          <span class="tipo-chip">🔢 Ordenamiento</span>
+          <span class="tipo-chip">🔗 Relación de Elementos</span>
+        </div>
+
+        <!-- ── CAMPO PARA EL NOMBRE ── -->
+        <div class="campo-nombre">
+          <label for="input-nombre">👤 Ingresa tu nombre completo para comenzar:</label>
+          <input type="text" id="input-nombre"
+                 placeholder="Ejemplo: María González Ramírez"
+                 maxlength="80"
+                 autocomplete="name" />
+          <p class="error-nombre" id="error-nombre">Por favor escribe tu nombre para continuar.</p>
+        </div>
+
+        <button class="btn btn-primario"
+                onclick="validarNombreEIniciar()"
+                style="font-size:1rem;padding:0.85rem 2.2rem;">
+          ▶ Comenzar Simulación
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SIMULADOR ── -->
+    <div id="pantalla-simulador" style="display:none;">
+
+      <!-- Barra de progreso de preguntas -->
+      <div class="progreso-wrapper">
+        <span class="progreso-texto">Progreso</span>
+        <div class="barra-fondo">
+          <div class="barra-relleno" id="barra-relleno"></div>
+        </div>
+        <span class="progreso-num" id="progreso-num">0 / 35</span>
+      </div>
+
+      <!-- La pregunta activa se inyecta aquí por JS -->
+      <div id="contenedor-pregunta"></div>
+
+      <!-- Navegación -->
+      <div class="controles">
+        <button class="btn btn-secundario" id="btn-anterior"
+                onclick="preguntaAnterior()" disabled>← Anterior</button>
+        <button class="btn btn-primario"   id="btn-siguiente"
+                onclick="preguntaSiguiente()">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- ── PANTALLA DE RESULTADOS ── -->
+    <div id="pantalla-resultados">
+      <div class="resultado-card">
+        <p class="resultado-saludo" id="resultado-saludo"></p>
+        <div class="circulo-score">
+          <span class="score-numero" id="score-num">0</span>
+          <span class="score-total">de 35</span>
+        </div>
+        <h2 class="resultado-titulo" id="resultado-titulo">¡Simulación completada!</h2>
+        <p  class="resultado-desc"  id="resultado-desc"></p>
+        <div class="resumen-grid">
+          <div class="resumen-item">
+            <div class="resumen-num color-correcto"    id="res-correctas">0</div>
+            <div class="resumen-label">Correctas</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-num color-incorrecto"  id="res-incorrectas">0</div>
+            <div class="resumen-label">Incorrectas</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-num color-azul"        id="res-porcentaje">0%</div>
+            <div class="resumen-label">Calificación</div>
+          </div>
+        </div>
+        <!-- Botón dinámico: reinicia sin pedir nombre de nuevo -->
+        <button class="btn btn-primario"
+                onclick="reiniciarSimulador()"
+                style="font-size:1rem;padding:0.8rem 2rem;">
+          🔄 Intentar de nuevo
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =============================================
+       PIE DE PÁGINA
+  ============================================= -->
+  <footer>
+    <strong>Prof. Francisco De Jesus Luna Benitez</strong>&nbsp;|&nbsp;
+    Simulador — Metodologías Sociocríticas y Diseño Creativo&nbsp;|&nbsp;NEM 2025
+  </footer>
+
+
+  <!-- =============================================
+       JAVASCRIPT — TODA LA LÓGICA DEL SIMULADOR
+  ============================================= -->
+  <script>
+
+    /*
+     * ============================================================
+     *  BANCO DE 35 PREGUNTAS
+     *  Basado en la Guía Maestra: "Metodologías Sociocríticas
+     *  y el Diseño Creativo" del Prof. Francisco De Jesus Luna Benitez
+     *
+     *  Distribución de reactivos:
+     *    14 – Cuestionamiento Directo (1-14)
+     *     9 – Completamiento         (15-23)
+     *     6 – Ordenamiento           (24-29)
+     *     6 – Relación de Elementos  (30-35)
+     * ============================================================
+     */
+    const preguntas = [
+
+      /* ══════════════════════════════════════════════
+         CUESTIONAMIENTO DIRECTO — Preguntas 1 a 14
+      ══════════════════════════════════════════════ */
+
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de los siguientes enunciados describe mejor la naturaleza de las metodologías sociocríticas?",
+        opciones: [
+          { letra: "A", texto: "Son recetas pedagógicas rígidas que los maestros deben seguir al pie de la letra para garantizar resultados uniformes." },
+          { letra: "B", texto: "Son posibilidades de acercamiento interdisciplinar que representan un cambio fundamental en cómo concebimos el aprendizaje." },
+          { letra: "C", texto: "Son instrumentos de evaluación estandarizada que permiten medir el avance académico de los estudiantes a nivel nacional." }
+        ],
+        correcta: "B",
+        feedback: "Las metodologías sociocríticas no son recetas rígidas, sino posibilidades de acercamiento interdisciplinar. Respetan y exigen la creatividad del maestro, reconstruyen significados a partir de escenarios pedagógicos reales y convierten a los estudiantes en sujetos solidarios y responsables."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es el propósito central del Aprendizaje Basado en Proyectos Comunitarios como metodología sociocrítica?",
+        opciones: [
+          { letra: "A", texto: "Lograr que los estudiantes memoricen los contenidos del programa sintético mediante actividades lúdicas repetitivas." },
+          { letra: "B", texto: "Explorar el entorno inmediato para identificar situaciones-problema, promover diversidad de soluciones y tejer redes con la comunidad." },
+          { letra: "C", texto: "Desarrollar habilidades digitales y tecnológicas para que los estudiantes se inserten en el mercado laboral global." }
+        ],
+        correcta: "B",
+        feedback: "El Aprendizaje Basado en Proyectos Comunitarios permite explorar el entorno inmediato para identificar situaciones-problema, promover la diversidad de soluciones y tejer redes con distintos actores de la comunidad. Sus características clave son la experimentación creativa, la diversidad de lenguajes y el involucramiento gradual de la comunidad."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la diferencia esencial entre el Aprendizaje Basado en Problemas (ABP) y el Aprendizaje Servicio (AS)?",
+        opciones: [
+          { letra: "A", texto: "El ABP integra ciencias y artes, mientras que el AS se enfoca exclusivamente en la resolución matemática de problemas." },
+          { letra: "B", texto: "El ABP orienta al pensamiento crítico y análisis de causas y efectos; el AS combina el contenido curricular con el servicio solidario a una necesidad real." },
+          { letra: "C", texto: "El ABP trabaja en proyectos individuales de investigación, mientras que el AS siempre se desarrolla en equipos de cinco estudiantes." }
+        ],
+        correcta: "B",
+        feedback: "Según la Matriz de Síntesis, el ABP se enfoca en el análisis profundo de causas y efectos para generar pensamiento crítico, mientras que el Aprendizaje Servicio combina el contenido curricular (aprendizaje intencionado) + necesidad social (servicio solidario) = protagonismo activo del estudiante."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes situaciones describe correctamente una aplicación de la Indagación STEAM en el aula?",
+        opciones: [
+          { letra: "A", texto: "Los estudiantes memorizan las tablas de multiplicar y repiten los pasos de un procedimiento matemático definido por el maestro." },
+          { letra: "B", texto: "Los estudiantes solo dibujan y pintan cuadros relacionados con el tema de ciencias naturales del programa sintético." },
+          { letra: "C", texto: "Los estudiantes se comprometen con preguntas orientadas, priorizan evidencia en diseños experimentales y construyen argumentos explicativos con coherencia." }
+        ],
+        correcta: "C",
+        feedback: "La Visión STEAM para México reconoce que la educación debe ser integral. Las artes y la lengua convergen con la capacidad numérica y el pensamiento computacional para: comprometer a los estudiantes con preguntas orientadas, priorizar la evidencia en diseños experimentales y construir argumentos explicativos con coherencia."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la función del Momento 3 (Planificación) dentro de la Fase 1 del Proyecto Comunitario?",
+        opciones: [
+          { letra: "A", texto: "Identificar la situación real e insumo inicial del problema detectado en la comunidad escolar." },
+          { letra: "B", texto: "Elaborar la primera versión del producto final del proyecto para presentarla a la comunidad." },
+          { letra: "C", texto: "Negociar los pasos, las producciones necesarias y los tiempos para el desarrollo del proyecto." }
+        ],
+        correcta: "C",
+        feedback: "La Fase 1 (Planeación) del Proyecto Comunitario tiene 3 momentos: Momento 1 – Identificación (situación real e insumo inicial), Momento 2 – Recuperación (vincular saberes previos y generar disonancia), Momento 3 – Planificación (negociar pasos, producciones y tiempos)."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es el resultado esperado del Aprendizaje Servicio como metodología sociocrítica?",
+        opciones: [
+          { letra: "A", texto: "Un examen escrito que demuestre que los estudiantes memorizaron los conceptos del tema abordado." },
+          { letra: "B", texto: "Un servicio real que transforma una necesidad comunitaria, combinando logros académicos con objetivos de servicio." },
+          { letra: "C", texto: "Un prototipo tecnológico presentado en feria de ciencias para la evaluación de los padres de familia." }
+        ],
+        correcta: "B",
+        feedback: "Según la Matriz de Síntesis Metodológica, el resultado esperado del Aprendizaje Servicio es: un servicio real que transforma una necesidad comunitaria. Es contrario a la simple acumulación académica; exige que los estudiantes desarrollen sentido de responsabilidad sobre su entorno."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es el propósito del Momento 9 (Difusión) dentro de la Fase 3 (Intervención) del Proyecto Comunitario?",
+        opciones: [
+          { letra: "A", texto: "Elaborar un portafolio de evidencias que identifique avances y dificultades del aprendizaje de los alumnos." },
+          { letra: "B", texto: "Realizar la presentación del producto final del proyecto ante la comunidad escolar y su entorno." },
+          { letra: "C", texto: "Negociar nuevamente los pasos y tiempos del proyecto con el equipo docente del plantel." }
+        ],
+        correcta: "B",
+        feedback: "La Fase 3 (Intervención) del Proyecto Comunitario incluye: Momento 8 – Integración (exposición, retroalimentación y ajuste), Momento 9 – Difusión (presentación del producto final), Momento 10 – Consideraciones (seguimiento del impacto), Momento 11 – Avances (decisiones para futuros proyectos)."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Qué distingue al Programa Analítico del Programa Sintético según el Diseño Creativo descrito en la guía?",
+        opciones: [
+          { letra: "A", texto: "El Programa Analítico es elaborado exclusivamente por la SEP para garantizar la uniformidad curricular en todo el país." },
+          { letra: "B", texto: "El Programa Analítico es una estrategia de contextualización que adapta lo establecido en los programas oficiales a las condiciones particulares de la escuela y el grupo, articulando las metodologías sociocríticas." },
+          { letra: "C", texto: "El Programa Analítico es un formato burocrático que el maestro llena al inicio del ciclo escolar para cumplir con los requisitos administrativos." }
+        ],
+        correcta: "B",
+        feedback: "La guía es muy clara: el Programa Analítico NO es un formato burocrático ni se llena con 'alguna receta'. Es una estrategia de contextualización. La premisa es reconocer al maestro como profesional de la enseñanza. Su objetivo es adecuar lo establecido en los programas oficiales a las condiciones particulares de la escuela y el grupo."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Qué analiza el Primer Plano del Diseño Creativo: 'Análisis del Contexto Socioeducativo' (Lectura de la Realidad)?",
+        opciones: [
+          { letra: "A", texto: "Exclusivamente los resultados de las evaluaciones nacionales e internacionales aplicadas al grupo escolar." },
+          { letra: "B", texto: "Las condiciones académicas, personales y familiares de los estudiantes y maestros, el contexto internacional/nacional/local, los procesos de aprendizaje y las necesidades de convivencia planetaria." },
+          { letra: "C", texto: "Únicamente el presupuesto disponible en la escuela para la compra de materiales y recursos didácticos del ciclo escolar." }
+        ],
+        correcta: "B",
+        feedback: "El Primer Plano (Análisis del Contexto Socioeducativo) es el punto de partida. Analiza: condiciones académicas, personales y familiares; elementos del contexto internacional, nacional, estatal y local; los procesos de aprendizaje de los alumnos y sus dificultades; e intersección del papel de los padres, contexto social y necesidades de convivencia planetaria."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la característica que mejor define al Plano de Codiseño (Plano 3) del Programa Analítico?",
+        opciones: [
+          { letra: "A", texto: "Articular los contenidos del programa sintético con la lectura de la realidad, usando el contexto para enseñar contenidos ya existentes." },
+          { letra: "B", texto: "Incorporar nuevos contenidos no contemplados en los programas sintéticos, pero que responden a necesidades locales imperativas, con su respectiva justificación." },
+          { letra: "C", texto: "Seleccionar cuáles contenidos del programa sintético se omitirán durante el ciclo escolar para ahorrar tiempo pedagógico." }
+        ],
+        correcta: "B",
+        feedback: "El Plano 3 (Codiseño) incorpora nuevos contenidos no contemplados en los programas sintéticos pero que responden a necesidades locales imperativas. La Regla de Oro: todo contenido de codiseño debe llevar una justificación de su incorporación y cómo abona al aprendizaje. Ejemplos: Lengua de Señas Mexicana, lenguas indígenas, recuperación emocional."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es el objetivo del Plano Didáctico como nivel 'Micro' del Diseño Creativo?",
+        opciones: [
+          { letra: "A", texto: "Es la elaboración del diagnóstico socioeducativo inicial sobre el contexto de la comunidad escolar." },
+          { letra: "B", texto: "Es la estructuración de la planeación didáctica por lapsos de tiempo, uniendo situación-problema, contenidos y metodología activa, con evaluación formativa y trabajo colaborativo." },
+          { letra: "C", texto: "Es la selección del presupuesto y los recursos materiales necesarios para implementar los proyectos del ciclo escolar." }
+        ],
+        correcta: "B",
+        feedback: "El Plano Didáctico (Nivel Micro / Vértice de Acción) es la estructuración de la planeación por lapsos. Sus características clave son: Articulación (une situación-problema, contenidos sintéticos+codiseño y metodología), Gradualidad (sucesión y dificultad), Evaluación Formativa (entregables, cuadernos, murales, autorreflexión) y Trabajo Colaborativo."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál de las siguientes opciones describe correctamente el tercer principio del Aprendizaje Basado en Problemas (ABP)?",
+        opciones: [
+          { letra: "A", texto: "Perspectivas Interrelacionadas: conecta disciplinas aparentemente inconexas para entender la naturaleza multifactorial de un problema." },
+          { letra: "B", texto: "Involucramiento Gradual: integra a la comunidad activamente en todas las fases del proyecto escolar." },
+          { letra: "C", texto: "Sujetos Solidarios: forma ciudadanos responsables de su comunidad y de la naturaleza." }
+        ],
+        correcta: "C",
+        feedback: "El ABP tiene 3 principios fundamentales: 1) Perspectivas Interrelacionadas (conecta disciplinas inconexas), 2) Pensamiento Crítico (genera propuestas de solución analíticas), 3) Sujetos Solidarios (forma ciudadanos responsables de su comunidad y de la naturaleza). El tercer principio es el de Sujetos Solidarios."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Cuál es la Fase 4 del Ciclo de Aprendizaje STEAM y en qué consiste?",
+        opciones: [
+          { letra: "A", texto: "Organización y estructuración: analizar, organizar e interpretar datos para clarificar conceptos y establecer conclusiones." },
+          { letra: "B", texto: "Presentación de resultados: elaborar propuestas de acción para resolver la problemática general detectada." },
+          { letra: "C", texto: "Metacognición: reflexión sobre planes de trabajo, logros, dificultades y fracasos del proceso de indagación." }
+        ],
+        correcta: "B",
+        feedback: "El Ciclo de Aprendizaje STEAM tiene 5 fases: Fase 1 (Introducción al tema), Fase 2 (Diseño de la investigación – acuerdos de indagación), Fase 3 (Organización y estructuración – analizar datos), Fase 4 (Presentación de resultados – propuestas de acción), Fase 5 (Metacognición – reflexión sobre el proceso)."
+      },
+      {
+        tipo: "🎯 Cuestionamiento Directo",
+        enunciado: "¿Qué caracteriza a la Fase 1 de la metodología de Aprendizaje Servicio denominada 'Punto de Partida: Sensibilización'?",
+        opciones: [
+          { letra: "A", texto: "Consiste en la puesta en práctica de las actividades diseñadas, monitoreando el contenido curricular y el servicio." },
+          { letra: "B", texto: "Consiste en la detección de una necesidad social real y el interés de los estudiantes por abordarla." },
+          { letra: "C", texto: "Consiste en la evaluación final de logros académicos y el cumplimiento de los objetivos de servicio comunitario." }
+        ],
+        correcta: "B",
+        feedback: "Las 5 fases del Aprendizaje Servicio son: 1) Punto de partida: Sensibilización (detección de necesidad social e interés de los estudiantes), 2) Diagnóstico participativo, 3) Planificación pedagógica y social, 4) Creatividad en marcha: Puesta en práctica, 5) Evaluación final de resultados."
+      },
+
+      /* ══════════════════════════════════════════════
+         COMPLETAMIENTO — Preguntas 15 a 23
+      ══════════════════════════════════════════════ */
+
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "Las metodologías sociocríticas representan un cambio de paradigma porque los estudiantes dejan de ser receptores pasivos para convertirse en…",
+        opciones: [
+          { letra: "A", texto: "…consumidores eficientes de información digital seleccionada y filtrada por el docente en clase." },
+          { letra: "B", texto: "…sujetos solidarios y responsables de su entorno, capaces de transformar su comunidad." },
+          { letra: "C", texto: "…evaluadores independientes del desempeño institucional de la escuela y sus maestros." }
+        ],
+        correcta: "B",
+        feedback: "La 'Acción Transformadora' es uno de los tres pilares del cambio de paradigma: los estudiantes dejan de ser receptores para convertirse en sujetos solidarios y responsables de su entorno. Los otros dos pilares son: Autonomía Profesional del maestro y Contexto Vivo."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El Aprendizaje Servicio resulta de la suma de Contenido Curricular (Aprendizaje Intencionado) + Necesidad Social (Servicio Solidario), lo que produce…",
+        opciones: [
+          { letra: "A", texto: "…un Proyecto de Indagación STEAM enfocado en el pensamiento científico y tecnológico." },
+          { letra: "B", texto: "…un examen departamental para evaluar los aprendizajes esperados del campo formativo." },
+          { letra: "C", texto: "…el Protagonismo Activo del estudiante, quien desarrolla sentido de responsabilidad al trabajar sobre necesidades reales de su entorno." }
+        ],
+        correcta: "C",
+        feedback: "La fórmula del AS es: Contenido Curricular (Aprendizaje Intencionado) + Necesidad Social (Servicio Solidario) = Aprendizaje Servicio (Protagonismo Activo). Es contrario a la simple acumulación académica y abona al desarrollo integral y la proyección social."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El Diseño de Ingeniería dentro del Ciclo STEAM es un proceso cíclico que incluye las etapas de: Diseño, Creación, Prueba y…",
+        opciones: [
+          { letra: "A", texto: "…Difusión comunitaria del producto final ante los padres de familia y autoridades educativas." },
+          { letra: "B", texto: "…Mejora del prototipo, completando así el ciclo iterativo de diseño de ingeniería." },
+          { letra: "C", texto: "…Calificación numérica por parte del docente para integrar la evaluación bimestral del campo formativo." }
+        ],
+        correcta: "B",
+        feedback: "El Diseño de Ingeniería dentro del Ciclo STEAM es un proceso cíclico de 4 etapas: Diseño → Creación → Prueba → Mejora del prototipo. Este ciclo se repite de forma iterativa hasta lograr la mejor solución posible para la problemática abordada."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "Según la Ruta del Diseño Creativo, el Nivel Meso (Filtro Intermedio) corresponde al Programa Analítico (Planos 2 y 3) porque…",
+        opciones: [
+          { letra: "A", texto: "…establece directamente las actividades del aula, las metodologías y los instrumentos de evaluación formativa." },
+          { letra: "B", texto: "…articula la Lectura de la Realidad con los contenidos curriculares, contextualizando saberes y codiseñando contenidos locales." },
+          { letra: "C", texto: "…determina los lineamientos nacionales que todas las escuelas del país deben seguir sin excepción curricular." }
+        ],
+        correcta: "B",
+        feedback: "La Ruta del Diseño Creativo tiene 3 niveles: Macro (Lectura de la Realidad – Plano 1), Meso (Programa Analítico – Planos 2 y 3: contextualización de saberes y codiseño de contenidos locales), Micro (Plano Didáctico: secuencia de actividades, metodologías activas y evaluación formativa en el aula)."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El Momento 6 (Reconocimiento) de la Fase 2 del Proyecto Comunitario tiene como propósito…",
+        opciones: [
+          { letra: "A", texto: "…explorar la problemática del entorno y acercarse a las causas que la originan para planear la intervención." },
+          { letra: "B", texto: "…identificar los avances y dificultades que manifiestan los estudiantes durante el proceso de producción del proyecto." },
+          { letra: "C", texto: "…presentar el producto final ante la comunidad escolar y recabar su retroalimentación y validación." }
+        ],
+        correcta: "B",
+        feedback: "La Fase 2 (Acción) del Proyecto Comunitario tiene 4 momentos: Momento 4 – Acercamiento (exploración del problema), Momento 5 – Comprensión y producción (elaborar producciones necesarias), Momento 6 – Reconocimiento (identificar avances y dificultades), Momento 7 – Concreción (primera versión del producto)."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El Momento 5 del ABP, 'Vivamos la experiencia', consiste en…",
+        opciones: [
+          { letra: "A", texto: "…determinar con claridad el problema a trabajar y las inquietudes de los estudiantes sobre la situación." },
+          { letra: "B", texto: "…trazar la ruta del proyecto (objetivos, acuerdos, tiempos) con dirección hacia la comprensión o transformación." },
+          { letra: "C", texto: "…realizar la indagación documental o vivencial, junto con la discusión grupal y el análisis metódico del tema." }
+        ],
+        correcta: "C",
+        feedback: "Los 6 Momentos del ABP son: 1) Presentemos (reflexión inicial), 2) Recolectemos (saberes previos), 3) Formulemos el problema (clarificación del problema), 4) Organicemos la experiencia (trazar la ruta), 5) Vivamos la experiencia (indagación documental/vivencial, discusión grupal y análisis metódico), 6) Resultados y análisis."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "La Evaluación Formativa en el Plano Didáctico establece mecanismos para la autorreflexión y avance continuo porque…",
+        opciones: [
+          { letra: "A", texto: "…es el instrumento definitivo que genera la calificación final con la que se promueve o reprueba al estudiante." },
+          { letra: "B", texto: "…incluye herramientas como entregables, cuadernos y murales, que son distintos de la calificación final y orientan el proceso." },
+          { letra: "C", texto: "…la aplica únicamente el director escolar como parte del proceso de supervisión pedagógica institucional." }
+        ],
+        correcta: "B",
+        feedback: "La Evaluación Formativa en el Plano Didáctico establece mecanismos para la autorreflexión y el avance continuo usando entregables, cuadernos y murales. Es importante no confundirla con la calificación final; es un proceso continuo de acompañamiento que retroalimenta el aprendizaje."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "El Plano de Contextualización (Plano 2) del Programa Analítico se caracteriza porque…",
+        opciones: [
+          { letra: "A", texto: "…incorpora nuevos contenidos al currículo que no están en los programas sintéticos pero que la comunidad requiere urgentemente." },
+          { letra: "B", texto: "…articula los contenidos de los programas sintéticos con la Lectura de la Realidad, usando el contexto para enseñar contenidos ya existentes." },
+          { letra: "C", texto: "…diseña la secuencia detallada de actividades, los tiempos y los instrumentos de evaluación formativa para el aula." }
+        ],
+        correcta: "B",
+        feedback: "El Plano 2 (Contextualización) articula los contenidos de los programas sintéticos con la Lectura de la Realidad. El ejemplo de la guía: usar el rasgo de la pandemia para enseñar contenidos existentes. Es diferente del Plano 3 (Codiseño), que incorpora contenidos NUEVOS no contemplados en los programas."
+      },
+      {
+        tipo: "✏️ Completamiento",
+        enunciado: "La fase 3 del Aprendizaje Servicio, 'Organicemos las actividades: Planificación pedagógica y social', consiste en definir…",
+        opciones: [
+          { letra: "A", texto: "…la necesidad social detectada y el interés inicial de los estudiantes por abordarla como punto de partida." },
+          { letra: "B", texto: "…¿Qué? ¿Por qué? ¿Para qué? ¿A quiénes? ¿Cómo? ¿Cuándo? ¿Con qué? para estructurar el proyecto de servicio." },
+          { letra: "C", texto: "…los logros académicos finales y los objetivos de servicio alcanzados mediante la autoevaluación y reflexión." }
+        ],
+        correcta: "B",
+        feedback: "La Fase 3 del AS (Planificación pedagógica y social) define las 7 preguntas clave: ¿Qué? ¿Por qué? ¿Para qué? ¿A quiénes? ¿Cómo? ¿Cuándo? ¿Con qué? Estas preguntas estructuran tanto el contenido curricular como el servicio solidario que se va a desarrollar."
+      },
+
+      /* ══════════════════════════════════════════════
+         ORDENAMIENTO — Preguntas 24 a 29
+      ══════════════════════════════════════════════ */
+
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene las tres fases del Aprendizaje Basado en Proyectos Comunitarios de la primera a la última:
+          <br><br>
+          <strong>1.</strong> Intervención: exposición, difusión y seguimiento del impacto en la comunidad.<br>
+          <strong>2.</strong> Planeación: identificación, recuperación y negociación del proyecto.<br>
+          <strong>3.</strong> Acción: acercamiento, producción, reconocimiento y concreción del producto.`,
+        opciones: [
+          { letra: "A", texto: "3 → 1 → 2 (Acción, Intervención, Planeación)" },
+          { letra: "B", texto: "1 → 3 → 2 (Intervención, Acción, Planeación)" },
+          { letra: "C", texto: "2 → 3 → 1 (Planeación, Acción, Intervención)" }
+        ],
+        correcta: "C",
+        feedback: "La estructura del Proyecto Comunitario sigue el orden: Fase 1 – Planeación (Momentos 1-3: Identificación, Recuperación, Planificación) → Fase 2 – Acción (Momentos 4-7: Acercamiento, Comprensión, Reconocimiento, Concreción) → Fase 3 – Intervención (Momentos 8-11: Integración, Difusión, Consideraciones, Avances)."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene los 6 Momentos del Aprendizaje Basado en Problemas (ABP) del primero al último, según la secuencia didáctica correcta:
+          <br><br>
+          <strong>a.</strong> Formulemos el problema: determinar con claridad el problema y las inquietudes de los estudiantes.<br>
+          <strong>b.</strong> Resultados y análisis: visualizar avances e identificar nuevos problemas.<br>
+          <strong>c.</strong> Presentemos: reflexión inicial e introducción del escenario o problemática.<br>
+          <strong>d.</strong> Organicemos la experiencia: trazar la ruta (objetivos, acuerdos, tiempos).<br>
+          <strong>e.</strong> Vivamos la experiencia: indagación documental o vivencial.<br>
+          <strong>f.</strong> Recolectemos: explorar saberes previos de los estudiantes sobre la temática.`,
+        opciones: [
+          { letra: "A", texto: "c → f → a → d → e → b" },
+          { letra: "B", texto: "a → c → f → e → d → b" },
+          { letra: "C", texto: "f → a → c → e → b → d" }
+        ],
+        correcta: "A",
+        feedback: "La secuencia correcta de los 6 momentos del ABP es: 1) Presentemos (introducción de la problemática) → 2) Recolectemos (saberes previos) → 3) Formulemos el problema → 4) Organicemos la experiencia (ruta/objetivos/tiempos) → 5) Vivamos la experiencia (indagación) → 6) Resultados y análisis."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene las 5 Fases del Ciclo de Aprendizaje STEAM del inicio al cierre:
+          <br><br>
+          <strong>1.</strong> Metacognición: reflexión sobre logros, dificultades y fracasos del proceso.<br>
+          <strong>2.</strong> Diseño de la investigación: acuerdos de indagación (¿Qué? ¿Quién? ¿Cómo? ¿Para qué?).<br>
+          <strong>3.</strong> Introducción al tema: conocimientos previos, disonancia e identificación de la problemática.<br>
+          <strong>4.</strong> Organización y estructuración: analizar, organizar e interpretar datos.<br>
+          <strong>5.</strong> Presentación de resultados: elaborar propuestas de acción para resolver la problemática.`,
+        opciones: [
+          { letra: "A", texto: "2 → 3 → 4 → 1 → 5" },
+          { letra: "B", texto: "3 → 2 → 4 → 5 → 1" },
+          { letra: "C", texto: "1 → 3 → 5 → 2 → 4" }
+        ],
+        correcta: "B",
+        feedback: "El Ciclo STEAM tiene este orden: Fase 1 – Introducción al tema (conocimientos previos y problemática) → Fase 2 – Diseño de la investigación (acuerdos de indagación) → Fase 3 – Organización y estructuración (análisis de datos) → Fase 4 – Presentación de resultados (propuestas de acción) → Fase 5 – Metacognición (reflexión final)."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene los niveles de la Ruta del Diseño Creativo de lo más amplio/general a lo más concreto/específico, según el embudo presentado en la guía de estudio:
+          <br><br>
+          <strong>X.</strong> Nivel Micro (Vértice de Acción): Plano Didáctico con metodologías activas y evaluación formativa.<br>
+          <strong>Y.</strong> Nivel Macro (Base Ancha): Lectura de la Realidad — Plano 1.<br>
+          <strong>Z.</strong> Nivel Meso (Filtro Intermedio): Programa Analítico — Planos 2 y 3.`,
+        opciones: [
+          { letra: "A", texto: "X → Z → Y (Micro, Meso, Macro)" },
+          { letra: "B", texto: "Z → Y → X (Meso, Macro, Micro)" },
+          { letra: "C", texto: "Y → Z → X (Macro, Meso, Micro)" }
+        ],
+        correcta: "C",
+        feedback: "La Ruta del Diseño Creativo es un embudo que va de lo más amplio a lo más concreto: Macro (Base Ancha) = Lectura de la Realidad (Plano 1) → Meso (Filtro Intermedio) = Programa Analítico (Planos 2 y 3) → Micro (Vértice de Acción) = Plano Didáctico. El conocimiento del contexto alimenta y da sentido a todo lo que sigue."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene las 5 fases de la metodología de Aprendizaje Servicio (AS) desde el inicio hasta la evaluación final:
+          <br><br>
+          <strong>A.</strong> Creatividad en marcha: Puesta en práctica — monitoreo del contenido curricular y del servicio.<br>
+          <strong>B.</strong> Compartimos y evaluamos lo aprendido: Evaluación final de resultados.<br>
+          <strong>C.</strong> Punto de partida: Sensibilización — detección de la necesidad social.<br>
+          <strong>D.</strong> Lo que sé y lo que quiero saber: Diagnóstico participativo.<br>
+          <strong>E.</strong> Organicemos las actividades: Planificación pedagógica y social.`,
+        opciones: [
+          { letra: "A", texto: "A → C → E → D → B" },
+          { letra: "B", texto: "C → D → E → A → B" },
+          { letra: "C", texto: "D → E → C → B → A" }
+        ],
+        correcta: "B",
+        feedback: "Las 5 fases del AS en orden son: 1) Punto de partida: Sensibilización (C) → 2) Diagnóstico participativo (D) → 3) Planificación pedagógica y social (E) → 4) Creatividad en marcha: Puesta en práctica (A) → 5) Evaluación final de resultados (B)."
+      },
+      {
+        tipo: "🔢 Ordenamiento",
+        enunciado: `Ordene los elementos del Diseño Creativo según el flujo: desde el documento institucional hasta la práctica en el aula:
+          <br><br>
+          <strong>1.</strong> Plano Didáctico (secuencia de actividades en el aula con metodologías activas).<br>
+          <strong>2.</strong> Programa Sintético (documento oficial de la SEP).<br>
+          <strong>3.</strong> Lectura de la Realidad (diagnóstico del contexto socioeducativo).<br>
+          <strong>4.</strong> Programa Analítico (contextualización y codiseño de contenidos).`,
+        opciones: [
+          { letra: "A", texto: "3 → 2 → 4 → 1" },
+          { letra: "B", texto: "2 → 3 → 4 → 1" },
+          { letra: "C", texto: "4 → 1 → 2 → 3" }
+        ],
+        correcta: "B",
+        feedback: "El flujo del Diseño Creativo es: Programa Sintético (lo que entrega la SEP) → Lectura de la Realidad (el maestro analiza su contexto) → Programa Analítico (contextualiza y codiseña) → Plano Didáctico (lleva todo al aula con metodologías activas). El maestro es el prisma que transforma lo sintético en analítico."
+      },
+
+      /* ══════════════════════════════════════════════
+         RELACIÓN DE ELEMENTOS — Preguntas 30 a 35
+      ══════════════════════════════════════════════ */
+
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione cada metodología sociocrítica con su enfoque principal según la Matriz de Síntesis:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Metodología</th><th>Enfoque Principal</th></tr>
+            <tr><td>1. Proyectos Comunitarios</td><td>a) Análisis profundo de causas y efectos.</td></tr>
+            <tr><td>2. Indagación STEAM</td><td>b) Acción solidaria y protagonismo social.</td></tr>
+            <tr><td>3. ABP</td><td>c) Exploración comunitaria y múltiples lenguajes.</td></tr>
+            <tr><td>4. Aprendizaje Servicio</td><td>d) Ciencia, tecnología, ingeniería, matemáticas + artes.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1c, 2d, 3a, 4b" },
+          { letra: "B", texto: "1d, 2c, 3b, 4a" },
+          { letra: "C", texto: "1a, 2b, 3d, 4c" }
+        ],
+        correcta: "A",
+        feedback: "Según la Matriz de Síntesis: Proyectos Comunitarios → Exploración comunitaria y múltiples lenguajes (c). Indagación STEAM → Ciencia, tecnología, ingeniería, matemáticas + artes (d). ABP → Análisis profundo de causas y efectos (a). Aprendizaje Servicio → Acción solidaria y protagonismo social (b)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione la estructura clave de cada metodología con su número de componentes y descripción según la Matriz de Síntesis:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Metodología</th><th>Estructura Clave</th></tr>
+            <tr><td>1. Proyectos Comunitarios</td><td>a) 6 Momentos secuenciales de análisis.</td></tr>
+            <tr><td>2. STEAM</td><td>b) 5 Etapas desde sensibilización hasta evaluación social.</td></tr>
+            <tr><td>3. ABP</td><td>c) 5 Fases de indagación + Proceso de diseño de ingeniería.</td></tr>
+            <tr><td>4. Aprendizaje Servicio</td><td>d) 3 Fases (Planeación, Acción, Intervención) con 11 momentos.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1d, 2c, 3a, 4b" },
+          { letra: "B", texto: "1c, 2a, 3d, 4b" },
+          { letra: "C", texto: "1a, 2b, 3c, 4d" }
+        ],
+        correcta: "A",
+        feedback: "Estructuras según la Matriz de Síntesis: Proyectos Comunitarios → 3 Fases y 11 Momentos (d). STEAM → 5 Fases de indagación + Diseño de ingeniería (c). ABP → 6 Momentos secuenciales (a). Aprendizaje Servicio → 5 Etapas desde sensibilización hasta evaluación social (b)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione la fase del Proyecto Comunitario con el momento específico que le corresponde:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Fase</th><th>Momento específico</th></tr>
+            <tr><td>1. Planeación</td><td>a) Momento 9: Difusión (presentación del producto final).</td></tr>
+            <tr><td>2. Acción</td><td>b) Momento 2: Recuperación (vincular conocimientos previos).</td></tr>
+            <tr><td>3. Intervención</td><td>c) Momento 5: Comprensión y producción.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1c, 2b, 3a" },
+          { letra: "B", texto: "1a, 2c, 3b" },
+          { letra: "C", texto: "1b, 2c, 3a" }
+        ],
+        correcta: "C",
+        feedback: "Planeación incluye los momentos 1-3: el Momento 2 (Recuperación) es de Planeación (b). Acción incluye momentos 4-7: el Momento 5 (Comprensión y producción) es de Acción (c). Intervención incluye momentos 8-11: el Momento 9 (Difusión) es de Intervención (a)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione el nivel del Diseño Creativo con su plano correspondiente y su descripción:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Nivel</th><th>Plano y descripción</th></tr>
+            <tr><td>1. Macro (Base Ancha)</td><td>a) Plano Didáctico: secuencia de actividades y evaluación formativa en el aula.</td></tr>
+            <tr><td>2. Meso (Filtro Intermedio)</td><td>b) Lectura de la Realidad (Plano 1): diagnóstico del contexto socioeducativo.</td></tr>
+            <tr><td>3. Micro (Vértice de Acción)</td><td>c) Programa Analítico (Planos 2 y 3): contextualización y codiseño.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1c, 2b, 3a" },
+          { letra: "B", texto: "1b, 2c, 3a" },
+          { letra: "C", texto: "1a, 2c, 3b" }
+        ],
+        correcta: "B",
+        feedback: "Macro = Lectura de la Realidad/Plano 1 (b); es la base ancha del embudo, el análisis del contexto socioeducativo. Meso = Programa Analítico/Planos 2 y 3 (c); es el filtro que contextualiza y codiseña. Micro = Plano Didáctico (a); es el vértice de acción donde se implementa todo en el aula."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione la fase del Aprendizaje Servicio con la actividad que le corresponde:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Fase del AS</th><th>Actividad principal</th></tr>
+            <tr><td>1. Diagnóstico participativo</td><td>a) Monitoreo del contenido curricular y del servicio; interacción entre alumnos, maestros y familia.</td></tr>
+            <tr><td>2. Creatividad en marcha</td><td>b) Recabar información, escuchar a la comunidad, identificar aliados y recursos disponibles.</td></tr>
+            <tr><td>3. Evaluación final</td><td>c) Logros académicos + cumplimiento de objetivos de servicio, autoevaluación y reflexión.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1a, 2b, 3c" },
+          { letra: "B", texto: "1c, 2a, 3b" },
+          { letra: "C", texto: "1b, 2a, 3c" }
+        ],
+        correcta: "C",
+        feedback: "Diagnóstico participativo → recabar información, escuchar a la comunidad, identificar aliados y recursos (b). Creatividad en marcha (Puesta en práctica) → monitoreo del contenido curricular y del servicio, interacción entre alumnos, maestros y familia (a). Evaluación final → logros académicos + objetivos de servicio, autoevaluación y reflexión (c)."
+      },
+      {
+        tipo: "🔗 Relación de Elementos",
+        enunciado: `Relacione el principio del ABP con su descripción correcta:
+          <br><br>
+          <table class="tabla-relacion">
+            <tr><th>Principio ABP</th><th>Descripción</th></tr>
+            <tr><td>1. Perspectivas Interrelacionadas</td><td>a) Forma ciudadanos responsables de su comunidad y de la naturaleza.</td></tr>
+            <tr><td>2. Pensamiento Crítico</td><td>b) Conecta disciplinas aparentemente inconexas para entender la naturaleza multifactorial del problema.</td></tr>
+            <tr><td>3. Sujetos Solidarios</td><td>c) Genera distintas propuestas de solución analíticas ante el problema detectado.</td></tr>
+          </table>`,
+        opciones: [
+          { letra: "A", texto: "1c, 2a, 3b" },
+          { letra: "B", texto: "1b, 2c, 3a" },
+          { letra: "C", texto: "1a, 2b, 3c" }
+        ],
+        correcta: "B",
+        feedback: "Los 3 principios del ABP son: Perspectivas Interrelacionadas → conecta disciplinas inconexas para entender la naturaleza multifactorial del problema (b). Pensamiento Crítico → genera distintas propuestas de solución analíticas (c). Sujetos Solidarios → forma ciudadanos responsables de su comunidad y de la naturaleza (a)."
+      }
+
+    ]; // ← Fin del banco de 35 preguntas
+
+
+    /* ============================================================
+       VARIABLES DE ESTADO
+    ============================================================ */
+    let preguntaActual = 0;
+    let respuestas   = new Array(preguntas.length).fill(null);
+    let respondidas  = new Array(preguntas.length).fill(false);
+    let nombreUsuario = '';     // guardamos el nombre ingresado
+
+    /* ============================================================
+       TEMPORIZADOR DE 60 MINUTOS
+    ============================================================ */
+    const TIEMPO_TOTAL    = 60 * 60;   // 3600 segundos
+    let segundosRestantes = TIEMPO_TOTAL;
+    let intervaloTimer    = null;
+
+    /** Formatea segundos como MM:SS */
+    function formatearTiempo(seg) {
+      const m = Math.floor(seg / 60);
+      const s = seg % 60;
+      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+
+    /** Inicia el contador y actualiza el DOM cada segundo */
+    function iniciarTimer() {
+      segundosRestantes = TIEMPO_TOTAL;
+      if (intervaloTimer) clearInterval(intervaloTimer);
+
+      const bar      = document.getElementById('timer-bar');
+      bar.style.display = 'flex';
+
+      // Mostrar nombre en la barra del timer
+      document.getElementById('timer-nombre-txt').textContent =
+        '👤 ' + nombreUsuario;
+
+      const displayEl = document.getElementById('timer-display');
+      displayEl.className = 'timer-display';
+      document.getElementById('timer-agotado').style.display = 'none';
+      document.getElementById('timer-texto').textContent = formatearTiempo(TIEMPO_TOTAL);
+      const progEl = document.getElementById('timer-prog');
+      progEl.style.width = '100%';
+      progEl.style.background = 'linear-gradient(90deg, var(--azul-claro), var(--azul-medio))';
+
+      intervaloTimer = setInterval(() => {
+        segundosRestantes--;
+        const pct = (segundosRestantes / TIEMPO_TOTAL) * 100;
+        document.getElementById('timer-texto').textContent =
+          formatearTiempo(Math.max(0, segundosRestantes));
+        progEl.style.width = Math.max(0, pct) + '%';
+
+        // Cambios de color por urgencia
+        if (segundosRestantes <= 10 * 60 && segundosRestantes > 5 * 60) {
+          displayEl.className = 'timer-display advertencia';
+          progEl.style.background = 'linear-gradient(90deg,#e08a2a,#b55e00)';
+        } else if (segundosRestantes <= 5 * 60 && segundosRestantes > 0) {
+          displayEl.className = 'timer-display urgente';
+          progEl.style.background = 'linear-gradient(90deg,#e05252,#b52a2a)';
+        }
+
+        // Tiempo agotado
+        if (segundosRestantes <= 0) {
+          clearInterval(intervaloTimer);
+          document.getElementById('timer-texto').textContent = '00:00';
+          progEl.style.width = '0%';
+          document.getElementById('timer-agotado').style.display = 'inline';
+          displayEl.className = 'timer-display urgente';
+          document.getElementById('modal-tiempo').classList.add('activo');
+        }
+      }, 1000);
+    }
+
+    /** Detiene el contador */
+    function detenerTimer() {
+      if (intervaloTimer) { clearInterval(intervaloTimer); intervaloTimer = null; }
+    }
+
+    /** Cierra el modal y va a resultados */
+    function cerrarModalYResultados() {
+      document.getElementById('modal-tiempo').classList.remove('activo');
+      mostrarResultados();
+    }
+
+    /* ============================================================
+       VALIDAR NOMBRE E INICIAR
+    ============================================================ */
+    function validarNombreEIniciar() {
+      const inputNombre = document.getElementById('input-nombre');
+      const errorEl     = document.getElementById('error-nombre');
+      const nombre      = inputNombre.value.trim();
+
+      // Validación: al menos 2 caracteres
+      if (nombre.length < 2) {
+        errorEl.style.display = 'block';
+        inputNombre.focus();
+        return;
+      }
+
+      errorEl.style.display = 'none';
+      nombreUsuario = nombre;
+      iniciarSimulador();
+    }
+
+    // También iniciar al presionar Enter en el campo de nombre
+    document.getElementById('input-nombre').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') validarNombreEIniciar();
+    });
+
+    /* ============================================================
+       INICIAR SIMULADOR
+    ============================================================ */
+    function iniciarSimulador() {
+      document.getElementById('pantalla-inicio').style.display    = 'none';
+      document.getElementById('pantalla-simulador').style.display = 'block';
+      respuestas   = new Array(preguntas.length).fill(null);
+      respondidas  = new Array(preguntas.length).fill(false);
+      preguntaActual = 0;
+      iniciarTimer();
+      renderizarPregunta();
+    }
+
+    /* ============================================================
+       RENDERIZAR LA PREGUNTA ACTIVA
+    ============================================================ */
+    function renderizarPregunta() {
+      const p            = preguntas[preguntaActual];
+      const yaRespondida = respondidas[preguntaActual];
+      const respGuardada = respuestas[preguntaActual];
+
+      // Actualizar barra de progreso de preguntas
+      const pct = ((preguntaActual + 1) / preguntas.length) * 100;
+      document.getElementById('barra-relleno').style.width = pct + '%';
+      document.getElementById('progreso-num').textContent =
+        (preguntaActual + 1) + ' / ' + preguntas.length;
+
+      // Construir opciones HTML
+      let opcionesHTML = '';
+      p.opciones.forEach(op => {
+        let cls = '', dis = '';
+        if (yaRespondida) {
+          dis = 'disabled';
+          if (op.letra === p.correcta)          cls = 'correcta';
+          else if (op.letra === respGuardada)   cls = 'incorrecta';
+        }
+        opcionesHTML += `
+          <li>
+            <button class="opcion-btn ${cls}" onclick="seleccionarRespuesta('${op.letra}')" ${dis}>
+              <span class="opcion-letra">${op.letra}</span>
+              <span>${op.texto}</span>
+            </button>
+          </li>`;
+      });
+
+      // Retroalimentación
+      let retroClass = '', retroHTML = '', retroVisible = '';
+      if (yaRespondida) {
+        retroVisible = 'visible';
+        if (respGuardada === p.correcta) {
+          retroClass = 'correcto';
+          retroHTML  = `<strong>✅ ¡Correcto!</strong> ${p.feedback}`;
+        } else {
+          retroClass = 'incorrecto';
+          retroHTML  = `<strong>❌ Incorrecto.</strong> La respuesta correcta es la opción <strong>${p.correcta}</strong>. ${p.feedback}`;
+        }
+      }
+
+      document.getElementById('contenedor-pregunta').innerHTML = `
+        <div class="tarjeta-pregunta">
+          <span class="tipo-reactivo">${p.tipo}</span>
+          <p class="num-pregunta">Pregunta ${preguntaActual + 1} de ${preguntas.length}</p>
+          <p class="enunciado-pregunta">${p.enunciado}</p>
+          <ul class="opciones-lista">${opcionesHTML}</ul>
+          <div class="retroalimentacion ${retroClass} ${retroVisible}">${retroHTML}</div>
+        </div>`;
+
+      document.getElementById('btn-anterior').disabled = (preguntaActual === 0);
+      actualizarBotonSiguiente();
+    }
+
+    /** Actualiza el texto del botón Siguiente */
+    function actualizarBotonSiguiente() {
+      const btn    = document.getElementById('btn-siguiente');
+      const esUlti = (preguntaActual === preguntas.length - 1);
+      btn.textContent = esUlti ? '📊 Ver resultados' : 'Siguiente →';
+      btn.disabled    = esUlti && !respondidas[preguntaActual];
+    }
+
+    /* ============================================================
+       SELECCIONAR RESPUESTA
+    ============================================================ */
+    function seleccionarRespuesta(letra) {
+      if (respondidas[preguntaActual]) return;
+      respuestas[preguntaActual]  = letra;
+      respondidas[preguntaActual] = true;
+      renderizarPregunta();
+    }
+
+    /* ============================================================
+       NAVEGACIÓN
+    ============================================================ */
+    function preguntaSiguiente() {
+      if (preguntaActual < preguntas.length - 1) {
+        preguntaActual++;
+        renderizarPregunta();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        mostrarResultados();
+      }
+    }
+    function preguntaAnterior() {
+      if (preguntaActual > 0) {
+        preguntaActual--;
+        renderizarPregunta();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ============================================================
+       MOSTRAR RESULTADOS — contenido dinámico generado por JS
+       El nombre del usuario aparece en el encabezado de resultados
+    ============================================================ */
+    function mostrarResultados() {
+      detenerTimer();
+
+      let correctas = 0;
+      respuestas.forEach((r, i) => { if (r === preguntas[i].correcta) correctas++; });
+
+      const incorrectas = preguntas.length - correctas;
+      const porcentaje  = Math.round((correctas / preguntas.length) * 100);
+
+      // Mensaje personalizado por nivel de desempeño
+      let titulo, desc;
+      if (porcentaje >= 90) {
+        titulo = '🏆 ¡Excelente dominio!';
+        desc   = 'Dominas a la perfección las Metodologías Sociocríticas y el Diseño Creativo de la NEM. ¡Estás list@ para el instrumento!';
+      } else if (porcentaje >= 70) {
+        titulo = '👍 ¡Buen trabajo!';
+        desc   = 'Tienes una comprensión sólida. Repasa las fases del Proyecto Comunitario, el Ciclo STEAM y los Planos del Diseño Creativo para reforzar.';
+      } else if (porcentaje >= 50) {
+        titulo = '📚 En proceso de consolidación';
+        desc   = 'Vas bien encaminad@. Revisa la Matriz de Síntesis Metodológica y los momentos del ABP y el AS con más detalle.';
+      } else {
+        titulo = '💪 ¡Sigue estudiando!';
+        desc   = 'No te desanimes. Regresa a la Guía de estudio, visualiza los mapas de cada metodología y vuelve a intentarlo.';
+      }
+
+      // Actualizar DOM (contenido dinámico JavaScript)
+      document.getElementById('resultado-saludo').textContent  = '📋 Resultado de: ' + nombreUsuario;
+      document.getElementById('score-num').textContent         = correctas;
+      document.getElementById('resultado-titulo').textContent  = titulo;
+      document.getElementById('resultado-desc').textContent    = desc;
+      document.getElementById('res-correctas').textContent     = correctas;
+      document.getElementById('res-incorrectas').textContent   = incorrectas;
+      document.getElementById('res-porcentaje').textContent    = porcentaje + '%';
+
+      document.getElementById('pantalla-simulador').style.display  = 'none';
+      document.getElementById('pantalla-resultados').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ============================================================
+       REINICIAR (conserva el nombre del usuario ya ingresado)
+    ============================================================ */
+    function reiniciarSimulador() {
+      respuestas   = new Array(preguntas.length).fill(null);
+      respondidas  = new Array(preguntas.length).fill(false);
+      preguntaActual = 0;
+      document.getElementById('pantalla-resultados').style.display = 'none';
+      document.getElementById('pantalla-simulador').style.display  = 'block';
+      iniciarTimer();
+      renderizarPregunta();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+  </script>
+</body>
+</html>
